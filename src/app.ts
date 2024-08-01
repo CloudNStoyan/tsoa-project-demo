@@ -8,9 +8,9 @@ import express, {
 import swaggerUi from "swagger-ui-express";
 
 import { ValidateError } from "tsoa";
-import { RegisterRoutes } from "./generated/routes";
-import { AuthError } from "./auth";
-import swaggerDoc from "./generated/swagger.json";
+import { RegisterRoutes } from "./generated/routes.js";
+import { AuthError } from "./auth.js";
+import swaggerDoc from "./generated/swagger.json" with {type: "json"};
 
 export const app = express();
 

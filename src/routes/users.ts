@@ -11,7 +11,7 @@ import {
   Body,
   Tags,
 } from "tsoa";
-import { customLog } from "../middlewares/custom-log";
+import { customLog } from "../middlewares/custom-log.js";
 
 interface ApiError {
   status: number;

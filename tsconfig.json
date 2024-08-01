@@ -1,19 +1,19 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "target": "es2021",
+    "target": "ESNext",
     "module": "NodeNext",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
 
     "moduleResolution": "NodeNext",
-
+    "experimentalDecorators": true,
     "resolveJsonModule": true,
     "outDir": "dist",
-    /* Type Checking */
-    "strict": true /* Enable all strict type-checking options. */,
 
-    /* Completeness */
-    "skipLibCheck": true /* Skip type checking all .d.ts files. */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "pretty": true
   }
 }

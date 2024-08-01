@@ -1,9 +1,9 @@
 {
   "name": "tsoa-project-demo",
   "version": "1.0.0",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
-    "convert-swagger": "node convert-swagger-to-yaml.mjs",
+    "convert-swagger": "node convert-swagger-to-yaml.js",
     "generate-spec-and-routes": "tsoa spec-and-routes && npm run convert-swagger",
     "dev": "concurrently \"nodemon\" \"nodemon -x npm run generate-spec-and-routes\"",
     "build": "rimraf ./dist && npm run generate-spec-and-routes && tsc",
