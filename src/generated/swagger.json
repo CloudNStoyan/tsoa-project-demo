@@ -1,0 +1,459 @@
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"UUID": {
+				"type": "string",
+				"example": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
+				"format": "uuid",
+				"description": "Stringified UUIDv4.\r\nSee [RFC 4112](https://tools.ietf.org/html/rfc4122)",
+				"pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}"
+			},
+			"UserFromGroup": {
+				"description": "User objects allow you to associate actions performed\r\nin the system with the user that performed them.\r\nThe User object contains common information across\r\nevery user in the system regardless of status and role.",
+				"properties": {
+					"id": {
+						"$ref": "#/components/schemas/UUID"
+					},
+					"email": {
+						"type": "string",
+						"description": "The email the user used to register his account"
+					},
+					"name": {
+						"type": "string",
+						"description": "The name the user used to register his account"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"Happy",
+							"Sad"
+						],
+						"description": "The happiness status of the user"
+					},
+					"phoneNumbers": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array",
+						"description": "The phone numbers associated with the user"
+					},
+					"groupId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				},
+				"required": [
+					"id",
+					"email",
+					"name",
+					"phoneNumbers",
+					"groupId"
+				],
+				"type": "object",
+				"additionalProperties": false,
+				"example": {
+					"id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
+					"email": "jane@doe.com",
+					"name": "Jane Doe",
+					"status": "Sad",
+					"phoneNumbers": [],
+					"groupId": 1
+				}
+			},
+			"ApiError": {
+				"properties": {
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"User": {
+				"properties": {
+					"id": {
+						"$ref": "#/components/schemas/UUID"
+					},
+					"email": {
+						"type": "string",
+						"description": "The email the user used to register his account"
+					},
+					"name": {
+						"type": "string",
+						"description": "The name the user used to register his account"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"Happy",
+							"Sad"
+						],
+						"description": "The happiness status of the user"
+					},
+					"phoneNumbers": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array",
+						"description": "The phone numbers associated with the user"
+					}
+				},
+				"required": [
+					"id",
+					"email",
+					"name",
+					"phoneNumbers"
+				],
+				"type": "object",
+				"additionalProperties": false,
+				"example": {
+					"id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
+					"email": "jane@doe.com",
+					"name": "Jane Doe",
+					"status": "Sad",
+					"phoneNumbers": []
+				}
+			}
+		},
+		"securitySchemes": {
+			"api_key": {
+				"type": "apiKey",
+				"name": "access_token",
+				"in": "query"
+			}
+		}
+	},
+	"info": {
+		"title": "tsoa-project-demo",
+		"version": "1.0.0",
+		"contact": {}
+	},
+	"paths": {
+		"/users/{groupId}/all": {
+			"get": {
+				"operationId": "GetUsers",
+				"responses": {
+					"200": {
+						"description": "An array with User Objects",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/UserFromGroup"
+									},
+									"type": "array"
+								},
+								"examples": {
+									"An example of Users": {
+										"value": [
+											{
+												"id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
+												"email": "jane@doe.com",
+												"name": "Jane Doe",
+												"status": "Happy",
+												"phoneNumbers": [],
+												"groupId": 1
+											},
+											{
+												"id": "c421afa9-08c7-491a-90a1-575bb656cffd",
+												"email": "john@doe.com",
+												"name": "John Doe",
+												"status": "Sad",
+												"phoneNumbers": [],
+												"groupId": 1
+											}
+										]
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiError"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 401,
+											"message": "Access denied!"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiError"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 404,
+											"message": "Users with this groupId have not be found!"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Retrieves the details of users.\r\nSupply the unique group ID from either and receive corresponding user details.",
+				"summary": "Retrieve details of users",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "The group's identifier",
+						"in": "path",
+						"name": "groupId",
+						"required": true,
+						"schema": {
+							"format": "int32",
+							"type": "integer"
+						}
+					},
+					{
+						"description": "Provide a limit to the result",
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "int32",
+							"type": "integer"
+						}
+					}
+				]
+			}
+		},
+		"/users/{userId}": {
+			"get": {
+				"operationId": "GetUser",
+				"responses": {
+					"200": {
+						"description": "details of the user in the form of an User Object",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/User"
+										},
+										{
+											"$ref": "#/components/schemas/ApiError"
+										}
+									]
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiError"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 401,
+											"message": "Access denied!"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiError"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 404,
+											"message": "User not found!"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Retrieves the details of a user.\r\nSupply the unique user ID from either and receive corresponding user details.",
+				"summary": "Retrieve details of a user",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "The user's identifier",
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/UUID"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "UpdateUser",
+				"responses": {
+					"200": {
+						"description": "the updated details of the user",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/User"
+										},
+										{
+											"$ref": "#/components/schemas/ApiError"
+										}
+									]
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiError"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 401,
+											"message": "Access denied!"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiError"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": 404,
+											"message": "User not found!"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Update the details of a user.\r\nSupply the unique user ID from either and receive corresponding user details.",
+				"summary": "Update details of a user",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "The user's identifier",
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/UUID"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/User"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/secure": {
+			"get": {
+				"operationId": "GetTreasure",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Secure"
+				],
+				"security": [
+					{
+						"api_key": [
+							"cat",
+							"dog"
+						]
+					}
+				],
+				"parameters": []
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	],
+	"tags": [
+		{
+			"name": "User",
+			"description": "Operations about users",
+			"externalDocs": {
+				"description": "Find out more about users",
+				"url": "http://swagger.io"
+			}
+		}
+	]
+}

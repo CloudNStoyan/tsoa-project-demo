@@ -2,5 +2,5 @@
   "exec": "ts-node src/server.ts",
   "watch": ["src"],
   "ext": "ts",
-  "ignore": ["src/swagger.json", "src/routes.ts"]
+  "ignore": ["src/generated"]
 }

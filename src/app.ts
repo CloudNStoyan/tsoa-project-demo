@@ -8,8 +8,9 @@ import express, {
 import swaggerUi from "swagger-ui-express";
 
 import { ValidateError } from "tsoa";
-import { RegisterRoutes } from "./routes";
-import swaggerDoc from "./swagger.json";
+import { RegisterRoutes } from "./generated/routes";
+import { AuthError } from "./auth";
+import swaggerDoc from "./generated/swagger.json";
 
 export const app = express();
 
@@ -40,9 +41,12 @@ app.use(function ErrorHandler(
     });
   }
 
-  console.log("cat");
+  if (err instanceof AuthError) {
+    return res.status(401).json({ status: 401, message: "Access denied!" });
+  }
 
   if (err instanceof Error) {
+    console.error(err);
     return res.status(500).json({
       message: "Internal Server Error",
     });

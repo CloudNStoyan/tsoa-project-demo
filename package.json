@@ -1,15 +1,19 @@
 {
   "name": "tsoa-project-demo",
   "version": "1.0.0",
+  "type": "commonjs",
   "scripts": {
-    "dev": "concurrently \"nodemon\" \"nodemon -x tsoa spec-and-routes\"",
-    "build": "rimraf ./dist && tsoa spec-and-routes && tsc",
+    "convert-swagger": "node convert-swagger-to-yaml.mjs",
+    "generate-spec-and-routes": "tsoa spec-and-routes && npm run convert-swagger",
+    "dev": "concurrently \"nodemon\" \"nodemon -x npm run generate-spec-and-routes\"",
+    "build": "rimraf ./dist && npm run generate-spec-and-routes && tsc",
     "start": "npm run build && node dist/server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
     "swagger-ui-express": "^5.0.1",
-    "tsoa": "^6.4.0"
+    "tsoa": "^6.4.0",
+    "yaml": "^2.5.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
