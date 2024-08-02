@@ -96,6 +96,10 @@ const data: User[] = [
   },
 ];
 
+@Response<ApiError>(401, 'Unauthorized', {
+  status: 401,
+  message: 'Access denied!',
+})
 @Route('users')
 @Middlewares(customLog)
 @Tags('User')
@@ -135,10 +139,6 @@ export class UserController extends Controller {
     status: 404,
     message: 'Users with this groupId have not be found!',
   })
-  @Response<ApiError>(401, 'Unauthorized', {
-    status: 401,
-    message: 'Access denied!',
-  })
   @Get('{groupId}/all')
   public async getUsers(
     @Path() groupId: number,
@@ -164,10 +164,6 @@ export class UserController extends Controller {
     status: 404,
     message: 'User not found!',
   })
-  @Response<ApiError>(401, 'Unauthorized', {
-    status: 401,
-    message: 'Access denied!',
-  })
   @Get('{userId}')
   public async getUser(@Path() userId: UUID): Promise<User | ApiError> {
     const user = data.find((u) => u.id === userId);
@@ -190,10 +186,6 @@ export class UserController extends Controller {
   @Response<ApiError>(404, 'Not Found', {
     status: 404,
     message: 'User not found!',
-  })
-  @Response<ApiError>(401, 'Unauthorized', {
-    status: 401,
-    message: 'Access denied!',
   })
   @Put('{userId}')
   public async updateUser(

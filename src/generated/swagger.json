@@ -7,6 +7,20 @@
     "requestBodies": {},
     "responses": {},
     "schemas": {
+      "ApiError": {
+        "properties": {
+          "status": {
+            "type": "number",
+            "format": "double"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["status", "message"],
+        "type": "object",
+        "additionalProperties": false
+      },
       "UUID": {
         "type": "string",
         "example": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
@@ -56,20 +70,6 @@
           "phoneNumbers": [],
           "groupId": 1
         }
-      },
-      "ApiError": {
-        "properties": {
-          "status": {
-            "type": "number",
-            "format": "double"
-          },
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": ["status", "message"],
-        "type": "object",
-        "additionalProperties": false
       },
       "User": {
         "properties": {
