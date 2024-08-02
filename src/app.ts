@@ -10,7 +10,6 @@ import swaggerUi from 'swagger-ui-express';
 import { ValidateError } from 'tsoa';
 import { RegisterRoutes } from './generated/routes.js';
 import { AuthError } from './auth.js';
-import swaggerDoc from './generated/swagger.json' with { type: 'json' };
 
 export const app = express();
 
@@ -22,7 +21,18 @@ app.use(
 
 app.use(json());
 
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+app.use(
+  '/docs',
+  swaggerUi.serve,
+  async (_req: ExpressRequest, res: ExpressResponse) => {
+    return res.send(
+      swaggerUi.generateHTML(
+        (await import('./generated/swagger.json', { with: { type: 'json' } }))
+          .default
+      )
+    );
+  }
+);
 
 RegisterRoutes(app);
 

@@ -155,7 +155,7 @@ paths:
                     status: 401
                     message: Access denied!
         '404':
-          description: Not found
+          description: Not Found
           content:
             application/json:
               schema:
@@ -213,7 +213,7 @@ paths:
                     status: 401
                     message: Access denied!
         '404':
-          description: Not found
+          description: Not Found
           content:
             application/json:
               schema:
@@ -262,7 +262,7 @@ paths:
                     status: 401
                     message: Access denied!
         '404':
-          description: Not found
+          description: Not Found
           content:
             application/json:
               schema:
