@@ -320,6 +320,39 @@ paths:
             - cat
             - dog
       parameters: []
+  /cats/add:
+    post:
+      operationId: PostCat
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: string
+      tags:
+        - Cat
+      security: []
+      parameters: []
+  /cats/{catId}:
+    post:
+      operationId: PostCatId
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: string
+      tags:
+        - Cat
+      security: []
+      parameters:
+        - in: path
+          name: catId
+          required: true
+          schema:
+            type: string
 servers:
   - url: /
 tags:

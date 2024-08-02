@@ -10,6 +10,8 @@ import {
 import { UserController } from './../routes/users.js';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { SecureController } from './../routes/secure.js';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { CatController } from './../routes/cat.js';
 import { expressAuthentication } from './../auth.js';
 // @ts-ignore - no great way to install types from subpackage
 import type {
@@ -293,6 +295,89 @@ export function RegisterRoutes(app: Router) {
 
         await templateService.apiHandler({
           methodName: 'getTreasure',
+          controller,
+          response,
+          next,
+          validatedArgs,
+          successStatus: undefined,
+        });
+      } catch (err) {
+        return next(err);
+      }
+    }
+  );
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  app.post(
+    '/cats/add',
+    ...fetchMiddlewares<RequestHandler>(CatController),
+    ...fetchMiddlewares<RequestHandler>(CatController.prototype.postCat),
+
+    async function CatController_postCat(
+      request: ExRequest,
+      response: ExResponse,
+      next: any
+    ) {
+      const args: Record<string, TsoaRoute.ParameterSchema> = {};
+
+      // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+      let validatedArgs: any[] = [];
+      try {
+        validatedArgs = templateService.getValidatedArgs({
+          args,
+          request,
+          response,
+        });
+
+        const controller = new CatController();
+
+        await templateService.apiHandler({
+          methodName: 'postCat',
+          controller,
+          response,
+          next,
+          validatedArgs,
+          successStatus: undefined,
+        });
+      } catch (err) {
+        return next(err);
+      }
+    }
+  );
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  app.post(
+    '/cats/:catId',
+    ...fetchMiddlewares<RequestHandler>(CatController),
+    ...fetchMiddlewares<RequestHandler>(CatController.prototype.postCatId),
+
+    async function CatController_postCatId(
+      request: ExRequest,
+      response: ExResponse,
+      next: any
+    ) {
+      const args: Record<string, TsoaRoute.ParameterSchema> = {
+        catId: {
+          in: 'path',
+          name: 'catId',
+          required: true,
+          dataType: 'string',
+        },
+      };
+
+      // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+      let validatedArgs: any[] = [];
+      try {
+        validatedArgs = templateService.getValidatedArgs({
+          args,
+          request,
+          response,
+        });
+
+        const controller = new CatController();
+
+        await templateService.apiHandler({
+          methodName: 'postCatId',
           controller,
           response,
           next,
