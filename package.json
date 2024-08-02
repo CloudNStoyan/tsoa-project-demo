@@ -4,10 +4,12 @@
   "type": "module",
   "scripts": {
     "convert-swagger": "node convert-swagger-to-yaml.js",
-    "generate-spec-and-routes": "tsoa spec-and-routes && npm run convert-swagger",
-    "dev": "concurrently \"nodemon\" \"nodemon -x npm run generate-spec-and-routes\"",
-    "build": "rimraf ./dist && npm run generate-spec-and-routes && tsc",
-    "start": "npm run build && node dist/server.js"
+    "generate": "tsoa spec-and-routes && npm run convert-swagger && npm run format",
+    "dev": "concurrently \"nodemon\" \"nodemon -x npm run generate\"",
+    "build": "rimraf ./dist && npm run generate && tsc",
+    "start": "npm run build && node dist/server.js",
+    "format": "prettier --cache --write .",
+    "format-check": "prettier --cache --check ."
   },
   "dependencies": {
     "express": "^4.19.2",
@@ -21,6 +23,7 @@
     "@types/swagger-ui-express": "^4.1.6",
     "concurrently": "^8.2.2",
     "nodemon": "^3.1.4",
+    "prettier": "^3.3.3",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"

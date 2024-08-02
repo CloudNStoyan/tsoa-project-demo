@@ -10,8 +10,8 @@ import {
   Put,
   Body,
   Tags,
-} from "tsoa";
-import { customLog } from "../middlewares/custom-log.js";
+} from 'tsoa';
+import { customLog } from '../middlewares/custom-log.js';
 
 interface ApiError {
   status: number;
@@ -50,7 +50,7 @@ interface User {
   /**
    * The happiness status of the user
    */
-  status?: "Happy" | "Sad";
+  status?: 'Happy' | 'Sad';
 
   /**
    * The phone numbers associated with the user
@@ -81,24 +81,24 @@ interface UserFromGroup extends User {
 
 const data: User[] = [
   {
-    id: "66ef17a1-af37-4f7b-8e82-b341e0241a30",
-    email: "jane@doe.com",
-    name: "Jane Doe",
-    status: "Happy",
+    id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
+    email: 'jane@doe.com',
+    name: 'Jane Doe',
+    status: 'Happy',
     phoneNumbers: [],
   },
   {
-    id: "c421afa9-08c7-491a-90a1-575bb656cffd",
-    email: "john@doe.com",
-    name: "John Doe",
-    status: "Sad",
+    id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
+    email: 'john@doe.com',
+    name: 'John Doe',
+    status: 'Sad',
     phoneNumbers: [],
   },
 ];
 
-@Route("users")
+@Route('users')
 @Middlewares(customLog)
-@Tags("User")
+@Tags('User')
 export class UserController extends Controller {
   /**
    * Retrieves the details of users.
@@ -113,33 +113,33 @@ export class UserController extends Controller {
   @Example<UserFromGroup[]>(
     [
       {
-        id: "66ef17a1-af37-4f7b-8e82-b341e0241a30",
-        email: "jane@doe.com",
-        name: "Jane Doe",
-        status: "Happy",
+        id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
+        email: 'jane@doe.com',
+        name: 'Jane Doe',
+        status: 'Happy',
         phoneNumbers: [],
         groupId: 1,
       },
       {
-        id: "c421afa9-08c7-491a-90a1-575bb656cffd",
-        email: "john@doe.com",
-        name: "John Doe",
-        status: "Sad",
+        id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
+        email: 'john@doe.com',
+        name: 'John Doe',
+        status: 'Sad',
         phoneNumbers: [],
         groupId: 1,
       },
     ],
-    "An example of Users"
+    'An example of Users'
   )
-  @Response<ApiError>(404, "Not found", {
+  @Response<ApiError>(404, 'Not Found', {
     status: 404,
-    message: "Users with this groupId have not be found!",
+    message: 'Users with this groupId have not be found!',
   })
-  @Response<ApiError>(401, "Unauthorized", {
+  @Response<ApiError>(401, 'Unauthorized', {
     status: 401,
-    message: "Access denied!",
+    message: 'Access denied!',
   })
-  @Get("{groupId}/all")
+  @Get('{groupId}/all')
   public async getUsers(
     @Path() groupId: number,
     @Query() limit?: number
@@ -160,21 +160,21 @@ export class UserController extends Controller {
    * @returns details of the user in the form of an User Object
    * @summary Retrieve details of a user
    */
-  @Response<ApiError>(404, "Not found", {
+  @Response<ApiError>(404, 'Not Found', {
     status: 404,
-    message: "User not found!",
+    message: 'User not found!',
   })
-  @Response<ApiError>(401, "Unauthorized", {
+  @Response<ApiError>(401, 'Unauthorized', {
     status: 401,
-    message: "Access denied!",
+    message: 'Access denied!',
   })
-  @Get("{userId}")
+  @Get('{userId}')
   public async getUser(@Path() userId: UUID): Promise<User | ApiError> {
     const user = data.find((u) => u.id === userId);
 
     if (!user) {
       this.setStatus(404);
-      return { status: 404, message: "User not found!" };
+      return { status: 404, message: 'User not found!' };
     }
 
     return user;
@@ -187,15 +187,15 @@ export class UserController extends Controller {
    * @returns the updated details of the user
    * @summary Update details of a user
    */
-  @Response<ApiError>(404, "Not found", {
+  @Response<ApiError>(404, 'Not Found', {
     status: 404,
-    message: "User not found!",
+    message: 'User not found!',
   })
-  @Response<ApiError>(401, "Unauthorized", {
+  @Response<ApiError>(401, 'Unauthorized', {
     status: 401,
-    message: "Access denied!",
+    message: 'Access denied!',
   })
-  @Put("{userId}")
+  @Put('{userId}')
   public async updateUser(
     @Path() userId: UUID,
     @Body() userData: User
@@ -204,7 +204,7 @@ export class UserController extends Controller {
 
     if (!user) {
       this.setStatus(404);
-      return { status: 404, message: "User not found!" };
+      return { status: 404, message: 'User not found!' };
     }
 
     return userData;
