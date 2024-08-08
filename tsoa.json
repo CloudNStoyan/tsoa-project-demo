@@ -3,6 +3,8 @@
   "noImplicitAdditionalProperties": "throw-on-extras",
   "controllerPathGlobs": ["src/routes/*.ts"],
   "spec": {
+    "schemes": ["http"],
+    "host": "localhost:3000",
     "outputDirectory": "src/generated/",
     "specVersion": 3,
     "securityDefinitions": {

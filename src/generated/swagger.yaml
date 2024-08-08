@@ -354,7 +354,7 @@ paths:
           schema:
             type: string
 servers:
-  - url: /
+  - url: http://localhost:3000/
 tags:
   - name: User
     description: Operations about users
