@@ -4,12 +4,14 @@
   "type": "module",
   "scripts": {
     "convert-swagger": "node convert-swagger-to-yaml.js",
-    "generate": "tsoa spec-and-routes && npm run convert-swagger && npm run format",
+    "generate": "tsoa spec-and-routes && npm run convert-swagger && npm run generate-client-from-swagger && npm run format",
     "dev": "concurrently \"nodemon\" \"nodemon -x npm run generate\"",
     "build": "rimraf ./dist && npm run generate && tsc",
     "start": "npm run build && node dist/server.js",
     "format": "prettier --cache --write .",
-    "format-check": "prettier --cache --check ."
+    "format-check": "prettier --cache --check .",
+    "install-codegen-cli": "node install-codegen-cli.js",
+    "generate-client-from-swagger": "rimraf ./src/generated/client && node generate-client-from-swagger.js"
   },
   "dependencies": {
     "express": "^4.19.2",
