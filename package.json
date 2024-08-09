@@ -11,6 +11,8 @@
     "start:swagger-ui-live-reload": "browser-sync start --config ./browsersync-config.cjs",
     "format": "prettier --cache --write .",
     "format-check": "prettier --cache --check .",
+    "lint": "eslint ./ --max-warnings 0",
+    "lint:fix": "npm run lint -- --fix",
     "install-codegen-cli": "node ./scripts/install-codegen-cli.js",
     "generate-client-from-swagger": "rimraf ./src/generated/client && node ./scripts/generate-client-from-swagger.js"
   },
@@ -21,16 +23,24 @@
     "yaml": "^2.5.0"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.25.1",
+    "@babel/plugin-syntax-import-assertions": "^7.24.7",
+    "@eslint/js": "^9.8.0",
     "@types/express": "^4.17.21",
     "@types/node": "^22.0.0",
     "@types/swagger-ui-express": "^4.1.6",
     "browser-sync": "^3.0.2",
     "concurrently": "^8.2.2",
     "copyfiles": "^2.4.1",
+    "eslint": "^9.8.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jsdoc": "^50.0.0",
+    "globals": "^15.9.0",
     "nodemon": "^3.1.4",
     "prettier": "^3.3.3",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.0.1"
   }
 }

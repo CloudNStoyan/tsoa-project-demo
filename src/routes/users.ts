@@ -20,40 +20,40 @@ interface ApiError {
 
 /**
  * Stringified UUIDv4.
- * See [RFC 4112](https://tools.ietf.org/html/rfc4122)
+ * See [RFC 4112](https://tools.ietf.org/html/rfc4122).
  * @pattern [0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}
- * @format uuid
+ * @format  uuid
  * @example "66ef17a1-af37-4f7b-8e82-b341e0241a30"
  */
 type UUID = string;
 
 /**
  * @example {
- *   "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
- *   "email": "jane@doe.com",
- *   "name": "Jane Doe",
- *   "status": "Sad",
- *   "phoneNumbers": []
- * }
+ *  "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
+ *  "email": "jane@doe.com",
+ *  "name": "Jane Doe",
+ *  "status": "Sad",
+ *  "phoneNumbers": []
+ *  }
  */
 interface User {
   id: UUID;
   /**
-   * The email the user used to register his account
+   * The email the user used to register his account.
    */
   email: string;
   /**
-   * The name the user used to register his account
+   * The name the user used to register his account.
    */
   name: string;
 
   /**
-   * The happiness status of the user
+   * The happiness status of the user.
    */
   status?: 'Happy' | 'Sad';
 
   /**
-   * The phone numbers associated with the user
+   * The phone numbers associated with the user.
    */
   phoneNumbers: string[];
 }
@@ -64,17 +64,17 @@ interface User {
  * The User object contains common information across
  * every user in the system regardless of status and role.
  * @example {
- *   "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
- *   "email": "jane@doe.com",
- *   "name": "Jane Doe",
- *   "status": "Sad",
- *   "phoneNumbers": [],
- *   "groupId": 1
- * }
+ * "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
+ *  "email": "jane@doe.com",
+ *  "name": "Jane Doe",
+ *  "status": "Sad",
+ *  "phoneNumbers": [],
+ *  "groupId": 1
+ *  }
  */
 interface UserFromGroup extends User {
   /**
-   * @isInt we would kindly ask you to provide a number here
+   * @isInt We would kindly ask you to provide a number here.
    */
   groupId: number;
 }
@@ -107,12 +107,12 @@ export class UserController extends Controller {
   /**
    * Retrieves the details of users.
    * Supply the unique group ID from either and receive corresponding user details.
-   * @param groupId The group's identifier
-   * @isInt groupId This message will show if the validation fails
-   * @param limit Provide a limit to the result
-   * @isInt limit This message will show if the validation fails
-   * @returns An array with User Objects
-   * @summary Retrieve details of users
+   * @param groupId The group's identifier.
+   * @isInt groupId This message will show if the validation fails.
+   * @param limit   Provide a limit to the result.
+   * @isInt limit   This message will show if the validation fails.
+   * @returns       An array with User Objects.
+   * @summary       Retrieve details of users.
    */
   @Example<UserFromGroup[]>(
     [
@@ -156,9 +156,9 @@ export class UserController extends Controller {
   /**
    * Retrieves the details of a user.
    * Supply the unique user ID from either and receive corresponding user details.
-   * @param userId The user's identifier
-   * @returns details of the user in the form of an User Object
-   * @summary Retrieve details of a user
+   * @param userId The user's identifier.
+   * @returns      details of the user in the form of an User Object.
+   * @summary      Retrieve details of a user.
    */
   @Response<ApiError>(404, 'Not Found', {
     status: 404,
@@ -179,9 +179,10 @@ export class UserController extends Controller {
   /**
    * Update the details of a user.
    * Supply the unique user ID from either and receive corresponding user details.
-   * @param userId The user's identifier
-   * @returns the updated details of the user
-   * @summary Update details of a user
+   * @param userId   The user's identifier.
+   * @param userData The user's data.
+   * @returns        the updated details of the user.
+   * @summary        Update details of a user.
    */
   @Response<ApiError>(404, 'Not Found', {
     status: 404,

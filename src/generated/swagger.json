@@ -25,7 +25,7 @@
         "type": "string",
         "example": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
         "format": "uuid",
-        "description": "Stringified UUIDv4.\nSee [RFC 4112](https://tools.ietf.org/html/rfc4122)",
+        "description": "Stringified UUIDv4.\nSee [RFC 4112](https://tools.ietf.org/html/rfc4122).",
         "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}"
       },
       "UserFromGroup": {
@@ -36,23 +36,23 @@
           },
           "email": {
             "type": "string",
-            "description": "The email the user used to register his account"
+            "description": "The email the user used to register his account."
           },
           "name": {
             "type": "string",
-            "description": "The name the user used to register his account"
+            "description": "The name the user used to register his account."
           },
           "status": {
             "type": "string",
             "enum": ["Happy", "Sad"],
-            "description": "The happiness status of the user"
+            "description": "The happiness status of the user."
           },
           "phoneNumbers": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "description": "The phone numbers associated with the user"
+            "description": "The phone numbers associated with the user."
           },
           "groupId": {
             "type": "integer",
@@ -78,23 +78,23 @@
           },
           "email": {
             "type": "string",
-            "description": "The email the user used to register his account"
+            "description": "The email the user used to register his account."
           },
           "name": {
             "type": "string",
-            "description": "The name the user used to register his account"
+            "description": "The name the user used to register his account."
           },
           "status": {
             "type": "string",
             "enum": ["Happy", "Sad"],
-            "description": "The happiness status of the user"
+            "description": "The happiness status of the user."
           },
           "phoneNumbers": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "description": "The phone numbers associated with the user"
+            "description": "The phone numbers associated with the user."
           }
         },
         "required": ["id", "email", "name", "phoneNumbers"],
@@ -128,7 +128,7 @@
         "operationId": "GetUsers",
         "responses": {
           "200": {
-            "description": "An array with User Objects",
+            "description": "An array with User Objects.",
             "content": {
               "application/json": {
                 "schema": {
@@ -200,12 +200,12 @@
           }
         },
         "description": "Retrieves the details of users.\nSupply the unique group ID from either and receive corresponding user details.",
-        "summary": "Retrieve details of users",
+        "summary": "Retrieve details of users.",
         "tags": ["User"],
         "security": [],
         "parameters": [
           {
-            "description": "The group's identifier",
+            "description": "The group's identifier.",
             "in": "path",
             "name": "groupId",
             "required": true,
@@ -215,7 +215,7 @@
             }
           },
           {
-            "description": "Provide a limit to the result",
+            "description": "Provide a limit to the result.",
             "in": "query",
             "name": "limit",
             "required": false,
@@ -232,7 +232,7 @@
         "operationId": "GetUser",
         "responses": {
           "200": {
-            "description": "details of the user in the form of an User Object",
+            "description": "details of the user in the form of an User Object.",
             "content": {
               "application/json": {
                 "schema": {
@@ -286,12 +286,12 @@
           }
         },
         "description": "Retrieves the details of a user.\nSupply the unique user ID from either and receive corresponding user details.",
-        "summary": "Retrieve details of a user",
+        "summary": "Retrieve details of a user.",
         "tags": ["User"],
         "security": [],
         "parameters": [
           {
-            "description": "The user's identifier",
+            "description": "The user's identifier.",
             "in": "path",
             "name": "userId",
             "required": true,
@@ -305,7 +305,7 @@
         "operationId": "UpdateUser",
         "responses": {
           "200": {
-            "description": "the updated details of the user",
+            "description": "the updated details of the user.",
             "content": {
               "application/json": {
                 "schema": {
@@ -359,12 +359,12 @@
           }
         },
         "description": "Update the details of a user.\nSupply the unique user ID from either and receive corresponding user details.",
-        "summary": "Update details of a user",
+        "summary": "Update details of a user.",
         "tags": ["User"],
         "security": [],
         "parameters": [
           {
-            "description": "The user's identifier",
+            "description": "The user's identifier.",
             "in": "path",
             "name": "userId",
             "required": true,
@@ -374,11 +374,13 @@
           }
         ],
         "requestBody": {
+          "description": "The user's data.",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/User"
+                "$ref": "#/components/schemas/User",
+                "description": "The user's data."
               }
             }
           }

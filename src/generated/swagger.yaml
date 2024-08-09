@@ -24,7 +24,7 @@ components:
       format: uuid
       description: |-
         Stringified UUIDv4.
-        See [RFC 4112](https://tools.ietf.org/html/rfc4122)
+        See [RFC 4112](https://tools.ietf.org/html/rfc4122).
       pattern:
         "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-\
         [0-9A-Fa-f]{12}"
@@ -39,21 +39,21 @@ components:
           $ref: '#/components/schemas/UUID'
         email:
           type: string
-          description: The email the user used to register his account
+          description: The email the user used to register his account.
         name:
           type: string
-          description: The name the user used to register his account
+          description: The name the user used to register his account.
         status:
           type: string
           enum:
             - Happy
             - Sad
-          description: The happiness status of the user
+          description: The happiness status of the user.
         phoneNumbers:
           items:
             type: string
           type: array
-          description: The phone numbers associated with the user
+          description: The phone numbers associated with the user.
         groupId:
           type: integer
           format: int32
@@ -78,21 +78,21 @@ components:
           $ref: '#/components/schemas/UUID'
         email:
           type: string
-          description: The email the user used to register his account
+          description: The email the user used to register his account.
         name:
           type: string
-          description: The name the user used to register his account
+          description: The name the user used to register his account.
         status:
           type: string
           enum:
             - Happy
             - Sad
-          description: The happiness status of the user
+          description: The happiness status of the user.
         phoneNumbers:
           items:
             type: string
           type: array
-          description: The phone numbers associated with the user
+          description: The phone numbers associated with the user.
       required:
         - id
         - email
@@ -121,7 +121,7 @@ paths:
       operationId: GetUsers
       responses:
         '200':
-          description: An array with User Objects
+          description: An array with User Objects.
           content:
             application/json:
               schema:
@@ -170,19 +170,19 @@ paths:
 
         Supply the unique group ID from either and receive corresponding user
         details.
-      summary: Retrieve details of users
+      summary: Retrieve details of users.
       tags:
         - User
       security: []
       parameters:
-        - description: The group's identifier
+        - description: The group's identifier.
           in: path
           name: groupId
           required: true
           schema:
             format: int32
             type: integer
-        - description: Provide a limit to the result
+        - description: Provide a limit to the result.
           in: query
           name: limit
           required: false
@@ -194,7 +194,7 @@ paths:
       operationId: GetUser
       responses:
         '200':
-          description: details of the user in the form of an User Object
+          description: details of the user in the form of an User Object.
           content:
             application/json:
               schema:
@@ -228,12 +228,12 @@ paths:
 
         Supply the unique user ID from either and receive corresponding user
         details.
-      summary: Retrieve details of a user
+      summary: Retrieve details of a user.
       tags:
         - User
       security: []
       parameters:
-        - description: The user's identifier
+        - description: The user's identifier.
           in: path
           name: userId
           required: true
@@ -243,7 +243,7 @@ paths:
       operationId: UpdateUser
       responses:
         '200':
-          description: the updated details of the user
+          description: the updated details of the user.
           content:
             application/json:
               schema:
@@ -277,23 +277,25 @@ paths:
 
         Supply the unique user ID from either and receive corresponding user
         details.
-      summary: Update details of a user
+      summary: Update details of a user.
       tags:
         - User
       security: []
       parameters:
-        - description: The user's identifier
+        - description: The user's identifier.
           in: path
           name: userId
           required: true
           schema:
             $ref: '#/components/schemas/UUID'
       requestBody:
+        description: The user's data.
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
+              description: The user's data.
   /secure:
     get:
       operationId: GetTreasure

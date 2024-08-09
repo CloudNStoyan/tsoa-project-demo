@@ -76,7 +76,7 @@ const models: TsoaRoute.Models = {
         required: true,
         validators: {
           isInt: {
-            errorMsg: 'we would kindly ask you to provide a number here',
+            errorMsg: 'We would kindly ask you to provide a number here.',
           },
         },
       },
@@ -138,7 +138,7 @@ export function RegisterRoutes(app: Router) {
           dataType: 'integer',
           validators: {
             isInt: {
-              errorMsg: 'This message will show if the validation fails',
+              errorMsg: 'This message will show if the validation fails.',
             },
           },
         },
@@ -148,7 +148,7 @@ export function RegisterRoutes(app: Router) {
           dataType: 'integer',
           validators: {
             isInt: {
-              errorMsg: 'This message will show if the validation fails',
+              errorMsg: 'This message will show if the validation fails.',
             },
           },
         },

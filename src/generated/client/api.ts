@@ -129,7 +129,7 @@ export interface InlineResponse2001 {
   id: number;
 }
 /**
- * Stringified UUIDv4. See [RFC 4112](https://tools.ietf.org/html/rfc4122)
+ * Stringified UUIDv4. See [RFC 4112](https://tools.ietf.org/html/rfc4122).
  * @export
  */
 export type UUID = string;
@@ -146,25 +146,25 @@ export interface User {
    */
   id: string;
   /**
-   * The email the user used to register his account
+   * The email the user used to register his account.
    * @type {string}
    * @memberof User
    */
   email: string;
   /**
-   * The name the user used to register his account
+   * The name the user used to register his account.
    * @type {string}
    * @memberof User
    */
   name: string;
   /**
-   * The happiness status of the user
+   * The happiness status of the user.
    * @type {string}
    * @memberof User
    */
   status?: User.StatusEnum;
   /**
-   * The phone numbers associated with the user
+   * The phone numbers associated with the user.
    * @type {Array<string>}
    * @memberof User
    */
@@ -198,25 +198,25 @@ export interface UserFromGroup {
    */
   id: string;
   /**
-   * The email the user used to register his account
+   * The email the user used to register his account.
    * @type {string}
    * @memberof UserFromGroup
    */
   email: string;
   /**
-   * The name the user used to register his account
+   * The name the user used to register his account.
    * @type {string}
    * @memberof UserFromGroup
    */
   name: string;
   /**
-   * The happiness status of the user
+   * The happiness status of the user.
    * @type {string}
    * @memberof UserFromGroup
    */
   status?: UserFromGroup.StatusEnum;
   /**
-   * The phone numbers associated with the user
+   * The phone numbers associated with the user.
    * @type {Array<string>}
    * @memberof UserFromGroup
    */
@@ -592,8 +592,8 @@ export const UserApiFetchParamCreator = function (
   return {
     /**
      * Retrieves the details of a user. Supply the unique user ID from either and receive corresponding user details.
-     * @summary Retrieve details of a user
-     * @param {string} userId The user&#x27;s identifier
+     * @summary Retrieve details of a user.
+     * @param {string} userId The user&#x27;s identifier.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -635,9 +635,9 @@ export const UserApiFetchParamCreator = function (
     },
     /**
      * Retrieves the details of users. Supply the unique group ID from either and receive corresponding user details.
-     * @summary Retrieve details of users
-     * @param {number} groupId The group&#x27;s identifier
-     * @param {number} [limit] Provide a limit to the result
+     * @summary Retrieve details of users.
+     * @param {number} groupId The group&#x27;s identifier.
+     * @param {number} [limit] Provide a limit to the result.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -683,9 +683,9 @@ export const UserApiFetchParamCreator = function (
     },
     /**
      * Update the details of a user. Supply the unique user ID from either and receive corresponding user details.
-     * @summary Update details of a user
-     * @param {User} body
-     * @param {string} userId The user&#x27;s identifier
+     * @summary Update details of a user.
+     * @param {User} body The user&#x27;s data.
+     * @param {string} userId The user&#x27;s identifier.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -751,8 +751,8 @@ export const UserApiFp = function (configuration?: Configuration) {
   return {
     /**
      * Retrieves the details of a user. Supply the unique user ID from either and receive corresponding user details.
-     * @summary Retrieve details of a user
-     * @param {string} userId The user&#x27;s identifier
+     * @summary Retrieve details of a user.
+     * @param {string} userId The user&#x27;s identifier.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -782,9 +782,9 @@ export const UserApiFp = function (configuration?: Configuration) {
     },
     /**
      * Retrieves the details of users. Supply the unique group ID from either and receive corresponding user details.
-     * @summary Retrieve details of users
-     * @param {number} groupId The group&#x27;s identifier
-     * @param {number} [limit] Provide a limit to the result
+     * @summary Retrieve details of users.
+     * @param {number} groupId The group&#x27;s identifier.
+     * @param {number} [limit] Provide a limit to the result.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -814,9 +814,9 @@ export const UserApiFp = function (configuration?: Configuration) {
     },
     /**
      * Update the details of a user. Supply the unique user ID from either and receive corresponding user details.
-     * @summary Update details of a user
-     * @param {User} body
-     * @param {string} userId The user&#x27;s identifier
+     * @summary Update details of a user.
+     * @param {User} body The user&#x27;s data.
+     * @param {string} userId The user&#x27;s identifier.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -859,8 +859,8 @@ export const UserApiFactory = function (
   return {
     /**
      * Retrieves the details of a user. Supply the unique user ID from either and receive corresponding user details.
-     * @summary Retrieve details of a user
-     * @param {string} userId The user&#x27;s identifier
+     * @summary Retrieve details of a user.
+     * @param {string} userId The user&#x27;s identifier.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -869,9 +869,9 @@ export const UserApiFactory = function (
     },
     /**
      * Retrieves the details of users. Supply the unique group ID from either and receive corresponding user details.
-     * @summary Retrieve details of users
-     * @param {number} groupId The group&#x27;s identifier
-     * @param {number} [limit] Provide a limit to the result
+     * @summary Retrieve details of users.
+     * @param {number} groupId The group&#x27;s identifier.
+     * @param {number} [limit] Provide a limit to the result.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -884,9 +884,9 @@ export const UserApiFactory = function (
     },
     /**
      * Update the details of a user. Supply the unique user ID from either and receive corresponding user details.
-     * @summary Update details of a user
-     * @param {User} body
-     * @param {string} userId The user&#x27;s identifier
+     * @summary Update details of a user.
+     * @param {User} body The user&#x27;s data.
+     * @param {string} userId The user&#x27;s identifier.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -909,8 +909,8 @@ export const UserApiFactory = function (
 export class UserApi extends BaseAPI {
   /**
    * Retrieves the details of a user. Supply the unique user ID from either and receive corresponding user details.
-   * @summary Retrieve details of a user
-   * @param {string} userId The user&#x27;s identifier
+   * @summary Retrieve details of a user.
+   * @param {string} userId The user&#x27;s identifier.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof UserApi
@@ -924,9 +924,9 @@ export class UserApi extends BaseAPI {
 
   /**
    * Retrieves the details of users. Supply the unique group ID from either and receive corresponding user details.
-   * @summary Retrieve details of users
-   * @param {number} groupId The group&#x27;s identifier
-   * @param {number} [limit] Provide a limit to the result
+   * @summary Retrieve details of users.
+   * @param {number} groupId The group&#x27;s identifier.
+   * @param {number} [limit] Provide a limit to the result.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof UserApi
@@ -941,9 +941,9 @@ export class UserApi extends BaseAPI {
 
   /**
    * Update the details of a user. Supply the unique user ID from either and receive corresponding user details.
-   * @summary Update details of a user
-   * @param {User} body
-   * @param {string} userId The user&#x27;s identifier
+   * @summary Update details of a user.
+   * @param {User} body The user&#x27;s data.
+   * @param {string} userId The user&#x27;s identifier.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof UserApi
