@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "convert-swagger": "node convert-swagger-to-yaml.js",
+    "convert-swagger": "node ./scripts/convert-swagger-to-yaml.js",
     "generate": "tsoa spec-and-routes && npm run convert-swagger && npm run generate-client-from-swagger && npm run format",
     "dev": "concurrently \"nodemon\" \"nodemon -x npm run generate\"",
     "build": "rimraf ./dist && npm run generate && tsc && copyfiles -f ./src/generated/swagger.yaml ./dist/generated/",
     "start": "npm run build && node dist/server.js",
     "format": "prettier --cache --write .",
     "format-check": "prettier --cache --check .",
-    "install-codegen-cli": "node install-codegen-cli.js",
-    "generate-client-from-swagger": "rimraf ./src/generated/client && node generate-client-from-swagger.js"
+    "install-codegen-cli": "node ./scripts/install-codegen-cli.js",
+    "generate-client-from-swagger": "rimraf ./src/generated/client && node ./scripts/generate-client-from-swagger.js"
   },
   "dependencies": {
     "express": "^4.19.2",
