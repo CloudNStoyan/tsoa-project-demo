@@ -198,9 +198,7 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - $ref: '#/components/schemas/User'
-                  - $ref: '#/components/schemas/ApiError'
+                $ref: '#/components/schemas/User'
         '401':
           description: Unauthorized
           content:
@@ -247,9 +245,7 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - $ref: '#/components/schemas/User'
-                  - $ref: '#/components/schemas/ApiError'
+                $ref: '#/components/schemas/User'
         '401':
           description: Unauthorized
           content:

@@ -236,14 +236,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/User"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ApiError"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/User"
                 }
               }
             }
@@ -309,14 +302,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/User"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ApiError"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/User"
                 }
               }
             }

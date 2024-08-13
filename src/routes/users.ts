@@ -1,5 +1,4 @@
 import {
-  Controller,
   Get,
   Path,
   Query,
@@ -12,11 +11,7 @@ import {
   Tags,
 } from 'tsoa';
 import { customLog } from '../middlewares/custom-log.js';
-
-interface ApiError {
-  status: number;
-  message: string;
-}
+import { ApiError, BaseController } from '../utils.js';
 
 /**
  * Stringified UUIDv4.
@@ -103,7 +98,7 @@ const data: User[] = [
 @Route('users')
 @Middlewares(customLog)
 @Tags('User')
-export class UserController extends Controller {
+export class UserController extends BaseController {
   /**
    * Retrieves the details of users.
    * Supply the unique group ID from either and receive corresponding user details.
@@ -165,12 +160,13 @@ export class UserController extends Controller {
     message: 'User not found!',
   })
   @Get('{userId}')
-  public async getUser(@Path() userId: UUID): Promise<User | ApiError> {
+  public async getUser(@Path() userId: UUID): Promise<User> {
     const user = data.find((u) => u.id === userId);
 
     if (!user) {
-      this.setStatus(404);
-      return { status: 404, message: 'User not found!' };
+      return this.errorResult<User>(404, {
+        message: 'User not found!',
+      });
     }
 
     return user;
@@ -192,12 +188,13 @@ export class UserController extends Controller {
   public async updateUser(
     @Path() userId: UUID,
     @Body() userData: User
-  ): Promise<User | ApiError> {
+  ): Promise<User> {
     const user = data.find((u) => u.id === userId);
 
     if (!user) {
-      this.setStatus(404);
-      return { status: 404, message: 'User not found!' };
+      return this.errorResult<User>(404, {
+        message: 'User not found!',
+      });
     }
 
     return userData;

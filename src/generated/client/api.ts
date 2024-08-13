@@ -108,23 +108,17 @@ export interface ApiError {
  * @export
  * @interface InlineResponse200
  */
-export interface InlineResponse200 {}
-/**
- *
- * @export
- * @interface InlineResponse2001
- */
-export interface InlineResponse2001 {
+export interface InlineResponse200 {
   /**
    *
    * @type {string}
-   * @memberof InlineResponse2001
+   * @memberof InlineResponse200
    */
   name: string;
   /**
    *
    * @type {number}
-   * @memberof InlineResponse2001
+   * @memberof InlineResponse200
    */
   id: number;
 }
@@ -519,7 +513,7 @@ export const SecureApiFp = function (configuration?: Configuration) {
      */
     getTreasure(
       options?: any
-    ): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse2001> {
+    ): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
       const localVarFetchArgs =
         SecureApiFetchParamCreator(configuration).getTreasure(options);
       return (
@@ -759,7 +753,7 @@ export const UserApiFp = function (configuration?: Configuration) {
     getUser(
       userId: string,
       options?: any
-    ): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
+    ): (fetch?: FetchAPI, basePath?: string) => Promise<User> {
       const localVarFetchArgs = UserApiFetchParamCreator(configuration).getUser(
         userId,
         options
@@ -824,7 +818,7 @@ export const UserApiFp = function (configuration?: Configuration) {
       body: User,
       userId: string,
       options?: any
-    ): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
+    ): (fetch?: FetchAPI, basePath?: string) => Promise<User> {
       const localVarFetchArgs = UserApiFetchParamCreator(
         configuration
       ).updateUser(body, userId, options);
