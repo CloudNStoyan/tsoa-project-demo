@@ -93,7 +93,7 @@ function outputParams(params, body) {
       output += ', ';
     }
 
-    output += `body: ${body.resolvedType}`;
+    output += `${lowercaseFirstLetter(body.resolvedType)}: ${body.resolvedType}`;
   }
 
   return output;
@@ -133,7 +133,7 @@ function outputOperation(operation) {
     output += `method: "${operation.httpMethod.toUpperCase()}",\n`;
 
     if (operation.body) {
-      output += 'body: JSON.stringify(body),\n';
+      output += `body: JSON.stringify(${lowercaseFirstLetter(operation.body.resolvedType)}),\n`;
       output += `headers: {\n'Content-Type': 'application/json'\n},\n`;
     }
 
@@ -230,7 +230,7 @@ function outputTypes(types) {
       output += outputJsdoc(tsType.jsdoc);
     }
 
-    output += `export type ${tsType.name} = ${tsType.resolvedTypescript};\n\n`;
+    output += `export type ${tsType.name} = ${tsType.resolvedType};\n\n`;
   }
 
   return output;
@@ -247,7 +247,16 @@ function outputInterfaces(interfaces) {
     output += `export interface ${tsInterface.name} {\n`;
 
     for (const property of tsInterface.properties) {
-      output += `${property.name}: ${property.resolvedTypescript};\n`;
+      if (property.jsdoc) {
+        output += outputJsdoc(property.jsdoc);
+      }
+      output += property.name;
+
+      if (!property.required) {
+        output += '?';
+      }
+
+      output += `: ${property.resolvedType}\n`;
     }
 
     output += '}\n\n';
@@ -372,7 +381,7 @@ function generateEnums(schemas) {
         };
 
         if (enums[enumName]) {
-          // What should we do here
+          // FIXME: What should we do if there is already an enum with the same name?
         }
 
         enums[enumName] = enumData;
@@ -383,14 +392,15 @@ function generateEnums(schemas) {
   return Object.values(enums);
 }
 
-function generateProperties(openapiProperties) {
+function generateProperties(openapiProperties, requiredProperties) {
   const properties = [];
 
   for (const [propertyName, propertyData] of openapiProperties) {
     const property = {
       name: propertyName,
       jsdoc: propertyData.enum ? undefined : resolveJsdoc(propertyData),
-      resolvedTypescript: resolveProperty(propertyData, propertyName),
+      resolvedType: resolveProperty(propertyData, propertyName),
+      required: requiredProperties.includes(propertyName),
     };
 
     properties.push(property);
@@ -415,7 +425,10 @@ function generateInterfaces(schemas) {
 
     const openapiProperties = Object.entries(schemas[interfaceName].properties);
 
-    const properties = generateProperties(openapiProperties);
+    const properties = generateProperties(
+      openapiProperties,
+      schemas[interfaceName].required
+    );
 
     tsInterface.properties = properties;
 
@@ -437,7 +450,7 @@ function generateTypes(schemas) {
 
     const tsType = {
       name: typeName,
-      resolvedTypescript: resolveProperty(typeData),
+      resolvedType: resolveProperty(typeData),
       jsdoc: resolveJsdoc(typeData),
     };
 

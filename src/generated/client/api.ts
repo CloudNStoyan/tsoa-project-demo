@@ -15,6 +15,9 @@ export enum Status {
 export type UUID = string;
 
 export interface ApiError {
+  /**
+   * @format double
+   */
   status: number;
   message: string;
 }
@@ -35,10 +38,22 @@ export interface ApiError {
 */
 export interface UserFromGroup {
   id: UUID;
+  /**
+   * The email the user used to register his account.
+   */
   email: string;
+  /**
+   * The name the user used to register his account.
+   */
   name: string;
-  status: Status;
+  status?: Status;
+  /**
+   * The phone numbers associated with the user.
+   */
   phoneNumbers: Array<string>;
+  /**
+   * @format int32
+   */
   groupId: number;
 }
 
@@ -53,13 +68,25 @@ export interface UserFromGroup {
 */
 export interface User {
   id: UUID;
+  /**
+   * The email the user used to register his account.
+   */
   email: string;
+  /**
+   * The name the user used to register his account.
+   */
   name: string;
-  status: Status;
+  status?: Status;
+  /**
+   * The phone numbers associated with the user.
+   */
   phoneNumbers: Array<string>;
 }
 
 export interface AuthUser {
+  /**
+   * @format double
+   */
   id: number;
   name: string;
 }
@@ -110,10 +137,10 @@ export class UserClientAPI extends ClientAPIBase {
     return super.fetch<User>(`/users/${userId}`);
   }
 
-  updateUser(userId: UUID, body: User): Promise<User> {
+  updateUser(userId: UUID, user: User): Promise<User> {
     return super.fetch<User>(`/users/${userId}`, {
       method: 'PUT',
-      body: JSON.stringify(body),
+      body: JSON.stringify(user),
       headers: {
         'Content-Type': 'application/json',
       },
