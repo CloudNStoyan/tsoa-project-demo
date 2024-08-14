@@ -107,6 +107,20 @@
           "status": "Sad",
           "phoneNumbers": []
         }
+      },
+      "AuthUser": {
+        "properties": {
+          "id": {
+            "type": "number",
+            "format": "double"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "name"],
+        "type": "object",
+        "additionalProperties": false
       }
     },
     "securitySchemes": {
@@ -382,17 +396,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "name": {
-                      "type": "string"
-                    },
-                    "id": {
-                      "type": "number",
-                      "format": "double"
-                    }
-                  },
-                  "required": ["name", "id"],
-                  "type": "object"
+                  "$ref": "#/components/schemas/AuthUser"
                 }
               }
             }
