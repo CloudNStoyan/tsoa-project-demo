@@ -91,6 +91,9 @@ const data: User[] = [
   },
 ];
 
+/**
+ * User operations.
+ */
 @Response<ApiError>(401, 'Unauthorized', {
   status: 401,
   message: 'Access denied!',

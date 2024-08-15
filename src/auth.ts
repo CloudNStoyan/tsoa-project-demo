@@ -2,7 +2,6 @@ import type { Request } from 'express';
 
 export class AuthError extends Error {}
 
-// eslint-disable-next-line jsdoc/require-example
 /**
  * TSOA Authentication Module.
  * @param request      Express Request.

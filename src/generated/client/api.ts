@@ -106,21 +106,21 @@ export interface ApiError {
 /**
  *
  * @export
- * @interface InlineResponse200
+ * @interface AuthUser
  */
-export interface InlineResponse200 {
-  /**
-   *
-   * @type {string}
-   * @memberof InlineResponse200
-   */
-  name: string;
+export interface AuthUser {
   /**
    *
    * @type {number}
-   * @memberof InlineResponse200
+   * @memberof AuthUser
    */
   id: number;
+  /**
+   *
+   * @type {string}
+   * @memberof AuthUser
+   */
+  name: string;
 }
 /**
  * Stringified UUIDv4. See [RFC 4112](https://tools.ietf.org/html/rfc4122).
@@ -246,7 +246,8 @@ export const CatApiFetchParamCreator = function (
 ) {
   return {
     /**
-     *
+     * Demonstrative cat endpoint that returns static data.
+     * @summary Retrieve \"add :)\" from the server.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -277,8 +278,9 @@ export const CatApiFetchParamCreator = function (
       };
     },
     /**
-     *
-     * @param {string} catId
+     * Demonstrative cat endpoint that returns dynamic data.
+     * @summary Retrieve catId from the server.
+     * @param {string} catId The identification of a cat.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -328,7 +330,8 @@ export const CatApiFetchParamCreator = function (
 export const CatApiFp = function (configuration?: Configuration) {
   return {
     /**
-     *
+     * Demonstrative cat endpoint that returns static data.
+     * @summary Retrieve \"add :)\" from the server.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -354,8 +357,9 @@ export const CatApiFp = function (configuration?: Configuration) {
       };
     },
     /**
-     *
-     * @param {string} catId
+     * Demonstrative cat endpoint that returns dynamic data.
+     * @summary Retrieve catId from the server.
+     * @param {string} catId The identification of a cat.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -396,7 +400,8 @@ export const CatApiFactory = function (
 ) {
   return {
     /**
-     *
+     * Demonstrative cat endpoint that returns static data.
+     * @summary Retrieve \"add :)\" from the server.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -404,8 +409,9 @@ export const CatApiFactory = function (
       return CatApiFp(configuration).postCat(options)(fetch, basePath);
     },
     /**
-     *
-     * @param {string} catId
+     * Demonstrative cat endpoint that returns dynamic data.
+     * @summary Retrieve catId from the server.
+     * @param {string} catId The identification of a cat.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -423,7 +429,8 @@ export const CatApiFactory = function (
  */
 export class CatApi extends BaseAPI {
   /**
-   *
+   * Demonstrative cat endpoint that returns static data.
+   * @summary Retrieve \"add :)\" from the server.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof CatApi
@@ -436,8 +443,9 @@ export class CatApi extends BaseAPI {
   }
 
   /**
-   *
-   * @param {string} catId
+   * Demonstrative cat endpoint that returns dynamic data.
+   * @summary Retrieve catId from the server.
+   * @param {string} catId The identification of a cat.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof CatApi
@@ -458,7 +466,8 @@ export const SecureApiFetchParamCreator = function (
 ) {
   return {
     /**
-     *
+     * Get the biggest treasure.
+     * @summary Retrieve treasure.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -507,13 +516,14 @@ export const SecureApiFetchParamCreator = function (
 export const SecureApiFp = function (configuration?: Configuration) {
   return {
     /**
-     *
+     * Get the biggest treasure.
+     * @summary Retrieve treasure.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     getTreasure(
       options?: any
-    ): (fetch?: FetchAPI, basePath?: string) => Promise<InlineResponse200> {
+    ): (fetch?: FetchAPI, basePath?: string) => Promise<AuthUser> {
       const localVarFetchArgs =
         SecureApiFetchParamCreator(configuration).getTreasure(options);
       return (
@@ -546,7 +556,8 @@ export const SecureApiFactory = function (
 ) {
   return {
     /**
-     *
+     * Get the biggest treasure.
+     * @summary Retrieve treasure.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -564,7 +575,8 @@ export const SecureApiFactory = function (
  */
 export class SecureApi extends BaseAPI {
   /**
-   *
+   * Get the biggest treasure.
+   * @summary Retrieve treasure.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof SecureApi

@@ -106,6 +106,18 @@ components:
         name: Jane Doe
         status: Sad
         phoneNumbers: []
+    AuthUser:
+      properties:
+        id:
+          type: number
+          format: double
+        name:
+          type: string
+      required:
+        - id
+        - name
+      type: object
+      additionalProperties: false
   securitySchemes:
     api_key:
       type: apiKey
@@ -297,20 +309,13 @@ paths:
       operationId: GetTreasure
       responses:
         '200':
-          description: Ok
+          description: An AuthUser.
           content:
             application/json:
               schema:
-                properties:
-                  name:
-                    type: string
-                  id:
-                    type: number
-                    format: double
-                required:
-                  - name
-                  - id
-                type: object
+                $ref: '#/components/schemas/AuthUser'
+      description: Get the biggest treasure.
+      summary: Retrieve treasure.
       tags:
         - Secure
       security:
@@ -323,11 +328,13 @@ paths:
       operationId: PostCat
       responses:
         '200':
-          description: Ok
+          description: '"add :)".'
           content:
             application/json:
               schema:
                 type: string
+      description: Demonstrative cat endpoint that returns static data.
+      summary: Retrieve "add :)" from the server.
       tags:
         - Cat
       security: []
@@ -337,16 +344,19 @@ paths:
       operationId: PostCatId
       responses:
         '200':
-          description: Ok
+          description: The given catId.
           content:
             application/json:
               schema:
                 type: string
+      description: Demonstrative cat endpoint that returns dynamic data.
+      summary: Retrieve catId from the server.
       tags:
         - Cat
       security: []
       parameters:
-        - in: path
+        - description: The identification of a cat.
+          in: path
           name: catId
           required: true
           schema:

@@ -22,51 +22,58 @@ export default tseslint.config(
   prettier,
   {
     files: ['**/*.ts'],
-    extends: [
-      jsdoc.configs['flat/recommended-typescript-error'],
-      {
-        rules: {
-          'jsdoc/check-tag-names': [
-            'error',
-            {
-              definedTags: ['pattern', 'format', 'isInt'],
-            },
-          ],
-          'jsdoc/check-indentation': 'error',
-          'jsdoc/check-line-alignment': [
-            'error',
-            'always',
-            {
-              tags: [
-                'param',
-                'arg',
-                'argument',
-                'property',
-                'prop',
-                'returns',
-                'return',
-                'summary',
-                'isInt',
-                'pattern',
-                'format',
-              ],
-            },
-          ],
-          'jsdoc/no-blank-block-descriptions': 'error',
-          'jsdoc/no-blank-blocks': ['error', { enableFixer: true }],
-          'jsdoc/require-asterisk-prefix': 'error',
-          'jsdoc/require-description': 'error',
-          'jsdoc/require-description-complete-sentence': 'error',
-          'jsdoc/require-example': ['error', { exemptedBy: ['summary'] }],
-          'jsdoc/require-throws': 'error',
-        },
-      },
-      prettier,
-    ],
+    extends: [jsdoc.configs['flat/recommended-typescript-error'], prettier],
     languageOptions: {
       parserOptions: {
         project: ['tsconfig.json'],
       },
+    },
+  },
+  {
+    files: ['src/routes/**'],
+    rules: {
+      'jsdoc/check-tag-names': [
+        'error',
+        {
+          definedTags: ['pattern', 'format', 'isInt'],
+        },
+      ],
+      'jsdoc/check-indentation': 'error',
+      'jsdoc/check-line-alignment': [
+        'error',
+        'always',
+        {
+          tags: [
+            'param',
+            'arg',
+            'argument',
+            'property',
+            'prop',
+            'returns',
+            'return',
+            'summary',
+            'isInt',
+            'pattern',
+            'format',
+          ],
+        },
+      ],
+      'jsdoc/no-blank-block-descriptions': 'error',
+      'jsdoc/no-blank-blocks': ['error', { enableFixer: true }],
+      'jsdoc/require-asterisk-prefix': 'error',
+      'jsdoc/require-description': 'error',
+      'jsdoc/require-description-complete-sentence': 'error',
+      'jsdoc/require-example': ['error', { exemptedBy: ['summary'] }],
+      'jsdoc/require-throws': 'error',
+      'jsdoc/require-jsdoc': [
+        'error',
+        {
+          require: {
+            ClassDeclaration: true,
+            MethodDefinition: true,
+          },
+        },
+      ],
     },
   },
   { ignores: ['dist', 'src/generated/client'] }
