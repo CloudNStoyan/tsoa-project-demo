@@ -124,6 +124,11 @@ export class UserClientAPI extends ClientAPIBase {
     super(...options);
   }
 
+  /**
+   * Retrieves the details of users.
+   * Supply the unique group ID from either and receive corresponding user details.
+   * @summary Retrieve details of users.
+   */
   getUsers(groupId: number, limit?: number): Promise<Array<UserFromGroup>> {
     const queries: Array<[string, unknown]> = [['limit', limit]];
     const queryString = generateQueryString(queries);
@@ -133,10 +138,20 @@ export class UserClientAPI extends ClientAPIBase {
     );
   }
 
+  /**
+   * Retrieves the details of a user.
+   * Supply the unique user ID from either and receive corresponding user details.
+   * @summary Retrieve details of a user.
+   */
   getUser(userId: UUID): Promise<User> {
     return super.fetch<User>(`/users/${userId}`);
   }
 
+  /**
+   * Update the details of a user.
+   * Supply the unique user ID from either and receive corresponding user details.
+   * @summary Update details of a user.
+   */
   updateUser(userId: UUID, user: User): Promise<User> {
     return super.fetch<User>(`/users/${userId}`, {
       method: 'PUT',
@@ -147,6 +162,10 @@ export class UserClientAPI extends ClientAPIBase {
     });
   }
 
+  /**
+   * Permanently delete an user.
+   * @summary Delete an user.
+   */
   deleteUser(userId: UUID): Promise<void> {
     return super.fetch(`/users/${userId}`, {
       method: 'DELETE',

@@ -511,6 +511,10 @@ function generateQueryString(queries: Array<[string, unknown]>): string {
   renderOperation(operation) {
     let output = '';
 
+    if (operation.jsdoc) {
+      output += this.renderJsdoc(operation.jsdoc);
+    }
+
     output += `${lowercaseFirstLetter(operation.operationId)}(${this.renderParams(operation.allParams, operation.body)}): Promise<${operation.returnType}> {\n`;
 
     const queryParams = operation.allParams?.filter((p) => p.type === 'query');
