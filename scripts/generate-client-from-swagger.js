@@ -198,6 +198,8 @@ class TypescriptModel {
     if (property.type === 'integer') {
       return 'number';
     }
+
+    throw new Error(`Invalid property type: '${property}'.`);
   }
 
   resolveJsdoc(property) {
@@ -272,7 +274,7 @@ class TypescriptModel {
       };
 
       if (enums[enumName]) {
-        // FIXME: What should we do if there is already an enum with the same name?
+        throw new Error(`There is already an enum named: '${enumName}'.`);
       }
 
       enums[enumName] = enumData;
