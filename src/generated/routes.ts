@@ -270,6 +270,46 @@ export function RegisterRoutes(app: Router) {
     }
   );
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  app.delete(
+    '/users/:userId',
+    ...fetchMiddlewares<RequestHandler>(UserController),
+    ...fetchMiddlewares<RequestHandler>(UserController.prototype.deleteUser),
+
+    async function UserController_deleteUser(
+      request: ExRequest,
+      response: ExResponse,
+      next: any
+    ) {
+      const args: Record<string, TsoaRoute.ParameterSchema> = {
+        userId: { in: 'path', name: 'userId', required: true, ref: 'UUID' },
+      };
+
+      // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+      let validatedArgs: any[] = [];
+      try {
+        validatedArgs = templateService.getValidatedArgs({
+          args,
+          request,
+          response,
+        });
+
+        const controller = new UserController();
+
+        await templateService.apiHandler({
+          methodName: 'deleteUser',
+          controller,
+          response,
+          next,
+          validatedArgs,
+          successStatus: undefined,
+        });
+      } catch (err) {
+        return next(err);
+      }
+    }
+  );
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   app.get(
     '/secure',
     authenticateMiddleware([{ api_key: ['cat', 'dog'] }]),

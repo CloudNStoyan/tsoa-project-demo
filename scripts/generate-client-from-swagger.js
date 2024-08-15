@@ -80,6 +80,20 @@ class TypescriptModel {
     return tags;
   }
 
+  getOperationResponseSchema(openapiOperationData) {
+    if (
+      !openapiOperationData?.responses ||
+      !openapiOperationData.responses['200'] ||
+      !openapiOperationData.responses['200'].content ||
+      !openapiOperationData.responses['200'].content['application/json']
+    ) {
+      return undefined;
+    }
+
+    return openapiOperationData.responses['200'].content['application/json']
+      .schema;
+  }
+
   generateOperations(swaggerDocument) {
     const paths = swaggerDocument.paths;
 
@@ -92,8 +106,7 @@ class TypescriptModel {
         const openapiOperationData = pathOperations[httpMethod];
 
         const responseSchema =
-          openapiOperationData.responses['200'].content['application/json']
-            .schema;
+          this.getOperationResponseSchema(openapiOperationData);
 
         if (
           responseSchema &&
@@ -160,6 +173,10 @@ class TypescriptModel {
   }
 
   resolveType(property) {
+    if (!property) {
+      return 'void';
+    }
+
     if (property.$ref) {
       if (!property.$ref.startsWith('#/components/schemas/')) {
         throw new Error(
@@ -513,7 +530,13 @@ function generateQueryString(queries: Array<[string, unknown]>): string {
       output += '];\nconst queryString = generateQueryString(queries);\n\n';
     }
 
-    output += `return super.fetch<${operation.returnType}>(\`${operation.templatePath}`;
+    output += 'return super.fetch';
+
+    if (operation.returnType !== 'void') {
+      output += `<${operation.returnType}>`;
+    }
+
+    output += `(\`${operation.templatePath}`;
 
     if (queryParams && queryParams.length > 0) {
       output += '${queryString}';

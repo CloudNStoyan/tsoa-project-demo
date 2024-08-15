@@ -146,6 +146,12 @@ export class UserClientAPI extends ClientAPIBase {
       },
     });
   }
+
+  deleteUser(userId: UUID): Promise<void> {
+    return super.fetch(`/users/${userId}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export class SecureClientAPI extends ClientAPIBase {

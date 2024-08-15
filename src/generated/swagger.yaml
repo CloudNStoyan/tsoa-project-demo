@@ -304,6 +304,45 @@ paths:
             schema:
               $ref: '#/components/schemas/User'
               description: The user's data.
+    delete:
+      operationId: DeleteUser
+      responses:
+        '204':
+          description: No content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              examples:
+                Example 1:
+                  value:
+                    status: 401
+                    message: Access denied!
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              examples:
+                Example 1:
+                  value:
+                    status: 404
+                    message: User not found!
+      description: Permanently delete an user.
+      summary: Delete an user.
+      tags:
+        - User
+      security: []
+      parameters:
+        - description: The user's identifier.
+          in: path
+          name: userId
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
   /secure:
     get:
       operationId: GetTreasure
