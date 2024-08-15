@@ -1,0 +1,21 @@
+@contentType = application/json
+
+#################################################################################################################################
+### Request: GET /users/{groupId}/all
+### Summary: Retrieve details of users.
+### Description: 
+###   Retrieves the details of users.
+###   Supply the unique group ID from either and receive corresponding user details.
+#################################################################################################################################
+
+### Path Parameter: The group's identifier.
+@groupId = 0
+
+### Query Parameter: Provide a limit to the result.
+@limit = 0
+
+
+GET http://localhost:3000/users/{{groupId}}/all
+Content-Type: {{contentType}}
+
+

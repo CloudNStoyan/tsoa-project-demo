@@ -1,0 +1,14 @@
+@contentType = application/json
+
+#################################
+### Request: POST /cats/{catId}
+#################################
+
+### Path Parameter: catId
+@catId = I LIKE CATS
+
+
+POST http://localhost:3000/cats/{{catId}}
+Content-Type: {{contentType}}
+
+

@@ -1,0 +1,11 @@
+@contentType = application/json
+
+#############################
+### Request: POST /cats/add
+#############################
+
+
+POST http://localhost:3000/cats/add
+Content-Type: {{contentType}}
+
+
