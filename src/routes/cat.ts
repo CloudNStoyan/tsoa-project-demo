@@ -1,4 +1,4 @@
-import { Controller, Path, Post, Route, Tags } from 'tsoa';
+import { Controller, Example, Path, Post, Route, Tags } from 'tsoa';
 
 /**
  * Cat operations.
@@ -12,6 +12,7 @@ export class CatController extends Controller {
    * @summary Retrieve "add :)" from the server.
    */
   @Post('add')
+  @Example<string>('add :)', 'An example of the add endpoint.')
   postCat() {
     return 'add :)';
   }
@@ -22,6 +23,7 @@ export class CatController extends Controller {
    * @returns     The given catId.
    * @summary     Retrieve catId from the server.
    */
+  @Example<string>('cat-4', 'An example of an catId.')
   @Post('{catId}')
   postCatId(@Path() catId: string) {
     return catId;

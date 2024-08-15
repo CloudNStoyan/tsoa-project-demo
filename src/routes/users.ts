@@ -158,6 +158,16 @@ export class UserController extends BaseController {
    * @returns      details of the user in the form of an User Object.
    * @summary      Retrieve details of a user.
    */
+  @Example<User>(
+    {
+      id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
+      email: 'Example@doe.com',
+      name: 'Example Doe',
+      status: 'Sad',
+      phoneNumbers: [],
+    },
+    'An example of a user.'
+  )
   @Response<ApiError>(404, 'Not Found', {
     status: 404,
     message: 'User not found!',
@@ -188,6 +198,16 @@ export class UserController extends BaseController {
     message: 'User not found!',
   })
   @Put('{userId}')
+  @Example<User>(
+    {
+      id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
+      email: 'Updated@doe.com',
+      name: 'Updated Doe',
+      status: 'Sad',
+      phoneNumbers: [],
+    },
+    'An example of updated user.'
+  )
   public async updateUser(
     @Path() userId: UUID,
     @Body() userData: User

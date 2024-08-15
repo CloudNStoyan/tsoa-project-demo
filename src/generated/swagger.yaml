@@ -211,6 +211,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+              examples:
+                An example of a user.:
+                  value:
+                    id: 66ef17a1-af37-4f7b-8e82-b341e0241a30
+                    email: Example@doe.com
+                    name: Example Doe
+                    status: Sad
+                    phoneNumbers: []
         '401':
           description: Unauthorized
           content:
@@ -258,6 +266,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+              examples:
+                An example of updated user.:
+                  value:
+                    id: 66ef17a1-af37-4f7b-8e82-b341e0241a30
+                    email: Updated@doe.com
+                    name: Updated Doe
+                    status: Sad
+                    phoneNumbers: []
         '401':
           description: Unauthorized
           content:
@@ -314,6 +330,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthUser'
+              examples:
+                An example of AuthUser.:
+                  value:
+                    id: 1
+                    name: AuthenticatedUser
       description: Get the biggest treasure.
       summary: Retrieve treasure.
       tags:
@@ -333,6 +354,9 @@ paths:
             application/json:
               schema:
                 type: string
+              examples:
+                An example of the add endpoint.:
+                  value: add :)
       description: Demonstrative cat endpoint that returns static data.
       summary: Retrieve "add :)" from the server.
       tags:
@@ -349,6 +373,9 @@ paths:
             application/json:
               schema:
                 type: string
+              examples:
+                An example of an catId.:
+                  value: cat-4
       description: Demonstrative cat endpoint that returns dynamic data.
       summary: Retrieve catId from the server.
       tags:

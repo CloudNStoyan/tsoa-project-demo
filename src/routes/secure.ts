@@ -1,4 +1,4 @@
-import { Controller, Get, Route, Security, Tags, Request } from 'tsoa';
+import { Controller, Get, Route, Security, Tags, Request, Example } from 'tsoa';
 import type { Request as ExpressRequest } from 'express';
 
 interface AuthUser {
@@ -24,6 +24,10 @@ export class SecureController extends Controller {
    */
   @Security('api_key', ['cat', 'dog'])
   @Get()
+  @Example<AuthUser>(
+    { id: 1, name: 'AuthenticatedUser' },
+    'An example of AuthUser.'
+  )
   getTreasure(@Request() request: ExpressRequestWithUser): Promise<AuthUser> {
     return Promise.resolve(request.user);
   }
