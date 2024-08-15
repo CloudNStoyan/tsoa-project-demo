@@ -2,8 +2,6 @@ import js from '@eslint/js';
 import prettier from 'eslint-config-prettier';
 import tseslint from 'typescript-eslint';
 import globals from 'globals';
-import babelParser from '@babel/eslint-parser';
-import babelPluginSyntaxImportAssertions from '@babel/plugin-syntax-import-assertions';
 import jsdoc from 'eslint-plugin-jsdoc';
 
 export default tseslint.config(
@@ -15,13 +13,7 @@ export default tseslint.config(
       },
       ecmaVersion: 'latest',
       sourceType: 'module',
-      parser: babelParser,
-      parserOptions: {
-        requireConfigFile: false,
-        babelOptions: {
-          plugins: [babelPluginSyntaxImportAssertions],
-        },
-      },
+      parser: tseslint.parser,
     },
     rules: {
       'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
@@ -72,9 +64,6 @@ export default tseslint.config(
       prettier,
     ],
     languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      parser: tseslint.parser,
       parserOptions: {
         project: ['tsconfig.json'],
       },
