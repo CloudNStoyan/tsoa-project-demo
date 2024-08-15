@@ -5,7 +5,7 @@
 #################################
 
 ### Path Parameter: catId
-@catId = I LIKE CATS
+@catId = str
 
 
 POST http://localhost:3000/cats/{{catId}}

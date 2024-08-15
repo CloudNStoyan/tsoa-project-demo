@@ -15,7 +15,7 @@
     "lint:fix": "npm run lint -- --fix",
     "install-codegen-cli": "node ./scripts/install-codegen-cli.js",
     "generate-client-from-swagger": "rimraf ./src/generated/client && node ./scripts/generate-client-from-swagger.js",
-    "generate-http-files": "httpgenerator ./src/generated/swagger.json --base-url http://localhost:3000 --output ./http-generated"
+    "generate-http-files": "httpgenerator ./src/generated/swagger.json --base-url http://localhost:3000 --output ./src/generated/dot-http"
   },
   "dependencies": {
     "express": "^4.19.2",
