@@ -19,6 +19,7 @@ export interface ApiError {
    * @format double
    */
   status: number;
+
   message: string;
 }
 
@@ -37,20 +38,36 @@ export interface ApiError {
 }
 */
 export interface UserFromGroup {
+  /**
+   * The user's identifier.
+   */
   id: UUID;
+
   /**
    * The email the user used to register his account.
    */
   email: string;
+
   /**
    * The name the user used to register his account.
    */
   name: string;
+
+  /**
+   * The happiness status of the user.
+   */
   status?: Status;
+
   /**
    * The phone numbers associated with the user.
    */
   phoneNumbers: Array<string>;
+
+  /**
+   * Whether or not the user is a cat.
+   */
+  isCat?: boolean;
+
   /**
    * @format int32
    */
@@ -67,20 +84,35 @@ export interface UserFromGroup {
 }
 */
 export interface User {
+  /**
+   * The user's identifier.
+   */
   id: UUID;
+
   /**
    * The email the user used to register his account.
    */
   email: string;
+
   /**
    * The name the user used to register his account.
    */
   name: string;
+
+  /**
+   * The happiness status of the user.
+   */
   status?: Status;
+
   /**
    * The phone numbers associated with the user.
    */
   phoneNumbers: Array<string>;
+
+  /**
+   * Whether or not the user is a cat.
+   */
+  isCat?: boolean;
 }
 
 export interface AuthUser {
@@ -88,6 +120,7 @@ export interface AuthUser {
    * @format double
    */
   id: number;
+
   name: string;
 }
 
@@ -103,35 +136,27 @@ export class ClientAPI {
   }
 }
 
-function generateQueryString(queries: Array<[string, unknown]>): string {
-  const queryString = queries
-    .filter(([_name, query]) => query !== undefined)
-    .map(([name, query]) => `${name}=${query}`)
-    .join('&');
-
-  if (queryString.length > 0) {
-    return `?${queryString}`;
-  }
-
-  return '';
-}
-
 /**
  * Operations about users
  */
 export class UserClientAPI extends ClientAPIBase {
-  constructor(...options: unknown[]) {
-    super(...options);
-  }
-
   /**
    * Retrieves the details of users.
    * Supply the unique group ID from either and receive corresponding user details.
+   * @param groupId The group's identifier.
+   * @param limit Provide a limit to the result.
    * @summary Retrieve details of users.
    */
   getUsers(groupId: number, limit?: number): Promise<Array<UserFromGroup>> {
-    const queries: Array<[string, unknown]> = [['limit', limit]];
-    const queryString = generateQueryString(queries);
+    const urlParams = new URLSearchParams();
+
+    if (limit) {
+      urlParams.set('limit', String(limit));
+    }
+
+    const urlParamsString = urlParams.toString();
+
+    const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
 
     return super.fetch<Array<UserFromGroup>>(
       `/users/${groupId}/all${queryString}`
@@ -141,6 +166,7 @@ export class UserClientAPI extends ClientAPIBase {
   /**
    * Retrieves the details of a user.
    * Supply the unique user ID from either and receive corresponding user details.
+   * @param userId The user's identifier.
    * @summary Retrieve details of a user.
    */
   getUser(userId: UUID): Promise<User> {
@@ -150,6 +176,8 @@ export class UserClientAPI extends ClientAPIBase {
   /**
    * Update the details of a user.
    * Supply the unique user ID from either and receive corresponding user details.
+   * @param userId The user's identifier.
+   * @param user The user's data.
    * @summary Update details of a user.
    */
   updateUser(userId: UUID, user: User): Promise<User> {
@@ -164,36 +192,32 @@ export class UserClientAPI extends ClientAPIBase {
 
   /**
    * Permanently delete an user.
+   * @param userId The user's identifier.
    * @summary Delete an user.
    */
-  deleteUser(userId: UUID): Promise<void> {
-    return super.fetch(`/users/${userId}`, {
+  deleteUser(userId: UUID): Promise<User | void> {
+    return super.fetch<User | void>(`/users/${userId}`, {
       method: 'DELETE',
     });
   }
 }
 
 export class SecureClientAPI extends ClientAPIBase {
-  constructor(...options: unknown[]) {
-    super(...options);
-  }
-
   getTreasure(): Promise<AuthUser> {
     return super.fetch<AuthUser>(`/secure`);
   }
 }
 
 export class CatClientAPI extends ClientAPIBase {
-  constructor(...options: unknown[]) {
-    super(...options);
-  }
-
   postCat(): Promise<string> {
     return super.fetch<string>(`/cats/add`, {
       method: 'POST',
     });
   }
 
+  /**
+   * @param catId
+   */
   postCatId(catId: string): Promise<string> {
     return super.fetch<string>(`/cats/${catId}`, {
       method: 'POST',

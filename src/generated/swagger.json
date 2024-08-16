@@ -32,7 +32,8 @@
         "description": "User objects allow you to associate actions performed\nin the system with the user that performed them.\nThe User object contains common information across\nevery user in the system regardless of status and role.",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/UUID"
+            "$ref": "#/components/schemas/UUID",
+            "description": "The user's identifier."
           },
           "email": {
             "type": "string",
@@ -53,6 +54,10 @@
             },
             "type": "array",
             "description": "The phone numbers associated with the user."
+          },
+          "isCat": {
+            "type": "boolean",
+            "description": "Whether or not the user is a cat."
           },
           "groupId": {
             "type": "integer",
@@ -74,7 +79,8 @@
       "User": {
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/UUID"
+            "$ref": "#/components/schemas/UUID",
+            "description": "The user's identifier."
           },
           "email": {
             "type": "string",
@@ -95,6 +101,10 @@
             },
             "type": "array",
             "description": "The phone numbers associated with the user."
+          },
+          "isCat": {
+            "type": "boolean",
+            "description": "Whether or not the user is a cat."
           }
         },
         "required": ["id", "email", "name", "phoneNumbers"],
@@ -389,8 +399,18 @@
       "delete": {
         "operationId": "DeleteUser",
         "responses": {
+          "200": {
+            "description": "Nothing is returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
           "204": {
-            "description": "No content"
+            "description": "No Content"
           },
           "401": {
             "description": "Unauthorized",

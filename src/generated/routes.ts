@@ -71,6 +71,7 @@ const models: TsoaRoute.Models = {
         array: { dataType: 'string' },
         required: true,
       },
+      isCat: { dataType: 'boolean' },
       groupId: {
         dataType: 'integer',
         required: true,
@@ -102,6 +103,7 @@ const models: TsoaRoute.Models = {
         array: { dataType: 'string' },
         required: true,
       },
+      isCat: { dataType: 'boolean' },
     },
     additionalProperties: false,
   },

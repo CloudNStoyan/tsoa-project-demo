@@ -33,7 +33,11 @@ type UUID = string;
  *  }
  */
 interface User {
+  /**
+   * The user's identifier.
+   */
   id: UUID;
+
   /**
    * The email the user used to register his account.
    */
@@ -52,6 +56,11 @@ interface User {
    * The phone numbers associated with the user.
    */
   phoneNumbers: string[];
+
+  /**
+   * Whether or not the user is a cat.
+   */
+  isCat?: boolean;
 }
 
 /**
@@ -213,17 +222,17 @@ export class UserController extends BaseController {
     message: 'User not found!',
   })
   @Delete('{userId}')
-  public async deleteUser(@Path() userId: UUID): Promise<void> {
+  public async deleteUser(@Path() userId: UUID): Promise<User> {
     const user = data.find((u) => u.id === userId);
 
     if (!user) {
-      return this.errorResult<void>(404, {
+      return this.errorResult<User>(404, {
         message: 'User not found!',
       });
     }
 
     data = data.filter((u) => u.id !== userId);
 
-    return this.noContentResult();
+    return this.noContentResult<User>();
   }
 }

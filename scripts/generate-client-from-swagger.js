@@ -30,68 +30,58 @@ class TypescriptModel {
     this.tags = this.generateOperationTags(swaggerDocument);
   }
 
-  responseSchemaIsLiteralOrRef(schema) {
+  responseSchemaIsInlineObject(schema) {
     if (schema.type === 'array') {
       if (schema.items.$ref) {
-        return true;
+        return false;
       }
     }
 
     if (schema.$ref) {
-      return true;
-    }
-
-    if (schema.type === 'object') {
       return false;
     }
 
-    return true;
-  }
-
-  generateOperationTags(swaggerDocument) {
-    const paths = swaggerDocument.paths;
-    const tagsData = swaggerDocument.tags;
-
-    const tagsMap = {};
-
-    for (const path in paths) {
-      const pathOperations = paths[path];
-
-      for (const httpMethod in pathOperations) {
-        const openapiOperationData = pathOperations[httpMethod];
-
-        for (const operationTag of openapiOperationData.tags) {
-          if (!tagsMap[operationTag]) {
-            tagsMap[operationTag] = { name: operationTag };
-          }
-        }
-      }
+    if (schema.type === 'object') {
+      return true;
     }
 
-    const tags = Object.values(tagsMap).map((tag) => {
-      const tagData = tagsData.find((t) => t.name === tag.name);
-      if (tagData) {
-        return { ...tag, jsdoc: this.resolveJsdoc(tagData) };
-      }
-
-      return tag;
-    });
-
-    return tags;
+    return false;
   }
 
-  getOperationResponseSchema(openapiOperationData) {
-    if (
-      !openapiOperationData?.responses ||
-      !openapiOperationData.responses['200'] ||
-      !openapiOperationData.responses['200'].content ||
-      !openapiOperationData.responses['200'].content['application/json']
-    ) {
-      return undefined;
+  throwIfResponseContentIsInvalid(content) {
+    if (!content) {
+      throw new Error(
+        `Response '200' did not have 'application/json' content:\n${JSON.stringify(content, null, 2)}`
+      );
     }
 
-    return openapiOperationData.responses['200'].content['application/json']
-      .schema;
+    if (this.responseSchemaIsInlineObject(content.schema)) {
+      throw new Error(
+        `Operation responses should have a reference to a schema instead of a inline object: \n${JSON.stringify(content.schema, null, 2)}`
+      );
+    }
+  }
+
+  generateReturnType(responses) {
+    if (responses['204'] && !responses['200']) {
+      return 'void';
+    }
+
+    if (responses['200']) {
+      const content = responses['200'].content['application/json'];
+
+      this.throwIfResponseContentIsInvalid(content);
+
+      if (responses['204']) {
+        return `${this.resolveType(content.schema)} | void`;
+      }
+
+      return this.resolveType(content.schema);
+    }
+
+    throw new Error(
+      `Unexpected response object:\n${JSON.stringify(responses, null, 2)}`
+    );
   }
 
   generateOperations(swaggerDocument) {
@@ -105,25 +95,13 @@ class TypescriptModel {
       for (const httpMethod in pathOperations) {
         const openapiOperationData = pathOperations[httpMethod];
 
-        const responseSchema =
-          this.getOperationResponseSchema(openapiOperationData);
-
-        if (
-          responseSchema &&
-          !this.responseSchemaIsLiteralOrRef(responseSchema)
-        ) {
-          throw new Error(
-            `Operation responses should have a reference to a schema instead of a inline object: \n${JSON.stringify(responseSchema, null, 2)}`
-          );
-        }
-
         const operation = {
           httpMethod,
           templatePath: path.replaceAll('{', '${'),
           operationId: openapiOperationData.operationId,
           tags: openapiOperationData.tags,
           jsdoc: this.resolveJsdoc(openapiOperationData),
-          returnType: this.resolveType(responseSchema),
+          returnType: this.generateReturnType(openapiOperationData.responses),
         };
 
         const allParams = [];
@@ -150,6 +128,17 @@ class TypescriptModel {
 
         operation.allParams = allParams.length > 0 ? allParams : undefined;
 
+        const paramsJsdoc = [];
+
+        if (operation.allParams) {
+          for (const param of operation.allParams) {
+            paramsJsdoc.push({
+              description: param.jsdoc?.description,
+              name: param.name,
+            });
+          }
+        }
+
         if (openapiOperationData.requestBody) {
           operation.body = {
             required: openapiOperationData.requestBody.required,
@@ -159,6 +148,15 @@ class TypescriptModel {
                 .schema
             ),
           };
+
+          paramsJsdoc.push({
+            description: operation.body.jsdoc?.description,
+            name: lowercaseFirstLetter(operation.body.resolvedType),
+          });
+        }
+
+        if (paramsJsdoc.length > 0) {
+          operation.jsdoc = { ...operation.jsdoc, params: paramsJsdoc };
         }
 
         operations.push(operation);
@@ -168,15 +166,43 @@ class TypescriptModel {
     return operations;
   }
 
+  generateOperationTags(swaggerDocument) {
+    const paths = swaggerDocument.paths;
+    const tagsData = swaggerDocument.tags;
+
+    const tagsMap = new Map();
+
+    for (const path in paths) {
+      const pathOperations = paths[path];
+
+      for (const httpMethod in pathOperations) {
+        const openapiOperationData = pathOperations[httpMethod];
+
+        for (const operationTag of openapiOperationData.tags) {
+          if (!tagsMap.has(operationTag)) {
+            tagsMap.set(operationTag, { name: operationTag });
+          }
+        }
+      }
+    }
+
+    const tags = Array.from(tagsMap.values()).map((tag) => {
+      const tagData = tagsData.find((t) => t.name === tag.name);
+      if (tagData) {
+        return { ...tag, jsdoc: this.resolveJsdoc(tagData) };
+      }
+
+      return tag;
+    });
+
+    return tags;
+  }
+
   resolveEnum(propertyName) {
     return capitalizeFirstLetter(propertyName);
   }
 
   resolveType(property) {
-    if (!property) {
-      return 'void';
-    }
-
     if (property.$ref) {
       if (!property.$ref.startsWith('#/components/schemas/')) {
         throw new Error(
@@ -191,7 +217,11 @@ class TypescriptModel {
       return `Array<${this.resolveType(property.items)}>`;
     }
 
-    if (property.type === 'string' || property.type === 'number') {
+    if (
+      property.type === 'string' ||
+      property.type === 'number' ||
+      property.type === 'boolean'
+    ) {
       return property.type;
     }
 
@@ -199,7 +229,7 @@ class TypescriptModel {
       return 'number';
     }
 
-    throw new Error(`Invalid property type: '${property}'.`);
+    throw new Error(`Invalid property type: '${property.type}'.`);
   }
 
   resolveJsdoc(property) {
@@ -230,13 +260,13 @@ class TypescriptModel {
 
     const interfaces = [];
     const types = [];
-    const enums = {};
+    const enumsMap = new Map();
 
     for (const componentName in schemas) {
       const componentData = schemas[componentName];
 
       if (componentData.type === 'object') {
-        this.appendEnums(componentData, enums);
+        this.appendEnums(componentData, enumsMap);
 
         const tsInterface = this.generateInterface(
           componentName,
@@ -250,10 +280,24 @@ class TypescriptModel {
       }
     }
 
-    return { interfaces, types, enums: Object.values(enums) };
+    return { interfaces, types, enums: Array.from(enumsMap.values()) };
   }
 
-  appendEnums(interfaceData, enums) {
+  areEnumsEqual(enum1, enum2) {
+    if (enum1.values.length !== enum2.values.length) {
+      return false;
+    }
+
+    for (const enumValue of enum1.values) {
+      if (!enum2.values.includes(enumValue)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  appendEnums(interfaceData, enumsMap) {
     const openapiProperties = Object.entries(interfaceData.properties);
 
     for (const [propertyName, propertyData] of openapiProperties) {
@@ -262,7 +306,9 @@ class TypescriptModel {
       }
 
       if (propertyData.type !== 'string') {
-        throw new Error('Enums that are not strings are not supported');
+        throw new Error(
+          `Enums that are not strings are not supported, enum type found: '${propertyData.type}'.`
+        );
       }
 
       const enumName = capitalizeFirstLetter(propertyName);
@@ -273,11 +319,13 @@ class TypescriptModel {
         jsdoc: this.resolveJsdoc(propertyData),
       };
 
-      if (enums[enumName]) {
+      if (!enumsMap.has(enumName)) {
+        enumsMap.set(enumName, enumData);
+      } else if (!this.areEnumsEqual(enumData, enumsMap.get(enumName))) {
         throw new Error(`There is already an enum named: '${enumName}'.`);
+      } else {
+        // We skip the enum because we have already added it.
       }
-
-      enums[enumName] = enumData;
     }
   }
 
@@ -296,14 +344,11 @@ class TypescriptModel {
       const tsProperty = {
         name: propertyName,
         required: requiredProperties.includes(propertyName),
+        jsdoc: this.resolveJsdoc(propertyData),
+        resolvedType: propertyData.enum
+          ? this.resolveEnum(propertyName)
+          : this.resolveType(propertyData),
       };
-
-      if (!propertyData.enum) {
-        tsProperty.jsdoc = this.resolveJsdoc(propertyData);
-        tsProperty.resolvedType = this.resolveType(propertyData);
-      } else {
-        tsProperty.resolvedType = this.resolveEnum(propertyName);
-      }
 
       tsProperties.push(tsProperty);
     }
@@ -340,8 +385,6 @@ class ModelRenderer {
     ${this.renderInterfaces()}
 
     ${this.renderMainApi()}
-
-    ${this.renderHelpers()}
 
     ${this.renderApis()}
     `;
@@ -403,7 +446,7 @@ class ModelRenderer {
           output += '?';
         }
 
-        output += `: ${property.resolvedType}\n`;
+        output += `: ${property.resolvedType}\n\n`;
       }
 
       output += '}\n\n';
@@ -432,26 +475,6 @@ class ModelRenderer {
     return output;
   }
 
-  renderHelpers() {
-    let output = '';
-
-    output += `
-function generateQueryString(queries: Array<[string, unknown]>): string {
-  const queryString = queries.filter(([_name, query]) => query !== undefined)
-    .map(([name, query]) => \`\${name}=\${query}\`)
-    .join('&');
-
-  if (queryString.length > 0) {
-    return \`?\${queryString}\`;
-  }
-
-  return '';
-}
-  `;
-
-    return output;
-  }
-
   renderApis() {
     let output = '';
 
@@ -461,8 +484,6 @@ function generateQueryString(queries: Array<[string, unknown]>): string {
       }
 
       output += `export class ${tag.name}ClientAPI extends ClientAPIBase {\n`;
-      output +=
-        'constructor(...options: unknown[]) {\nsuper(...options)\n}\n\n';
 
       const tagOperations = this.model.operations.filter((op) =>
         op.tags.includes(tag.name)
@@ -487,6 +508,12 @@ function generateQueryString(queries: Array<[string, unknown]>): string {
           .split('\n')
           .map((line) => `* ${line}`)
           .join('\n') + '\n';
+    }
+
+    if (jsdoc.params) {
+      for (const param of jsdoc.params) {
+        output += `* @param ${param.name} ${param.description ? param.description : ''}\n`;
+      }
     }
 
     if (jsdoc.pattern) {
@@ -522,18 +549,17 @@ function generateQueryString(queries: Array<[string, unknown]>): string {
     const queryParams = operation.allParams?.filter((p) => p.type === 'query');
 
     if (queryParams && queryParams.length > 0) {
-      output += 'const queries: Array<[string, unknown]> = [';
-      for (let i = 0; i < queryParams.length; i++) {
-        const queryParam = queryParams[i];
+      output += 'const urlParams = new URLSearchParams();\n\n';
 
-        if (i !== 0) {
-          output += ',';
-        }
-
-        output += `['${queryParam.name}', ${queryParam.name}]`;
+      for (const queryParam of queryParams) {
+        output += `if (${queryParam.name}) {\n`;
+        output += `urlParams.set("${queryParam.name}", String(${queryParam.name}));\n`;
+        output += '}\n';
       }
 
-      output += '];\nconst queryString = generateQueryString(queries);\n\n';
+      output += '\nconst urlParamsString = urlParams.toString();\n\n';
+      output +=
+        "const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';\n\n";
     }
 
     output += 'return super.fetch';
@@ -560,7 +586,7 @@ function generateQueryString(queries: Array<[string, unknown]>): string {
 
       output += '});';
     } else {
-      output += '`)';
+      output += '`);';
     }
 
     output += '}\n\n';

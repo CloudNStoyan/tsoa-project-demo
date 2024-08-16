@@ -37,6 +37,7 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/UUID'
+          description: The user's identifier.
         email:
           type: string
           description: The email the user used to register his account.
@@ -54,6 +55,9 @@ components:
             type: string
           type: array
           description: The phone numbers associated with the user.
+        isCat:
+          type: boolean
+          description: Whether or not the user is a cat.
         groupId:
           type: integer
           format: int32
@@ -76,6 +80,7 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/UUID'
+          description: The user's identifier.
         email:
           type: string
           description: The email the user used to register his account.
@@ -93,6 +98,9 @@ components:
             type: string
           type: array
           description: The phone numbers associated with the user.
+        isCat:
+          type: boolean
+          description: Whether or not the user is a cat.
       required:
         - id
         - email
@@ -307,8 +315,14 @@ paths:
     delete:
       operationId: DeleteUser
       responses:
+        '200':
+          description: Nothing is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '204':
-          description: No content
+          description: No Content
         '401':
           description: Unauthorized
           content:
