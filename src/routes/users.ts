@@ -234,16 +234,6 @@ export class UserController extends BaseController {
     status: 404,
     message: 'User not found!',
   })
-  @Example<User>(
-    {
-      id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
-      email: 'Example@doe.com',
-      name: 'Example Doe',
-      status: 'Sad',
-      phoneNumbers: [],
-    },
-    'An example of a user.'
-  )
   @Delete('{userId}')
   public async deleteUser(@Path() userId: UUID): Promise<User> {
     const user = data.find((u) => u.id === userId);

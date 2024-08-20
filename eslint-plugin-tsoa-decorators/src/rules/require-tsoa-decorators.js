@@ -52,6 +52,23 @@ function getDecoratorsInfo(MethodDefinitionNode) {
   return decorators;
 }
 
+function getMethodDefinitionReturnType(methodDefinitionNode) {
+  if (!methodDefinitionNode?.value?.returnType?.typeAnnotation) {
+    return null;
+  }
+
+  const typeAnnotation = methodDefinitionNode.value.returnType.typeAnnotation;
+
+  if (
+    typeAnnotation.type === 'TSTypeReference' &&
+    typeAnnotation.typeName.name === 'Promise'
+  ) {
+    return typeAnnotation.typeArguments.params[0];
+  }
+
+  return typeAnnotation;
+}
+
 function hasMethodDecorator(decorators) {
   return (
     decorators.filter((decorator) => METHOD_DECORATOR_NAMES.includes(decorator))
@@ -78,7 +95,14 @@ function create(context) {
 
       const missingDecorators = getMissingDecorators(decorators);
 
-      if (hasMethodDecorator(decorators) && missingDecorators.length > 0) {
+      const returnType = getMethodDefinitionReturnType(node);
+
+      if (
+        returnType &&
+        returnType.type === 'TSArrayType' &&
+        hasMethodDecorator(decorators) &&
+        missingDecorators.length > 0
+      ) {
         context.report({
           node,
           messageId: 'missingRequiredDecorators',
