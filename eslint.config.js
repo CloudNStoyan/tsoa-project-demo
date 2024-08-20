@@ -84,6 +84,7 @@ export default tseslint.config(
     },
     rules: {
       'tsoa-decorators/require-tsoa-decorators': 'error',
+      'tsoa-decorators/alternative-responses-require-decorators': 'error',
     },
   },
   { ignores: ['dist', 'src/generated/client'] }

@@ -1,4 +1,5 @@
 import requireTsoaDecoratorsRule from './rules/require-tsoa-decorators.js';
+import alternativeResponsesRequireDecoratorsRule from './rules/alternative-responses-require-decorators.js';
 
 /** @type {import('eslint').ESLint.Plugin} */
 const plugin = {
@@ -9,6 +10,8 @@ const plugin = {
   configs: {},
   rules: {
     'require-tsoa-decorators': requireTsoaDecoratorsRule,
+    'alternative-responses-require-decorators':
+      alternativeResponsesRequireDecoratorsRule,
   },
   processors: {},
 };
@@ -21,12 +24,14 @@ plugin.configs = {
     },
     rules: {
       'tsoa-decorators/require-tsoa-decorators': 'error',
+      'tsoa-decorators/alternative-responses-require-decorators': 'error',
     },
   },
   'recommended-legacy': {
     plugins: ['tsoa-decorators'],
     rules: {
       'tsoa-decorators/require-tsoa-decorators': 'error',
+      'tsoa-decorators/alternative-responses-require-decorators': 'error',
     },
   },
 };
