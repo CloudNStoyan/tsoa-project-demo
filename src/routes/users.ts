@@ -232,6 +232,7 @@ export class UserController extends BaseController {
    * @summary      Delete an user.
    * @returns      Nothing is returned.
    */
+  @Response(204, 'No Content')
   @Response<ApiError>(404, 'Not Found', {
     status: 404,
     message: 'User not found!',

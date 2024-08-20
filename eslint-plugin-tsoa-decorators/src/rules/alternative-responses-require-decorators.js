@@ -226,13 +226,6 @@ function create(context) {
         if (usedFunction.name === 'this.noContentResult') {
           reportIfTypeMismatch(context, returnType, usedFunction);
 
-          if (
-            !Array.isArray(usedFunction.arguments) ||
-            usedFunction.arguments.length === 0
-          ) {
-            continue;
-          }
-
           const responseDecorators = decorators['Response'];
           const NO_CONTENT_STATUS = 204;
 
