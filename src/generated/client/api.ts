@@ -104,19 +104,19 @@ export interface ApiError {
   message: string;
 }
 /**
- *
+ * An authenticated user.
  * @export
  * @interface AuthUser
  */
 export interface AuthUser {
   /**
-   *
+   * The authenticated user's identifier.
    * @type {number}
    * @memberof AuthUser
    */
   id: number;
   /**
-   *
+   * The authenticated user's name.
    * @type {string}
    * @memberof AuthUser
    */
@@ -128,7 +128,7 @@ export interface AuthUser {
  */
 export type UUID = string;
 /**
- *
+ * User description written by yours truly Stoyan.
  * @export
  * @interface User
  */
@@ -151,6 +151,12 @@ export interface User {
    * @memberof User
    */
   name: string;
+  /**
+   * Is the user a cat.
+   * @type {boolean}
+   * @memberof User
+   */
+  isCat: boolean;
   /**
    * The happiness status of the user.
    * @type {string}
@@ -203,6 +209,12 @@ export interface UserFromGroup {
    * @memberof UserFromGroup
    */
   name: string;
+  /**
+   * Is the user a cat.
+   * @type {boolean}
+   * @memberof UserFromGroup
+   */
+  isCat: boolean;
   /**
    * The happiness status of the user.
    * @type {string}
@@ -841,7 +853,7 @@ export const UserApiFp = function (configuration?: Configuration) {
     getUser(
       userId: string,
       options?: any
-    ): (fetch?: FetchAPI, basePath?: string) => Promise<User> {
+    ): (fetch?: FetchAPI, basePath?: string) => Promise<UserFromGroup> {
       const localVarFetchArgs = UserApiFetchParamCreator(configuration).getUser(
         userId,
         options

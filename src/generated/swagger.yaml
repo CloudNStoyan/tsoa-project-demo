@@ -37,82 +37,98 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/UUID'
+          description: The user's identifier.
+          example: 66ef17a1-af37-4f7b-8e82-b341e0241a30
         email:
           type: string
           description: The email the user used to register his account.
+          example: jane@doe.com
         name:
           type: string
           description: The name the user used to register his account.
+          example: Jane Doe The First
+        isCat:
+          type: boolean
+          description: Is the user a cat.
+          example: false
         status:
           type: string
           enum:
             - Happy
             - Sad
           description: The happiness status of the user.
+          example: Sad
         phoneNumbers:
           items:
             type: string
           type: array
           description: The phone numbers associated with the user.
+          example: []
         groupId:
           type: integer
           format: int32
+          example: 113
       required:
         - id
         - email
         - name
+        - isCat
         - phoneNumbers
         - groupId
       type: object
       additionalProperties: false
-      example:
-        id: 66ef17a1-af37-4f7b-8e82-b341e0241a30
-        email: jane@doe.com
-        name: Jane Doe
-        status: Sad
-        phoneNumbers: []
-        groupId: 1
     User:
+      description: User description written by yours truly Stoyan.
       properties:
         id:
           $ref: '#/components/schemas/UUID'
+          description: The user's identifier.
+          example: 66ef17a1-af37-4f7b-8e82-b341e0241a30
         email:
           type: string
           description: The email the user used to register his account.
+          example: jane@doe.com
         name:
           type: string
           description: The name the user used to register his account.
+          example: Jane Doe The First
+        isCat:
+          type: boolean
+          description: Is the user a cat.
+          example: false
         status:
           type: string
           enum:
             - Happy
             - Sad
           description: The happiness status of the user.
+          example: Sad
         phoneNumbers:
           items:
             type: string
           type: array
           description: The phone numbers associated with the user.
+          example: []
       required:
         - id
         - email
         - name
+        - isCat
         - phoneNumbers
       type: object
       additionalProperties: false
-      example:
-        id: 66ef17a1-af37-4f7b-8e82-b341e0241a30
-        email: jane@doe.com
-        name: Jane Doe
-        status: Sad
-        phoneNumbers: []
     AuthUser:
+      description: An authenticated user.
       properties:
         id:
           type: number
           format: double
+          description: The authenticated user's identifier.
+          example: 1
         name:
           type: string
+          description: The authenticated user's name.
+          example: Joe Done
       required:
         - id
         - name
@@ -149,12 +165,14 @@ paths:
                       status: Happy
                       phoneNumbers: []
                       groupId: 1
+                      isCat: false
                     - id: c421afa9-08c7-491a-90a1-575bb656cffd
                       email: john@doe.com
                       name: John Doe
                       status: Sad
                       phoneNumbers: []
                       groupId: 1
+                      isCat: false
         '401':
           description: Unauthorized
           content:
@@ -192,15 +210,15 @@ paths:
           name: groupId
           required: true
           schema:
-            format: int32
-            type: integer
+            format: double
+            type: number
         - description: Provide a limit to the result.
           in: query
           name: limit
           required: false
           schema:
-            format: int32
-            type: integer
+            format: double
+            type: number
   /users/{userId}:
     get:
       operationId: GetUser
@@ -210,7 +228,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserFromGroup'
               examples:
                 An example of a user.:
                   value:
@@ -329,14 +347,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-              examples:
-                An example of a user.:
-                  value:
-                    id: 66ef17a1-af37-4f7b-8e82-b341e0241a30
-                    email: Example@doe.com
-                    name: Example Doe
-                    status: Sad
-                    phoneNumbers: []
         '401':
           description: Unauthorized
           content:
