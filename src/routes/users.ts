@@ -32,46 +32,53 @@ enum HappinessStatus {
 }
 
 /**
- * @example {
- *  "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
- *  "email": "jane@doe.com",
- *  "name": "Jane Doe",
- *  "status": "Sad",
- *  "phoneNumbers": []
- *  }
+ * User description written by yours truly Stoyan.
  */
 interface User {
   /**
    * The user's identifier.
+   * @example "66ef17a1-af37-4f7b-8e82-b341e0241a30"
    */
   id: UUID;
 
   /**
    * The email the user used to register his account.
+   * @example "jane@doe.com"
    */
   email: string;
   /**
    * The name the user used to register his account.
+   * @example "Jane Doe The First"
    */
   name: string;
 
   /**
+   * Is the user a cat.
+   * @example false
+   */
+  isCat: boolean;
+
+  /**
    * The happiness status of the user.
+   * @example "Sad"
    */
   status?: HappinessStatus;
 
   /**
    * An array of happiness statuses of the user.
+   * @example []
    */
   manyStatuses?: HappinessStatus[];
 
   /**
    * The cat level of the user.
+   * @example "Ultra Cat"
    */
   catLevel?: 'Ultra Cat' | 'Mega Cat';
 
   /**
    * The cat index of the user.
+   * @example "cat index"
    */
   catIndex?: (
     | string
@@ -82,13 +89,9 @@ interface User {
 
   /**
    * The phone numbers associated with the user.
+   * @example []
    */
   phoneNumbers: string[];
-
-  /**
-   * Whether or not the user is a cat.
-   */
-  isCat?: boolean;
 }
 
 /**
@@ -96,18 +99,11 @@ interface User {
  * in the system with the user that performed them.
  * The User object contains common information across
  * every user in the system regardless of status and role.
- * @example {
- * "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
- *  "email": "jane@doe.com",
- *  "name": "Jane Doe",
- *  "status": "Sad",
- *  "phoneNumbers": [],
- *  "groupId": 1
- *  }
  */
 interface UserFromGroup extends User {
   /**
-   * @isInt We would kindly ask you to provide a number here.
+   * @isInt
+   * @example 113
    */
   groupId: number;
 }
@@ -119,6 +115,7 @@ let data: User[] = [
     name: 'Jane Doe',
     status: HappinessStatus.Happy,
     phoneNumbers: [],
+    isCat: false,
   },
   {
     id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
@@ -126,6 +123,7 @@ let data: User[] = [
     name: 'John Doe',
     status: HappinessStatus.Sad,
     phoneNumbers: [],
+    isCat: false,
   },
 ];
 
@@ -140,12 +138,11 @@ export class UserController extends BaseController {
   /**
    * Retrieves the details of users.
    * Supply the unique group ID from either and receive corresponding user details.
-   * @param groupId The group's identifier.
-   * @isInt groupId This message will show if the validation fails.
-   * @param limit   Provide a limit to the result.
-   * @isInt limit   This message will show if the validation fails.
-   * @returns       An array with User Objects.
-   * @summary       Retrieve details of users.
+   * @param groupId  The group's identifier.
+   * @param limit    Provide a limit to the result.
+   * @param catLevel The =required cat level of users.
+   * @returns        An array with User Objects.
+   * @summary        Retrieve details of users.
    */
   @Example<UserFromGroup[]>(
     [
@@ -156,6 +153,7 @@ export class UserController extends BaseController {
         status: HappinessStatus.Happy,
         phoneNumbers: [],
         groupId: 1,
+        isCat: false,
       },
       {
         id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
@@ -164,6 +162,7 @@ export class UserController extends BaseController {
         status: HappinessStatus.Sad,
         phoneNumbers: [],
         groupId: 1,
+        isCat: false,
       },
     ],
     'An example of Users'
@@ -184,7 +183,6 @@ export class UserController extends BaseController {
       return userFromGroup;
     });
 
-    // eslint-disable-next-line no-console
     console.log('users | catLevel', catLevel);
 
     return users.slice(0, limit || users.length);
@@ -202,11 +200,11 @@ export class UserController extends BaseController {
     message: 'User not found!',
   })
   @Get('{userId}')
-  public async getUser(@Path() userId: UUID): Promise<User> {
-    const user = data.find((u) => u.id === userId);
+  public async getUser(@Path() userId: UUID): Promise<UserFromGroup> {
+    const user = data.find((u) => u.id === userId) as UserFromGroup;
 
     if (!user) {
-      return this.errorResult<User>(404, {
+      return this.errorResult<UserFromGroup>(404, {
         message: 'User not found!',
       });
     }

@@ -27,52 +27,56 @@ export interface ApiError {
 }
 
 /**
-* User objects allow you to associate actions performed
-* in the system with the user that performed them.
-* The User object contains common information across
-* every user in the system regardless of status and role.
-* @example {
-  "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
-  "email": "jane@doe.com",
-  "name": "Jane Doe",
-  "status": "Sad",
-  "phoneNumbers": [],
-  "groupId": 1
-}
-*/
+ * User objects allow you to associate actions performed
+ * in the system with the user that performed them.
+ * The User object contains common information across
+ * every user in the system regardless of status and role.
+ */
 export interface UserFromGroup {
   /**
    * The user's identifier.
+   * @example "66ef17a1-af37-4f7b-8e82-b341e0241a30"
    */
   id: UUID;
 
   /**
    * The email the user used to register his account.
+   * @example "jane@doe.com"
    */
   email: string;
 
   /**
    * The name the user used to register his account.
+   * @example "Jane Doe The First"
    */
   name: string;
 
   /**
+   * Is the user a cat.
+   */
+  isCat: boolean;
+
+  /**
    * The happiness status of the user.
+   * @example "Sad"
    */
   status?: HappinessStatus;
 
   /**
    * An array of happiness statuses of the user.
+   * @example []
    */
   manyStatuses?: Array<HappinessStatus>;
 
   /**
    * The cat level of the user.
+   * @example "Ultra Cat"
    */
   catLevel?: 'Ultra Cat' | 'Mega Cat';
 
   /**
    * The cat index of the user.
+   * @example "cat index"
    */
   catIndex?: Array<
     string | number | HappinessStatus | (string | (string | HappinessStatus))
@@ -80,62 +84,65 @@ export interface UserFromGroup {
 
   /**
    * The phone numbers associated with the user.
+   * @example []
    */
   phoneNumbers: Array<string>;
 
   /**
-   * Whether or not the user is a cat.
-   */
-  isCat?: boolean;
-
-  /**
    * @format int32
+   * @example 113
    */
   groupId: number;
 }
 
 /**
-* @example {
-  "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
-  "email": "jane@doe.com",
-  "name": "Jane Doe",
-  "status": "Sad",
-  "phoneNumbers": []
-}
-*/
+ * User description written by yours truly Stoyan.
+ */
 export interface User {
   /**
    * The user's identifier.
+   * @example "66ef17a1-af37-4f7b-8e82-b341e0241a30"
    */
   id: UUID;
 
   /**
    * The email the user used to register his account.
+   * @example "jane@doe.com"
    */
   email: string;
 
   /**
    * The name the user used to register his account.
+   * @example "Jane Doe The First"
    */
   name: string;
 
   /**
+   * Is the user a cat.
+   */
+  isCat: boolean;
+
+  /**
    * The happiness status of the user.
+   * @example "Sad"
    */
   status?: HappinessStatus;
 
   /**
    * An array of happiness statuses of the user.
+   * @example []
    */
   manyStatuses?: Array<HappinessStatus>;
 
   /**
    * The cat level of the user.
+   * @example "Ultra Cat"
    */
   catLevel?: 'Ultra Cat' | 'Mega Cat';
 
   /**
    * The cat index of the user.
+   * @example "cat index"
    */
   catIndex?: Array<
     string | number | HappinessStatus | (string | (string | HappinessStatus))
@@ -143,21 +150,26 @@ export interface User {
 
   /**
    * The phone numbers associated with the user.
+   * @example []
    */
   phoneNumbers: Array<string>;
-
-  /**
-   * Whether or not the user is a cat.
-   */
-  isCat?: boolean;
 }
 
+/**
+ * An authenticated user.
+ */
 export interface AuthUser {
   /**
+   * The authenticated user's identifier.
    * @format double
+   * @example 1
    */
   id: number;
 
+  /**
+   * The authenticated user's name.
+   * @example "Joe Done"
+   */
   name: string;
 }
 
@@ -182,7 +194,7 @@ export class UserClientAPI extends ClientAPIBase {
    * Supply the unique group ID from either and receive corresponding user details.
    * @param groupId The group's identifier.
    * @param limit Provide a limit to the result.
-   * @param catLevel
+   * @param catLevel The =required cat level of users.
    * @summary Retrieve details of users.
    */
   getUsers(
@@ -219,8 +231,8 @@ export class UserClientAPI extends ClientAPIBase {
    * @param userId The user's identifier.
    * @summary Retrieve details of a user.
    */
-  getUser(userId: UUID): Promise<User> {
-    return super.fetch<User>(`/users/${userId}`);
+  getUser(userId: UUID): Promise<UserFromGroup> {
+    return super.fetch<UserFromGroup>(`/users/${userId}`);
   }
 
   /**
@@ -253,12 +265,20 @@ export class UserClientAPI extends ClientAPIBase {
 }
 
 export class SecureClientAPI extends ClientAPIBase {
+  /**
+   * Get the biggest treasure.
+   * @summary Retrieve treasure.
+   */
   getTreasure(): Promise<AuthUser> {
     return super.fetch<AuthUser>(`/secure`);
   }
 }
 
 export class CatClientAPI extends ClientAPIBase {
+  /**
+   * Demonstrative cat endpoint that returns static data.
+   * @summary Retrieve "add :)" from the server.
+   */
   postCat(): Promise<string> {
     return super.fetch<string>(`/cats/add`, {
       method: 'POST',
@@ -266,7 +286,9 @@ export class CatClientAPI extends ClientAPIBase {
   }
 
   /**
-   * @param catId
+   * Demonstrative cat endpoint that returns dynamic data.
+   * @param catId The identification of a cat.
+   * @summary Retrieve catId from the server.
    */
   postCatId(catId: string): Promise<string> {
     return super.fetch<string>(`/cats/${catId}`, {

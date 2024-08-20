@@ -38,31 +38,42 @@
         "properties": {
           "id": {
             "$ref": "#/components/schemas/UUID",
-            "description": "The user's identifier."
+            "description": "The user's identifier.",
+            "example": "66ef17a1-af37-4f7b-8e82-b341e0241a30"
           },
           "email": {
             "type": "string",
-            "description": "The email the user used to register his account."
+            "description": "The email the user used to register his account.",
+            "example": "jane@doe.com"
           },
           "name": {
             "type": "string",
-            "description": "The name the user used to register his account."
+            "description": "The name the user used to register his account.",
+            "example": "Jane Doe The First"
+          },
+          "isCat": {
+            "type": "boolean",
+            "description": "Is the user a cat.",
+            "example": false
           },
           "status": {
             "$ref": "#/components/schemas/HappinessStatus",
-            "description": "The happiness status of the user."
+            "description": "The happiness status of the user.",
+            "example": "Sad"
           },
           "manyStatuses": {
             "items": {
               "$ref": "#/components/schemas/HappinessStatus"
             },
             "type": "array",
-            "description": "An array of happiness statuses of the user."
+            "description": "An array of happiness statuses of the user.",
+            "example": []
           },
           "catLevel": {
             "type": "string",
             "enum": ["Ultra Cat", "Mega Cat"],
-            "description": "The cat level of the user."
+            "description": "The cat level of the user.",
+            "example": "Ultra Cat"
           },
           "catIndex": {
             "items": {
@@ -97,65 +108,68 @@
               ]
             },
             "type": "array",
-            "description": "The cat index of the user."
+            "description": "The cat index of the user.",
+            "example": "cat index"
           },
           "phoneNumbers": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "description": "The phone numbers associated with the user."
-          },
-          "isCat": {
-            "type": "boolean",
-            "description": "Whether or not the user is a cat."
+            "description": "The phone numbers associated with the user.",
+            "example": []
           },
           "groupId": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "example": 113
           }
         },
-        "required": ["id", "email", "name", "phoneNumbers", "groupId"],
+        "required": ["id", "email", "name", "isCat", "phoneNumbers", "groupId"],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
-          "email": "jane@doe.com",
-          "name": "Jane Doe",
-          "status": "Sad",
-          "phoneNumbers": [],
-          "groupId": 1
-        }
+        "additionalProperties": false
       },
       "User": {
+        "description": "User description written by yours truly Stoyan.",
         "properties": {
           "id": {
             "$ref": "#/components/schemas/UUID",
-            "description": "The user's identifier."
+            "description": "The user's identifier.",
+            "example": "66ef17a1-af37-4f7b-8e82-b341e0241a30"
           },
           "email": {
             "type": "string",
-            "description": "The email the user used to register his account."
+            "description": "The email the user used to register his account.",
+            "example": "jane@doe.com"
           },
           "name": {
             "type": "string",
-            "description": "The name the user used to register his account."
+            "description": "The name the user used to register his account.",
+            "example": "Jane Doe The First"
+          },
+          "isCat": {
+            "type": "boolean",
+            "description": "Is the user a cat.",
+            "example": false
           },
           "status": {
             "$ref": "#/components/schemas/HappinessStatus",
-            "description": "The happiness status of the user."
+            "description": "The happiness status of the user.",
+            "example": "Sad"
           },
           "manyStatuses": {
             "items": {
               "$ref": "#/components/schemas/HappinessStatus"
             },
             "type": "array",
-            "description": "An array of happiness statuses of the user."
+            "description": "An array of happiness statuses of the user.",
+            "example": []
           },
           "catLevel": {
             "type": "string",
             "enum": ["Ultra Cat", "Mega Cat"],
-            "description": "The cat level of the user."
+            "description": "The cat level of the user.",
+            "example": "Ultra Cat"
           },
           "catIndex": {
             "items": {
@@ -190,39 +204,35 @@
               ]
             },
             "type": "array",
-            "description": "The cat index of the user."
+            "description": "The cat index of the user.",
+            "example": "cat index"
           },
           "phoneNumbers": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "description": "The phone numbers associated with the user."
-          },
-          "isCat": {
-            "type": "boolean",
-            "description": "Whether or not the user is a cat."
+            "description": "The phone numbers associated with the user.",
+            "example": []
           }
         },
-        "required": ["id", "email", "name", "phoneNumbers"],
+        "required": ["id", "email", "name", "isCat", "phoneNumbers"],
         "type": "object",
-        "additionalProperties": false,
-        "example": {
-          "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
-          "email": "jane@doe.com",
-          "name": "Jane Doe",
-          "status": "Sad",
-          "phoneNumbers": []
-        }
+        "additionalProperties": false
       },
       "AuthUser": {
+        "description": "An authenticated user.",
         "properties": {
           "id": {
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "description": "The authenticated user's identifier.",
+            "example": 1
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "The authenticated user's name.",
+            "example": "Joe Done"
           }
         },
         "required": ["id", "name"],
@@ -267,7 +277,8 @@
                         "name": "Jane Doe",
                         "status": "Happy",
                         "phoneNumbers": [],
-                        "groupId": 1
+                        "groupId": 1,
+                        "isCat": false
                       },
                       {
                         "id": "c421afa9-08c7-491a-90a1-575bb656cffd",
@@ -275,7 +286,8 @@
                         "name": "John Doe",
                         "status": "Sad",
                         "phoneNumbers": [],
-                        "groupId": 1
+                        "groupId": 1,
+                        "isCat": false
                       }
                     ]
                   }
@@ -331,8 +343,8 @@
             "name": "groupId",
             "required": true,
             "schema": {
-              "format": "int32",
-              "type": "integer"
+              "format": "double",
+              "type": "number"
             }
           },
           {
@@ -341,11 +353,12 @@
             "name": "limit",
             "required": false,
             "schema": {
-              "format": "int32",
-              "type": "integer"
+              "format": "double",
+              "type": "number"
             }
           },
           {
+            "description": "The =required cat level of users.",
             "in": "query",
             "name": "catLevel",
             "required": false,
@@ -365,7 +378,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/UserFromGroup"
                 }
               }
             }
@@ -576,7 +589,7 @@
         "operationId": "GetTreasure",
         "responses": {
           "200": {
-            "description": "Ok",
+            "description": "An AuthUser.",
             "content": {
               "application/json": {
                 "schema": {
@@ -586,6 +599,8 @@
             }
           }
         },
+        "description": "Get the biggest treasure.",
+        "summary": "Retrieve treasure.",
         "tags": ["Secure"],
         "security": [
           {
@@ -600,7 +615,7 @@
         "operationId": "PostCat",
         "responses": {
           "200": {
-            "description": "Ok",
+            "description": "\"add :)\".",
             "content": {
               "application/json": {
                 "schema": {
@@ -610,6 +625,8 @@
             }
           }
         },
+        "description": "Demonstrative cat endpoint that returns static data.",
+        "summary": "Retrieve \"add :)\" from the server.",
         "tags": ["Cat"],
         "security": [],
         "parameters": []
@@ -620,7 +637,7 @@
         "operationId": "PostCatId",
         "responses": {
           "200": {
-            "description": "Ok",
+            "description": "The given catId.",
             "content": {
               "application/json": {
                 "schema": {
@@ -630,10 +647,13 @@
             }
           }
         },
+        "description": "Demonstrative cat endpoint that returns dynamic data.",
+        "summary": "Retrieve catId from the server.",
         "tags": ["Cat"],
         "security": [],
         "parameters": [
           {
+            "description": "The identification of a cat.",
             "in": "path",
             "name": "catId",
             "required": true,

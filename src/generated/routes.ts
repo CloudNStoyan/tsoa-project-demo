@@ -64,6 +64,7 @@ const models: TsoaRoute.Models = {
       id: { ref: 'UUID', required: true },
       email: { dataType: 'string', required: true },
       name: { dataType: 'string', required: true },
+      isCat: { dataType: 'boolean', required: true },
       status: { ref: 'HappinessStatus' },
       manyStatuses: {
         dataType: 'array',
@@ -105,16 +106,7 @@ const models: TsoaRoute.Models = {
         array: { dataType: 'string' },
         required: true,
       },
-      isCat: { dataType: 'boolean' },
-      groupId: {
-        dataType: 'integer',
-        required: true,
-        validators: {
-          isInt: {
-            errorMsg: 'We would kindly ask you to provide a number here.',
-          },
-        },
-      },
+      groupId: { dataType: 'integer', required: true },
     },
     additionalProperties: false,
   },
@@ -125,6 +117,7 @@ const models: TsoaRoute.Models = {
       id: { ref: 'UUID', required: true },
       email: { dataType: 'string', required: true },
       name: { dataType: 'string', required: true },
+      isCat: { dataType: 'boolean', required: true },
       status: { ref: 'HappinessStatus' },
       manyStatuses: {
         dataType: 'array',
@@ -166,7 +159,6 @@ const models: TsoaRoute.Models = {
         array: { dataType: 'string' },
         required: true,
       },
-      isCat: { dataType: 'boolean' },
     },
     additionalProperties: false,
   },
@@ -209,23 +201,9 @@ export function RegisterRoutes(app: Router) {
           in: 'path',
           name: 'groupId',
           required: true,
-          dataType: 'integer',
-          validators: {
-            isInt: {
-              errorMsg: 'This message will show if the validation fails.',
-            },
-          },
+          dataType: 'double',
         },
-        limit: {
-          in: 'query',
-          name: 'limit',
-          dataType: 'integer',
-          validators: {
-            isInt: {
-              errorMsg: 'This message will show if the validation fails.',
-            },
-          },
-        },
+        limit: { in: 'query', name: 'limit', dataType: 'double' },
         catLevel: { in: 'query', name: 'catLevel', dataType: 'string' },
       };
 
