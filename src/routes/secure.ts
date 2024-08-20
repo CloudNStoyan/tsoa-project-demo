@@ -1,18 +1,34 @@
 import { Controller, Get, Route, Security, Tags, Request } from 'tsoa';
 import type { Request as ExpressRequest } from 'express';
 
+/**
+ * An authenticated user.
+ */
 interface AuthUser {
+  /**
+   * The authenticated user's identifier.
+   * @example 1
+   */
   id: number;
+
+  /**
+   * The authenticated user's name.
+   * @example "Joe Done"
+   */
   name: string;
 }
 
+/**
+ * Express Request With User.
+ */
 interface ExpressRequestWithUser extends ExpressRequest {
+  /**
+   * Authenticated User.
+   * @example {}
+   */
   user: AuthUser;
 }
 
-/**
- * Secure operations.
- */
 @Tags('Secure')
 @Route('secure')
 export class SecureController extends Controller {

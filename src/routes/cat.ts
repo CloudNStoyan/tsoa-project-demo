@@ -1,8 +1,5 @@
 import { Controller, Path, Post, Route, Tags } from 'tsoa';
 
-/**
- * Cat operations.
- */
 @Route('cats')
 @Tags('Cat')
 export class CatController extends Controller {

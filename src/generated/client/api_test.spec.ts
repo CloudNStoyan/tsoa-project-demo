@@ -52,8 +52,8 @@ describe('UserApi', () => {
     return expect(instance.getUser(userId, {})).resolves.toBe(null);
   });
   test('getUsers', () => {
-    const groupId: number = 56;
-    const limit: number = 56;
+    const groupId: number = 1.2;
+    const limit: number = 1.2;
     return expect(instance.getUsers(groupId, limit, {})).resolves.toBe(null);
   });
   test('updateUser', () => {

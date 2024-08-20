@@ -23,32 +23,40 @@ import { ApiError, BaseController } from '../utils.js';
 type UUID = string;
 
 /**
- * @example {
- *  "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
- *  "email": "jane@doe.com",
- *  "name": "Jane Doe",
- *  "status": "Sad",
- *  "phoneNumbers": []
- *  }
+ * User description written by yours truly Stoyan.
  */
 interface User {
+  /**
+   * The user's identifier.
+   * @example "66ef17a1-af37-4f7b-8e82-b341e0241a30"
+   */
   id: UUID;
   /**
    * The email the user used to register his account.
+   * @example "jane@doe.com"
    */
   email: string;
   /**
    * The name the user used to register his account.
+   * @example "Jane Doe The First"
    */
   name: string;
 
   /**
+   * Is the user a cat.
+   * @example false
+   */
+  isCat: boolean;
+
+  /**
    * The happiness status of the user.
+   * @example "Sad"
    */
   status?: 'Happy' | 'Sad';
 
   /**
    * The phone numbers associated with the user.
+   * @example []
    */
   phoneNumbers: string[];
 }
@@ -58,18 +66,11 @@ interface User {
  * in the system with the user that performed them.
  * The User object contains common information across
  * every user in the system regardless of status and role.
- * @example {
- * "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
- *  "email": "jane@doe.com",
- *  "name": "Jane Doe",
- *  "status": "Sad",
- *  "phoneNumbers": [],
- *  "groupId": 1
- *  }
  */
 interface UserFromGroup extends User {
   /**
-   * @isInt We would kindly ask you to provide a number here.
+   * @isInt
+   * @example 113
    */
   groupId: number;
 }
@@ -81,6 +82,7 @@ const data: User[] = [
     name: 'Jane Doe',
     status: 'Happy',
     phoneNumbers: [],
+    isCat: false,
   },
   {
     id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
@@ -88,12 +90,10 @@ const data: User[] = [
     name: 'John Doe',
     status: 'Sad',
     phoneNumbers: [],
+    isCat: false,
   },
 ];
 
-/**
- * User operations.
- */
 @Response<ApiError>(401, 'Unauthorized', {
   status: 401,
   message: 'Access denied!',
@@ -106,9 +106,7 @@ export class UserController extends BaseController {
    * Retrieves the details of users.
    * Supply the unique group ID from either and receive corresponding user details.
    * @param groupId The group's identifier.
-   * @isInt groupId This message will show if the validation fails.
    * @param limit   Provide a limit to the result.
-   * @isInt limit   This message will show if the validation fails.
    * @returns       An array with User Objects.
    * @summary       Retrieve details of users.
    */
@@ -121,6 +119,7 @@ export class UserController extends BaseController {
         status: 'Happy',
         phoneNumbers: [],
         groupId: 1,
+        isCat: false,
       },
       {
         id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
@@ -129,6 +128,7 @@ export class UserController extends BaseController {
         status: 'Sad',
         phoneNumbers: [],
         groupId: 1,
+        isCat: false,
       },
     ],
     'An example of Users'
@@ -163,11 +163,11 @@ export class UserController extends BaseController {
     message: 'User not found!',
   })
   @Get('{userId}')
-  public async getUser(@Path() userId: UUID): Promise<User> {
-    const user = data.find((u) => u.id === userId);
+  public async getUser(@Path() userId: UUID): Promise<UserFromGroup> {
+    const user = data.find((u) => u.id === userId) as UserFromGroup;
 
     if (!user) {
-      return this.errorResult<User>(404, {
+      return this.errorResult<UserFromGroup>(404, {
         message: 'User not found!',
       });
     }

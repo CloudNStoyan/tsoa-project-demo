@@ -59,6 +59,7 @@ const models: TsoaRoute.Models = {
       id: { ref: 'UUID', required: true },
       email: { dataType: 'string', required: true },
       name: { dataType: 'string', required: true },
+      isCat: { dataType: 'boolean', required: true },
       status: {
         dataType: 'union',
         subSchemas: [
@@ -71,15 +72,7 @@ const models: TsoaRoute.Models = {
         array: { dataType: 'string' },
         required: true,
       },
-      groupId: {
-        dataType: 'integer',
-        required: true,
-        validators: {
-          isInt: {
-            errorMsg: 'We would kindly ask you to provide a number here.',
-          },
-        },
-      },
+      groupId: { dataType: 'integer', required: true },
     },
     additionalProperties: false,
   },
@@ -90,6 +83,7 @@ const models: TsoaRoute.Models = {
       id: { ref: 'UUID', required: true },
       email: { dataType: 'string', required: true },
       name: { dataType: 'string', required: true },
+      isCat: { dataType: 'boolean', required: true },
       status: {
         dataType: 'union',
         subSchemas: [
@@ -144,23 +138,9 @@ export function RegisterRoutes(app: Router) {
           in: 'path',
           name: 'groupId',
           required: true,
-          dataType: 'integer',
-          validators: {
-            isInt: {
-              errorMsg: 'This message will show if the validation fails.',
-            },
-          },
+          dataType: 'double',
         },
-        limit: {
-          in: 'query',
-          name: 'limit',
-          dataType: 'integer',
-          validators: {
-            isInt: {
-              errorMsg: 'This message will show if the validation fails.',
-            },
-          },
-        },
+        limit: { in: 'query', name: 'limit', dataType: 'double' },
       };
 
       // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
