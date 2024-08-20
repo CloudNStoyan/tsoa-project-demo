@@ -182,13 +182,26 @@ export class UserClientAPI extends ClientAPIBase {
    * Supply the unique group ID from either and receive corresponding user details.
    * @param groupId The group's identifier.
    * @param limit Provide a limit to the result.
+   * @param catLevel
    * @summary Retrieve details of users.
    */
-  getUsers(groupId: number, limit?: number): Promise<Array<UserFromGroup>> {
+  getUsers(
+    groupId: number,
+    limit?: number,
+    catLevel?: string
+  ): Promise<Array<UserFromGroup>> {
     const urlParams = new URLSearchParams();
 
-    if (limit) {
+    if (limit !== undefined) {
       urlParams.set('limit', String(limit));
+    }
+
+    if (Number.isNaN(limit)) {
+      throw new Error("Query param: 'limit' resolved to NaN.");
+    }
+
+    if (catLevel) {
+      urlParams.set('catLevel', catLevel);
     }
 
     const urlParamsString = urlParams.toString();

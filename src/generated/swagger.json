@@ -344,6 +344,14 @@
               "format": "int32",
               "type": "integer"
             }
+          },
+          {
+            "in": "query",
+            "name": "catLevel",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ]
       }

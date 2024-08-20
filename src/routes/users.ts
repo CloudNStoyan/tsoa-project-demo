@@ -175,13 +175,17 @@ export class UserController extends BaseController {
   @Get('{groupId}/all')
   public async getUsers(
     @Path() groupId: number,
-    @Query() limit?: number
+    @Query() limit?: number,
+    @Query() catLevel?: string
   ): Promise<UserFromGroup[]> {
     const users: UserFromGroup[] = data.map((user) => {
       const userFromGroup = user as UserFromGroup;
       userFromGroup.groupId = groupId;
       return userFromGroup;
     });
+
+    // eslint-disable-next-line no-console
+    console.log('users | catLevel', catLevel);
 
     return users.slice(0, limit || users.length);
   }

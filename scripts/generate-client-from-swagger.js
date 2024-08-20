@@ -560,9 +560,20 @@ class ModelRenderer {
       output += 'const urlParams = new URLSearchParams();\n\n';
 
       for (const queryParam of queryParams) {
-        output += `if (${queryParam.name}) {\n`;
-        output += `urlParams.set("${queryParam.name}", String(${queryParam.name}));\n`;
-        output += '}\n';
+        if (queryParam.resolvedType === 'number') {
+          output += `if (${queryParam.name} !== undefined) {\n`;
+          output += `urlParams.set("${queryParam.name}", String(${queryParam.name}));\n`;
+          output += '}\n\n';
+          output += `if (Number.isNaN(${queryParam.name})) {\n`;
+          output += `throw new Error("Query param: '${queryParam.name}' resolved to NaN.")\n`;
+          output += '}\n\n';
+        } else if (queryParam.resolvedType === 'string') {
+          output += `if (${queryParam.name}) {\n`;
+          output += `urlParams.set("${queryParam.name}", ${queryParam.name});\n`;
+          output += '}\n\n';
+        } else {
+          // TODO: What to do when the resolved type is something else?
+        }
       }
 
       output += '\nconst urlParamsString = urlParams.toString();\n\n';
