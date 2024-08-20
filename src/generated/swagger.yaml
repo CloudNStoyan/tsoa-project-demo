@@ -237,6 +237,7 @@ paths:
                     name: Example Doe
                     status: Sad
                     phoneNumbers: []
+                    isCat: false
         '401':
           description: Unauthorized
           content:
@@ -292,6 +293,7 @@ paths:
                     name: Updated Doe
                     status: Sad
                     phoneNumbers: []
+                    isCat: false
         '401':
           description: Unauthorized
           content:

@@ -275,7 +275,8 @@
                       "email": "Example@doe.com",
                       "name": "Example Doe",
                       "status": "Sad",
-                      "phoneNumbers": []
+                      "phoneNumbers": [],
+                      "isCat": false
                     }
                   }
                 }
@@ -352,7 +353,8 @@
                       "email": "Updated@doe.com",
                       "name": "Updated Doe",
                       "status": "Sad",
-                      "phoneNumbers": []
+                      "phoneNumbers": [],
+                      "isCat": false
                     }
                   }
                 }

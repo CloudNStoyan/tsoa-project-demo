@@ -166,6 +166,7 @@ export class UserController extends BaseController {
       name: 'Example Doe',
       status: 'Sad',
       phoneNumbers: [],
+      isCat: false,
     },
     'An example of a user.'
   )
@@ -206,6 +207,7 @@ export class UserController extends BaseController {
       name: 'Updated Doe',
       status: 'Sad',
       phoneNumbers: [],
+      isCat: false,
     },
     'An example of updated user.'
   )
