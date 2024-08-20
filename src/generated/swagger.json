@@ -407,6 +407,83 @@
             }
           }
         }
+      },
+      "delete": {
+        "operationId": "DeleteUser",
+        "responses": {
+          "200": {
+            "description": "Nothing is returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                },
+                "examples": {
+                  "An example of a user.": {
+                    "value": {
+                      "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
+                      "email": "Example@doe.com",
+                      "name": "Example Doe",
+                      "status": "Sad",
+                      "phoneNumbers": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "status": 401,
+                      "message": "Access denied!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "status": 404,
+                      "message": "User not found!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Permanently delete an user.",
+        "summary": "Delete an user.",
+        "tags": ["User"],
+        "security": [],
+        "parameters": [
+          {
+            "description": "The user's identifier.",
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UUID"
+            }
+          }
+        ]
       }
     },
     "/secure": {

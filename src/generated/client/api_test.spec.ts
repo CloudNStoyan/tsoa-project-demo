@@ -47,6 +47,10 @@ describe('UserApi', () => {
     instance = new api.UserApi(config);
   });
 
+  test('deleteUser', () => {
+    const userId: string = undefined;
+    return expect(instance.deleteUser(userId, {})).resolves.toBe(null);
+  });
   test('getUser', () => {
     const userId: string = undefined;
     return expect(instance.getUser(userId, {})).resolves.toBe(null);

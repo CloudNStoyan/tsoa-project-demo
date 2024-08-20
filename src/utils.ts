@@ -11,4 +11,9 @@ export class BaseController extends Controller {
     const errorWithStatus: ApiError = { ...error, status };
     return errorWithStatus as unknown as TSuccess;
   }
+
+  noContentResult<TSuccess>(): TSuccess {
+    this.setStatus(204);
+    return undefined as unknown as TSuccess;
+  }
 }

@@ -4,7 +4,7 @@ const meta = {
     returnTypeAsFirstTypeArg:
       "'{{ functionName }}' should have '{{ returnType }}' as first type argument",
     wrongFirstTypeArg:
-      "'{{ functionName }}' first type argument should be '{{ returnType }}' not '{{ wrongFirstArg }}'",
+      "'{{ functionName }}' first type argument should be the same as the method return type",
     noCorrectResponseDecorator:
       "Using '{{ functionName }}' inside a method requires you to have '@Response({{ status }})' decorator on the method",
   },
@@ -104,19 +104,90 @@ function getMethodDefinitionReturnType(methodDefinitionNode) {
 
 let usedFunctions = [];
 
+function recordUsedFunctions(functionNode) {
+  const functionName = getFullFunctionName(functionNode.callee);
+
+  usedFunctions.push({
+    name: functionName,
+    arguments: functionNode.arguments,
+    typeArguments: functionNode.typeArguments?.params,
+    node: functionNode,
+  });
+}
+
+function areTypesEqual(type1, type2) {
+  if (type1.type !== type2.type) {
+    return false;
+  }
+
+  if (
+    type1.type === 'TSTypeReference' &&
+    type1.typeName.name !== type2.typeName.name
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function reportIfTypeMismatch(context, returnType, usedFunction) {
+  if (!returnType) {
+    return;
+  }
+
+  if (
+    !Array.isArray(usedFunction.typeArguments) ||
+    usedFunction.typeArguments.length === 0
+  ) {
+    context.report({
+      node: usedFunction.node,
+      messageId: 'returnTypeAsFirstTypeArg',
+      data: {
+        functionName: usedFunction.name,
+        returnType: returnType.typeName.name,
+      },
+      fix: (fixer) => {
+        return fixer.replaceText(
+          usedFunction.node.callee,
+          `${usedFunction.name}<${returnType.typeName.name}>`
+        );
+      },
+    });
+    return;
+  }
+
+  if (!areTypesEqual(usedFunction.typeArguments[0], returnType)) {
+    context.report({
+      node: usedFunction.node,
+      messageId: 'wrongFirstTypeArg',
+      data: {
+        functionName: usedFunction.name,
+      },
+    });
+  }
+}
+
+function hasResponseDecoratorWithStatus(status, decorators) {
+  for (const decorator of decorators) {
+    if (
+      !Array.isArray(decorator.arguments) ||
+      decorator.arguments.length === 0
+    ) {
+      continue;
+    }
+
+    if (decorator.arguments[0].value === status) {
+      return true;
+    }
+  }
+}
+
 function create(context) {
   return {
     'MethodDefinition FunctionExpression > BlockStatement CallExpression': (
       node
     ) => {
-      const functionName = getFullFunctionName(node.callee);
-
-      usedFunctions.push({
-        name: functionName,
-        arguments: node.arguments,
-        typeArguments: node.typeArguments?.params,
-        node,
-      });
+      recordUsedFunctions(node);
     },
     'MethodDefinition:exit': (node) => {
       const decorators = getCallExpressionDecoratorsInfo(node);
@@ -125,137 +196,61 @@ function create(context) {
 
       for (const usedFunction of usedFunctions) {
         if (usedFunction.name === 'this.errorResult') {
-          if (returnType) {
-            if (
-              !Array.isArray(usedFunction.typeArguments) ||
-              usedFunction.typeArguments.length === 0
-            ) {
-              context.report({
-                node: usedFunction.node,
-                messageId: 'returnTypeAsFirstTypeArg',
-                data: {
-                  functionName: usedFunction.name,
-                  returnType: returnType.typeName.name,
-                },
-                fix: (fixer) => {
-                  return fixer.replaceText(
-                    usedFunction.node.callee,
-                    `${usedFunction.name}<${returnType.typeName.name}>`
-                  );
-                },
-              });
-            } else if (
-              usedFunction.typeArguments[0].typeName.name !==
-              returnType.typeName.name
-            ) {
-              context.report({
-                node: usedFunction.node,
-                messageId: 'wrongFirstTypeArg',
-                data: {
-                  functionName: usedFunction.name,
-                  returnType: returnType.typeName.name,
-                  wrongFirstArg: usedFunction.typeArguments[0].typeName.name,
-                },
-              });
-            } else {
-              // everything is good
-            }
-          }
+          reportIfTypeMismatch(context, returnType, usedFunction);
 
-          const responseDecorators = decorators['Response'];
-          if (!Array.isArray(responseDecorators)) {
-            context.report({
-              node,
-              messageId: 'noCorrectResponseDecorator',
-              data: {
-                functionName: usedFunction.name,
-                status: usedFunction.arguments[0].value,
-              },
-            });
+          if (
+            !Array.isArray(usedFunction.arguments) ||
+            usedFunction.arguments.length === 0
+          ) {
             continue;
           }
 
-          let hasCorrespondingResponseDecorator = false;
+          const responseDecorators = decorators['Response'];
+          const status = usedFunction.arguments[0].value;
 
-          for (const responseDecorator of responseDecorators) {
-            if (!Array.isArray(responseDecorator.arguments)) {
-              // TODO: report? Decorator Response should have first arg
-              context.report({
-                node,
-                messageId: 'noCorrectResponseDecorator',
-                data: {
-                  functionName: usedFunction.name,
-                  status: usedFunction.arguments[0].value,
-                },
-              });
-              continue;
-            }
-
-            if (!Array.isArray(usedFunction.arguments)) {
-              // TODO: what to do if the usedFunction doesn't have arguments? its not valid typescript
-              continue;
-            }
-
-            const firstArg = responseDecorator.arguments[0];
-
-            if (firstArg.value === usedFunction.arguments[0].value) {
-              // its the right response we good
-              hasCorrespondingResponseDecorator = true;
-              break;
-            }
-          }
-
-          if (!hasCorrespondingResponseDecorator) {
+          if (
+            !Array.isArray(responseDecorators) ||
+            !hasResponseDecoratorWithStatus(status, responseDecorators)
+          ) {
             context.report({
               node,
               messageId: 'noCorrectResponseDecorator',
               data: {
                 functionName: usedFunction.name,
-                status: usedFunction.arguments[0].value,
+                status,
               },
             });
           }
         }
 
         if (usedFunction.name === 'this.noContentResult') {
-          if (returnType) {
-            if (
-              !Array.isArray(usedFunction.typeArguments) ||
-              usedFunction.typeArguments.length === 0
-            ) {
-              // report [UsedFunction] should have [ReturnType] as first Type Argument.
-            } else if (
-              usedFunction.typeArguments[0].typeName.name !==
-              returnType.typeName.name
-            ) {
-              // report [UsedFunction]'s first Type Argument should be [ReturnType] not [TypeArgumentName]
-            } else {
-              // everything is good
-            }
+          reportIfTypeMismatch(context, returnType, usedFunction);
+
+          if (
+            !Array.isArray(usedFunction.arguments) ||
+            usedFunction.arguments.length === 0
+          ) {
+            continue;
           }
 
           const responseDecorators = decorators['Response'];
-          if (!Array.isArray(responseDecorators)) {
-            //report You must have [ResponseExample]
-          }
+          const NO_CONTENT_STATUS = 204;
 
-          let hasCorrespondingResponseDecorator = false;
-
-          for (const responseDecorator of responseDecorators) {
-            if (!Array.isArray(responseDecorator.arguments)) {
-              // TODO: report? Decorator Response should have first arg
-              continue;
-            }
-
-            if (usedFunction.arguments[0].value === 204) {
-              // its the right response we good
-              hasCorrespondingResponseDecorator = true;
-              break;
-            }
-          }
-
-          if (!hasCorrespondingResponseDecorator) {
-            // report no Response decorator with status [Status]
+          if (
+            !Array.isArray(responseDecorators) ||
+            !hasResponseDecoratorWithStatus(
+              NO_CONTENT_STATUS,
+              responseDecorators
+            )
+          ) {
+            context.report({
+              node,
+              messageId: 'noCorrectResponseDecorator',
+              data: {
+                functionName: usedFunction.name,
+                status: NO_CONTENT_STATUS,
+              },
+            });
           }
         }
       }

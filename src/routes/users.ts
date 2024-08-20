@@ -9,6 +9,7 @@ import {
   Put,
   Body,
   Tags,
+  Delete,
 } from 'tsoa';
 import { customLog } from '../middlewares/custom-log.js';
 import { ApiError, BaseController } from '../utils.js';
@@ -74,7 +75,7 @@ interface UserFromGroup extends User {
   groupId: number;
 }
 
-const data: User[] = [
+let data: User[] = [
   {
     id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
     email: 'jane@doe.com',
@@ -221,5 +222,40 @@ export class UserController extends BaseController {
     }
 
     return userData;
+  }
+
+  /**
+   * Permanently delete an user.
+   * @param userId The user's identifier.
+   * @summary      Delete an user.
+   * @returns      Nothing is returned.
+   */
+  @Response<ApiError>(404, 'Not Found', {
+    status: 404,
+    message: 'User not found!',
+  })
+  @Example<User>(
+    {
+      id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
+      email: 'Example@doe.com',
+      name: 'Example Doe',
+      status: 'Sad',
+      phoneNumbers: [],
+    },
+    'An example of a user.'
+  )
+  @Delete('{userId}')
+  public async deleteUser(@Path() userId: UUID): Promise<User> {
+    const user = data.find((u) => u.id === userId);
+
+    if (!user) {
+      return this.errorResult<User>(404, {
+        message: 'User not found!',
+      });
+    }
+
+    data = data.filter((u) => u.id !== userId);
+
+    return this.noContentResult<User>();
   }
 }
