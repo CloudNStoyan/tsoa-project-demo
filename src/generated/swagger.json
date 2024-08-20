@@ -28,6 +28,11 @@
         "description": "Stringified UUIDv4.\nSee [RFC 4112](https://tools.ietf.org/html/rfc4122).",
         "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}"
       },
+      "HappinessStatus": {
+        "description": "Happiness Status Enum that is very important.",
+        "enum": ["Happy", "Sad"],
+        "type": "string"
+      },
       "UserFromGroup": {
         "description": "User objects allow you to associate actions performed\nin the system with the user that performed them.\nThe User object contains common information across\nevery user in the system regardless of status and role.",
         "properties": {
@@ -44,9 +49,55 @@
             "description": "The name the user used to register his account."
           },
           "status": {
-            "type": "string",
-            "enum": ["Happy", "Sad"],
+            "$ref": "#/components/schemas/HappinessStatus",
             "description": "The happiness status of the user."
+          },
+          "manyStatuses": {
+            "items": {
+              "$ref": "#/components/schemas/HappinessStatus"
+            },
+            "type": "array",
+            "description": "An array of happiness statuses of the user."
+          },
+          "catLevel": {
+            "type": "string",
+            "enum": ["Ultra Cat", "Mega Cat"],
+            "description": "The cat level of the user."
+          },
+          "catIndex": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number",
+                  "format": "double"
+                },
+                {
+                  "$ref": "#/components/schemas/HappinessStatus"
+                },
+                {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/components/schemas/HappinessStatus"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "type": "array",
+            "description": "The cat index of the user."
           },
           "phoneNumbers": {
             "items": {
@@ -91,9 +142,55 @@
             "description": "The name the user used to register his account."
           },
           "status": {
-            "type": "string",
-            "enum": ["Happy", "Sad"],
+            "$ref": "#/components/schemas/HappinessStatus",
             "description": "The happiness status of the user."
+          },
+          "manyStatuses": {
+            "items": {
+              "$ref": "#/components/schemas/HappinessStatus"
+            },
+            "type": "array",
+            "description": "An array of happiness statuses of the user."
+          },
+          "catLevel": {
+            "type": "string",
+            "enum": ["Ultra Cat", "Mega Cat"],
+            "description": "The cat level of the user."
+          },
+          "catIndex": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number",
+                  "format": "double"
+                },
+                {
+                  "$ref": "#/components/schemas/HappinessStatus"
+                },
+                {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/components/schemas/HappinessStatus"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "type": "array",
+            "description": "The cat index of the user."
           },
           "phoneNumbers": {
             "items": {

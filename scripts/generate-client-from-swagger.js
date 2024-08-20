@@ -198,11 +198,44 @@ class TypescriptModel {
     return tags;
   }
 
-  resolveEnum(propertyName) {
-    return capitalizeFirstLetter(propertyName);
+  resolveUnion(union) {
+    if (Array.isArray(union.anyOf)) {
+      const resolvedUnionValues = [];
+      for (const unionValue of union.anyOf) {
+        resolvedUnionValues.push(this.resolveType(unionValue));
+      }
+
+      return `(${resolvedUnionValues.join('|')})`;
+    }
+
+    if (union.type === 'string') {
+      return `(${union.enum.map((value) => `'${value}'`).join('|')})`;
+    }
+
+    if (union.type === 'number' || union.type === 'integer') {
+      return `(${union.enum.join('|')})`;
+    }
+
+    throw new Error(`Invalid union type: '${union.type}'.`);
+  }
+
+  isPropertyAnUnion(propertyData) {
+    if (propertyData.anyOf) {
+      return true;
+    }
+
+    if (propertyData.enum) {
+      return true;
+    }
+
+    return false;
   }
 
   resolveType(property) {
+    if (this.isPropertyAnUnion(property)) {
+      return this.resolveUnion(property);
+    }
+
     if (property.$ref) {
       if (!property.$ref.startsWith('#/components/schemas/')) {
         throw new Error(
@@ -260,14 +293,16 @@ class TypescriptModel {
 
     const interfaces = [];
     const types = [];
-    const enumsMap = new Map();
+    const enums = [];
 
     for (const componentName in schemas) {
       const componentData = schemas[componentName];
 
-      if (componentData.type === 'object') {
-        this.appendEnums(componentData, enumsMap);
+      if (componentData.enum) {
+        const tsEnum = this.generateEnum(componentName, componentData);
 
+        enums.push(tsEnum);
+      } else if (componentData.type === 'object') {
         const tsInterface = this.generateInterface(
           componentName,
           componentData
@@ -276,57 +311,28 @@ class TypescriptModel {
         interfaces.push(tsInterface);
       } else {
         const tsType = this.generateType(componentName, componentData);
+
         types.push(tsType);
       }
     }
 
-    return { interfaces, types, enums: Array.from(enumsMap.values()) };
+    return { interfaces, types, enums };
   }
 
-  areEnumsEqual(enum1, enum2) {
-    if (enum1.values.length !== enum2.values.length) {
-      return false;
+  generateEnum(enumName, enumData) {
+    if (enumData.type !== 'string') {
+      throw new Error(
+        `Enums that are not strings are not supported, enum type found: '${enumData.type}'.`
+      );
     }
 
-    for (const enumValue of enum1.values) {
-      if (!enum2.values.includes(enumValue)) {
-        return false;
-      }
-    }
+    const tsEnum = {
+      name: enumName,
+      jsdoc: this.resolveJsdoc(enumData),
+      values: enumData.enum,
+    };
 
-    return true;
-  }
-
-  appendEnums(interfaceData, enumsMap) {
-    const openapiProperties = Object.entries(interfaceData.properties);
-
-    for (const [propertyName, propertyData] of openapiProperties) {
-      if (!propertyData.enum) {
-        continue;
-      }
-
-      if (propertyData.type !== 'string') {
-        throw new Error(
-          `Enums that are not strings are not supported, enum type found: '${propertyData.type}'.`
-        );
-      }
-
-      const enumName = capitalizeFirstLetter(propertyName);
-
-      const enumData = {
-        name: enumName,
-        values: propertyData.enum,
-        jsdoc: this.resolveJsdoc(propertyData),
-      };
-
-      if (!enumsMap.has(enumName)) {
-        enumsMap.set(enumName, enumData);
-      } else if (!this.areEnumsEqual(enumData, enumsMap.get(enumName))) {
-        throw new Error(`There is already an enum named: '${enumName}'.`);
-      } else {
-        // We skip the enum because we have already added it.
-      }
-    }
+    return tsEnum;
   }
 
   generateInterface(interfaceName, interfaceData) {
@@ -345,9 +351,7 @@ class TypescriptModel {
         name: propertyName,
         required: requiredProperties.includes(propertyName),
         jsdoc: this.resolveJsdoc(propertyData),
-        resolvedType: propertyData.enum
-          ? this.resolveEnum(propertyName)
-          : this.resolveType(propertyData),
+        resolvedType: this.resolveType(propertyData),
       };
 
       tsProperties.push(tsProperty);
@@ -402,6 +406,10 @@ class ModelRenderer {
     let output = '';
 
     for (const tsEnum of this.model.enums) {
+      if (tsEnum.jsdoc) {
+        output += this.renderJsdoc(tsEnum.jsdoc);
+      }
+
       output += `export enum ${tsEnum.name} {\n`;
       for (const enumValue of tsEnum.values) {
         output += `${enumValue} = "${enumValue}",\n`;

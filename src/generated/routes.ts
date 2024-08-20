@@ -53,18 +53,52 @@ const models: TsoaRoute.Models = {
     },
   },
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  HappinessStatus: {
+    dataType: 'refEnum',
+    enums: ['Happy', 'Sad'],
+  },
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   UserFromGroup: {
     dataType: 'refObject',
     properties: {
       id: { ref: 'UUID', required: true },
       email: { dataType: 'string', required: true },
       name: { dataType: 'string', required: true },
-      status: {
+      status: { ref: 'HappinessStatus' },
+      manyStatuses: {
+        dataType: 'array',
+        array: { dataType: 'refEnum', ref: 'HappinessStatus' },
+      },
+      catLevel: {
         dataType: 'union',
         subSchemas: [
-          { dataType: 'enum', enums: ['Happy'] },
-          { dataType: 'enum', enums: ['Sad'] },
+          { dataType: 'enum', enums: ['Ultra Cat'] },
+          { dataType: 'enum', enums: ['Mega Cat'] },
         ],
+      },
+      catIndex: {
+        dataType: 'array',
+        array: {
+          dataType: 'union',
+          subSchemas: [
+            { dataType: 'string' },
+            { dataType: 'double' },
+            { ref: 'HappinessStatus' },
+            {
+              dataType: 'union',
+              subSchemas: [
+                { dataType: 'string' },
+                {
+                  dataType: 'union',
+                  subSchemas: [
+                    { dataType: 'string' },
+                    { ref: 'HappinessStatus' },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       },
       phoneNumbers: {
         dataType: 'array',
@@ -91,12 +125,41 @@ const models: TsoaRoute.Models = {
       id: { ref: 'UUID', required: true },
       email: { dataType: 'string', required: true },
       name: { dataType: 'string', required: true },
-      status: {
+      status: { ref: 'HappinessStatus' },
+      manyStatuses: {
+        dataType: 'array',
+        array: { dataType: 'refEnum', ref: 'HappinessStatus' },
+      },
+      catLevel: {
         dataType: 'union',
         subSchemas: [
-          { dataType: 'enum', enums: ['Happy'] },
-          { dataType: 'enum', enums: ['Sad'] },
+          { dataType: 'enum', enums: ['Ultra Cat'] },
+          { dataType: 'enum', enums: ['Mega Cat'] },
         ],
+      },
+      catIndex: {
+        dataType: 'array',
+        array: {
+          dataType: 'union',
+          subSchemas: [
+            { dataType: 'string' },
+            { dataType: 'double' },
+            { ref: 'HappinessStatus' },
+            {
+              dataType: 'union',
+              subSchemas: [
+                { dataType: 'string' },
+                {
+                  dataType: 'union',
+                  subSchemas: [
+                    { dataType: 'string' },
+                    { ref: 'HappinessStatus' },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       },
       phoneNumbers: {
         dataType: 'array',

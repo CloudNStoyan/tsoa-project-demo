@@ -1,6 +1,9 @@
 import { ClientAPIBase } from '../../client-base.js';
 
-export enum Status {
+/**
+ * Happiness Status Enum that is very important.
+ */
+export enum HappinessStatus {
   Happy = 'Happy',
   Sad = 'Sad',
 }
@@ -56,7 +59,24 @@ export interface UserFromGroup {
   /**
    * The happiness status of the user.
    */
-  status?: Status;
+  status?: HappinessStatus;
+
+  /**
+   * An array of happiness statuses of the user.
+   */
+  manyStatuses?: Array<HappinessStatus>;
+
+  /**
+   * The cat level of the user.
+   */
+  catLevel?: 'Ultra Cat' | 'Mega Cat';
+
+  /**
+   * The cat index of the user.
+   */
+  catIndex?: Array<
+    string | number | HappinessStatus | (string | (string | HappinessStatus))
+  >;
 
   /**
    * The phone numbers associated with the user.
@@ -102,7 +122,24 @@ export interface User {
   /**
    * The happiness status of the user.
    */
-  status?: Status;
+  status?: HappinessStatus;
+
+  /**
+   * An array of happiness statuses of the user.
+   */
+  manyStatuses?: Array<HappinessStatus>;
+
+  /**
+   * The cat level of the user.
+   */
+  catLevel?: 'Ultra Cat' | 'Mega Cat';
+
+  /**
+   * The cat index of the user.
+   */
+  catIndex?: Array<
+    string | number | HappinessStatus | (string | (string | HappinessStatus))
+  >;
 
   /**
    * The phone numbers associated with the user.

@@ -28,6 +28,12 @@ components:
       pattern:
         "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-\
         [0-9A-Fa-f]{12}"
+    HappinessStatus:
+      description: Happiness Status Enum that is very important.
+      enum:
+        - Happy
+        - Sad
+      type: string
     UserFromGroup:
       description: |-
         User objects allow you to associate actions performed
@@ -45,11 +51,33 @@ components:
           type: string
           description: The name the user used to register his account.
         status:
+          $ref: '#/components/schemas/HappinessStatus'
+          description: The happiness status of the user.
+        manyStatuses:
+          items:
+            $ref: '#/components/schemas/HappinessStatus'
+          type: array
+          description: An array of happiness statuses of the user.
+        catLevel:
           type: string
           enum:
-            - Happy
-            - Sad
-          description: The happiness status of the user.
+            - Ultra Cat
+            - Mega Cat
+          description: The cat level of the user.
+        catIndex:
+          items:
+            anyOf:
+              - type: string
+              - type: number
+                format: double
+              - $ref: '#/components/schemas/HappinessStatus'
+              - anyOf:
+                  - type: string
+                  - anyOf:
+                      - type: string
+                      - $ref: '#/components/schemas/HappinessStatus'
+          type: array
+          description: The cat index of the user.
         phoneNumbers:
           items:
             type: string
@@ -88,11 +116,33 @@ components:
           type: string
           description: The name the user used to register his account.
         status:
+          $ref: '#/components/schemas/HappinessStatus'
+          description: The happiness status of the user.
+        manyStatuses:
+          items:
+            $ref: '#/components/schemas/HappinessStatus'
+          type: array
+          description: An array of happiness statuses of the user.
+        catLevel:
           type: string
           enum:
-            - Happy
-            - Sad
-          description: The happiness status of the user.
+            - Ultra Cat
+            - Mega Cat
+          description: The cat level of the user.
+        catIndex:
+          items:
+            anyOf:
+              - type: string
+              - type: number
+                format: double
+              - $ref: '#/components/schemas/HappinessStatus'
+              - anyOf:
+                  - type: string
+                  - anyOf:
+                      - type: string
+                      - $ref: '#/components/schemas/HappinessStatus'
+          type: array
+          description: The cat index of the user.
         phoneNumbers:
           items:
             type: string

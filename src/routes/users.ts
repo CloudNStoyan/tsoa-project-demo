@@ -24,6 +24,14 @@ import { ApiError, BaseController } from '../utils.js';
 type UUID = string;
 
 /**
+ * Happiness Status Enum that is very important.
+ */
+enum HappinessStatus {
+  Happy = 'Happy',
+  Sad = 'Sad',
+}
+
+/**
  * @example {
  *  "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
  *  "email": "jane@doe.com",
@@ -50,7 +58,27 @@ interface User {
   /**
    * The happiness status of the user.
    */
-  status?: 'Happy' | 'Sad';
+  status?: HappinessStatus;
+
+  /**
+   * An array of happiness statuses of the user.
+   */
+  manyStatuses?: HappinessStatus[];
+
+  /**
+   * The cat level of the user.
+   */
+  catLevel?: 'Ultra Cat' | 'Mega Cat';
+
+  /**
+   * The cat index of the user.
+   */
+  catIndex?: (
+    | string
+    | number
+    | HappinessStatus
+    | (string | (string | HappinessStatus))
+  )[];
 
   /**
    * The phone numbers associated with the user.
@@ -89,14 +117,14 @@ let data: User[] = [
     id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
     email: 'jane@doe.com',
     name: 'Jane Doe',
-    status: 'Happy',
+    status: HappinessStatus.Happy,
     phoneNumbers: [],
   },
   {
     id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
     email: 'john@doe.com',
     name: 'John Doe',
-    status: 'Sad',
+    status: HappinessStatus.Sad,
     phoneNumbers: [],
   },
 ];
@@ -125,7 +153,7 @@ export class UserController extends BaseController {
         id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
         email: 'jane@doe.com',
         name: 'Jane Doe',
-        status: 'Happy',
+        status: HappinessStatus.Happy,
         phoneNumbers: [],
         groupId: 1,
       },
@@ -133,7 +161,7 @@ export class UserController extends BaseController {
         id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
         email: 'john@doe.com',
         name: 'John Doe',
-        status: 'Sad',
+        status: HappinessStatus.Sad,
         phoneNumbers: [],
         groupId: 1,
       },
