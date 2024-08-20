@@ -10,10 +10,6 @@ const swaggerDocument = JSON.parse(swaggerJson);
 
 // TODO: validated swagger doc
 
-function capitalizeFirstLetter(string) {
-  return string[0].toUpperCase() + string.slice(1);
-}
-
 function lowercaseFirstLetter(string) {
   return string[0].toLowerCase() + string.slice(1);
 }
@@ -279,7 +275,7 @@ class TypescriptModel {
     let hasJsdoc = false;
 
     for (const jsdocProp of jsdocProperties) {
-      if (property[jsdocProp]) {
+      if (property[jsdocProp] !== undefined) {
         hasJsdoc = true;
         jsdoc[jsdocProp] = property[jsdocProp];
       }
@@ -532,7 +528,7 @@ class ModelRenderer {
       output += `* @format ${jsdoc.format}\n`;
     }
 
-    if (jsdoc.example) {
+    if (jsdoc.example !== undefined) {
       output += `* @example ${JSON.stringify(jsdoc.example, null, 2)}\n`;
     }
 

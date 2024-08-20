@@ -53,6 +53,7 @@ export interface UserFromGroup {
 
   /**
    * Is the user a cat.
+   * @example false
    */
   isCat: boolean;
 
@@ -119,6 +120,7 @@ export interface User {
 
   /**
    * Is the user a cat.
+   * @example false
    */
   isCat: boolean;
 
