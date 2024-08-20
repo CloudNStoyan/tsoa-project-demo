@@ -67,7 +67,7 @@ export interface UserFromGroup {
    * An array of happiness statuses of the user.
    * @example []
    */
-  manyStatuses?: Array<HappinessStatus>;
+  manyStatuses?: HappinessStatus[];
 
   /**
    * The cat level of the user.
@@ -79,15 +79,18 @@ export interface UserFromGroup {
    * The cat index of the user.
    * @example "cat index"
    */
-  catIndex?: Array<
-    string | number | HappinessStatus | (string | (string | HappinessStatus))
-  >;
+  catIndex?: (
+    | string
+    | number
+    | HappinessStatus
+    | (string | (string | HappinessStatus))
+  )[];
 
   /**
    * The phone numbers associated with the user.
    * @example []
    */
-  phoneNumbers: Array<string>;
+  phoneNumbers: string[];
 
   /**
    * @format int32
@@ -134,7 +137,7 @@ export interface User {
    * An array of happiness statuses of the user.
    * @example []
    */
-  manyStatuses?: Array<HappinessStatus>;
+  manyStatuses?: HappinessStatus[];
 
   /**
    * The cat level of the user.
@@ -146,15 +149,18 @@ export interface User {
    * The cat index of the user.
    * @example "cat index"
    */
-  catIndex?: Array<
-    string | number | HappinessStatus | (string | (string | HappinessStatus))
-  >;
+  catIndex?: (
+    | string
+    | number
+    | HappinessStatus
+    | (string | (string | HappinessStatus))
+  )[];
 
   /**
    * The phone numbers associated with the user.
    * @example []
    */
-  phoneNumbers: Array<string>;
+  phoneNumbers: string[];
 }
 
 /**
@@ -203,7 +209,7 @@ export class UserClientAPI extends ClientAPIBase {
     groupId: number,
     limit?: number,
     catLevel?: string
-  ): Promise<Array<UserFromGroup>> {
+  ): Promise<UserFromGroup[]> {
     const urlParams = new URLSearchParams();
 
     if (limit !== undefined) {
@@ -211,7 +217,7 @@ export class UserClientAPI extends ClientAPIBase {
     }
 
     if (Number.isNaN(limit)) {
-      throw new Error("Query param: 'limit' resolved to NaN.");
+      throw new Error("Invalid value NaN for query param: 'limit'.");
     }
 
     if (catLevel) {
@@ -222,9 +228,7 @@ export class UserClientAPI extends ClientAPIBase {
 
     const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
 
-    return super.fetch<Array<UserFromGroup>>(
-      `/users/${groupId}/all${queryString}`
-    );
+    return super.fetch<UserFromGroup[]>(`/users/${groupId}/all${queryString}`);
   }
 
   /**

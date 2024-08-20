@@ -8,8 +8,6 @@ const swaggerJson = await fs.readFile(SWAGGER_JSON_FILE_PATH, {
 
 const swaggerDocument = JSON.parse(swaggerJson);
 
-// TODO: validated swagger doc
-
 function lowercaseFirstLetter(string) {
   return string[0].toLowerCase() + string.slice(1);
 }
@@ -243,7 +241,7 @@ class TypescriptModel {
     }
 
     if (property.type === 'array') {
-      return `Array<${this.resolveType(property.items)}>`;
+      return `(${this.resolveType(property.items)})[]`;
     }
 
     if (
@@ -561,14 +559,16 @@ class ModelRenderer {
           output += `urlParams.set("${queryParam.name}", String(${queryParam.name}));\n`;
           output += '}\n\n';
           output += `if (Number.isNaN(${queryParam.name})) {\n`;
-          output += `throw new Error("Query param: '${queryParam.name}' resolved to NaN.")\n`;
+          output += `throw new Error("Invalid value NaN for query param: '${queryParam.name}'.")\n`;
           output += '}\n\n';
         } else if (queryParam.resolvedType === 'string') {
           output += `if (${queryParam.name}) {\n`;
           output += `urlParams.set("${queryParam.name}", ${queryParam.name});\n`;
           output += '}\n\n';
         } else {
-          // TODO: What to do when the resolved type is something else?
+          throw new Error(
+            `Query param type can only be 'number' or 'string', got: '${queryParam.resolvedType}'.`
+          );
         }
       }
 
