@@ -24,6 +24,23 @@ import { ApiError, BaseController } from '../utils.js';
 type UUID = string;
 
 /**
+ * Cat description.
+ */
+interface Cat {
+  /**
+   * The cat's identifier.
+   * @example 1
+   */
+  catId: number;
+
+  /**
+   * The cat's name.
+   * @example "Kozunak"
+   */
+  catName: string;
+}
+
+/**
  * User description written by yours truly Stoyan.
  */
 interface User {
@@ -60,6 +77,12 @@ interface User {
    * @example []
    */
   phoneNumbers: string[];
+
+  /**
+   * The user's cat.
+   * @example [{}]
+   */
+  cat: Cat[];
 }
 
 /**
@@ -84,6 +107,12 @@ let data: User[] = [
     status: 'Happy',
     phoneNumbers: [],
     isCat: false,
+    cat: [
+      {
+        catId: 2,
+        catName: 'Cat Name Here or smth',
+      },
+    ],
   },
   {
     id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
@@ -92,6 +121,12 @@ let data: User[] = [
     status: 'Sad',
     phoneNumbers: [],
     isCat: false,
+    cat: [
+      {
+        catId: 2,
+        catName: 'Cat Name Here or smth',
+      },
+    ],
   },
 ];
 
@@ -121,6 +156,12 @@ export class UserController extends BaseController {
         phoneNumbers: [],
         groupId: 1,
         isCat: false,
+        cat: [
+          {
+            catId: 2,
+            catName: 'Cat Name Here or smth',
+          },
+        ],
       },
       {
         id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
@@ -130,6 +171,12 @@ export class UserController extends BaseController {
         phoneNumbers: [],
         groupId: 1,
         isCat: false,
+        cat: [
+          {
+            catId: 2,
+            catName: 'Cat Name Here or smth',
+          },
+        ],
       },
     ],
     'An example of Users'
@@ -159,17 +206,6 @@ export class UserController extends BaseController {
    * @returns      details of the user in the form of an User Object.
    * @summary      Retrieve details of a user.
    */
-  @Example<User>(
-    {
-      id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
-      email: 'Example@doe.com',
-      name: 'Example Doe',
-      status: 'Sad',
-      phoneNumbers: [],
-      isCat: false,
-    },
-    'An example of a user.'
-  )
   @Response<ApiError>(404, 'Not Found', {
     status: 404,
     message: 'User not found!',
@@ -200,17 +236,6 @@ export class UserController extends BaseController {
     message: 'User not found!',
   })
   @Put('{userId}')
-  @Example<User>(
-    {
-      id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
-      email: 'Updated@doe.com',
-      name: 'Updated Doe',
-      status: 'Sad',
-      phoneNumbers: [],
-      isCat: false,
-    },
-    'An example of updated user.'
-  )
   public async updateUser(
     @Path() userId: UUID,
     @Body() userData: User

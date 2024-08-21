@@ -2,7 +2,7 @@
 const meta = {
   messages: {
     missingRequiredDecorators:
-      'The following required decorators are missing: [ {{ decorators }} ].',
+      'The Example decorator is required when the method returns an array.',
   },
   type: 'problem',
   hasSuggestions: false,

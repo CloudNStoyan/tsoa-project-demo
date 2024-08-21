@@ -123,6 +123,25 @@ export interface AuthUser {
   name: string;
 }
 /**
+ * Cat description.
+ * @export
+ * @interface Cat
+ */
+export interface Cat {
+  /**
+   * The cat's identifier.
+   * @type {number}
+   * @memberof Cat
+   */
+  catId: number;
+  /**
+   * The cat's name.
+   * @type {string}
+   * @memberof Cat
+   */
+  catName: string;
+}
+/**
  * Stringified UUIDv4. See [RFC 4112](https://tools.ietf.org/html/rfc4122).
  * @export
  */
@@ -169,6 +188,12 @@ export interface User {
    * @memberof User
    */
   phoneNumbers: Array<string>;
+  /**
+   * The user's cat.
+   * @type {Array<Cat>}
+   * @memberof User
+   */
+  cat: Array<Cat>;
 }
 
 /**
@@ -227,6 +252,12 @@ export interface UserFromGroup {
    * @memberof UserFromGroup
    */
   phoneNumbers: Array<string>;
+  /**
+   * The user's cat.
+   * @type {Array<Cat>}
+   * @memberof UserFromGroup
+   */
+  cat: Array<Cat>;
   /**
    *
    * @type {number}
@@ -623,8 +654,8 @@ export const UserApiFetchParamCreator = function (
           'Required parameter userId was null or undefined when calling deleteUser.'
         );
       }
-      const localVarPath = `/users/{userId}`.replace(
-        `{${'userId'}}`,
+      const localVarPath = `/users/{_userId}`.replace(
+        `{${'_userId'}}`,
         encodeURIComponent(String(userId))
       );
       const localVarUrlObj = url.parse(localVarPath, true);
@@ -823,7 +854,7 @@ export const UserApiFp = function (configuration?: Configuration) {
     deleteUser(
       userId: string,
       options?: any
-    ): (fetch?: FetchAPI, basePath?: string) => Promise<User> {
+    ): (fetch?: FetchAPI, basePath?: string) => Promise<Response> {
       const localVarFetchArgs = UserApiFetchParamCreator(
         configuration
       ).deleteUser(userId, options);
@@ -836,7 +867,7 @@ export const UserApiFp = function (configuration?: Configuration) {
           localVarFetchArgs.options
         ).then((response) => {
           if (response.status >= 200 && response.status < 300) {
-            return response.json();
+            return response;
           } else {
             throw response;
           }

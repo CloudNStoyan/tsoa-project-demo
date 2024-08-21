@@ -28,6 +28,25 @@
         "description": "Stringified UUIDv4.\nSee [RFC 4112](https://tools.ietf.org/html/rfc4122).",
         "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}"
       },
+      "Cat": {
+        "description": "Cat description.",
+        "properties": {
+          "catId": {
+            "type": "number",
+            "format": "double",
+            "description": "The cat's identifier.",
+            "example": 1
+          },
+          "catName": {
+            "type": "string",
+            "description": "The cat's name.",
+            "example": "Kozunak"
+          }
+        },
+        "required": ["catId", "catName"],
+        "type": "object",
+        "additionalProperties": false
+      },
       "UserFromGroup": {
         "description": "User objects allow you to associate actions performed\nin the system with the user that performed them.\nThe User object contains common information across\nevery user in the system regardless of status and role.",
         "properties": {
@@ -65,13 +84,29 @@
             "description": "The phone numbers associated with the user.",
             "example": []
           },
+          "cat": {
+            "items": {
+              "$ref": "#/components/schemas/Cat"
+            },
+            "type": "array",
+            "description": "The user's cat.",
+            "example": [{}]
+          },
           "groupId": {
             "type": "integer",
             "format": "int32",
             "example": 113
           }
         },
-        "required": ["id", "email", "name", "isCat", "phoneNumbers", "groupId"],
+        "required": [
+          "id",
+          "email",
+          "name",
+          "isCat",
+          "phoneNumbers",
+          "cat",
+          "groupId"
+        ],
         "type": "object",
         "additionalProperties": false
       },
@@ -111,9 +146,17 @@
             "type": "array",
             "description": "The phone numbers associated with the user.",
             "example": []
+          },
+          "cat": {
+            "items": {
+              "$ref": "#/components/schemas/Cat"
+            },
+            "type": "array",
+            "description": "The user's cat.",
+            "example": [{}]
           }
         },
-        "required": ["id", "email", "name", "isCat", "phoneNumbers"],
+        "required": ["id", "email", "name", "isCat", "phoneNumbers", "cat"],
         "type": "object",
         "additionalProperties": false
       },
@@ -175,7 +218,13 @@
                         "status": "Happy",
                         "phoneNumbers": [],
                         "groupId": 1,
-                        "isCat": false
+                        "isCat": false,
+                        "cat": [
+                          {
+                            "catId": 2,
+                            "catName": "Cat Name Here or smth"
+                          }
+                        ]
                       },
                       {
                         "id": "c421afa9-08c7-491a-90a1-575bb656cffd",
@@ -184,7 +233,13 @@
                         "status": "Sad",
                         "phoneNumbers": [],
                         "groupId": 1,
-                        "isCat": false
+                        "isCat": false,
+                        "cat": [
+                          {
+                            "catId": 2,
+                            "catName": "Cat Name Here or smth"
+                          }
+                        ]
                       }
                     ]
                   }
@@ -267,18 +322,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserFromGroup"
-                },
-                "examples": {
-                  "An example of a user.": {
-                    "value": {
-                      "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
-                      "email": "Example@doe.com",
-                      "name": "Example Doe",
-                      "status": "Sad",
-                      "phoneNumbers": [],
-                      "isCat": false
-                    }
-                  }
                 }
               }
             }
@@ -345,18 +388,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/User"
-                },
-                "examples": {
-                  "An example of updated user.": {
-                    "value": {
-                      "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
-                      "email": "Updated@doe.com",
-                      "name": "Updated Doe",
-                      "status": "Sad",
-                      "phoneNumbers": [],
-                      "isCat": false
-                    }
-                  }
                 }
               }
             }
@@ -425,22 +456,14 @@
             }
           }
         }
-      },
+      }
+    },
+    "/users/{_userId}": {
       "delete": {
         "operationId": "DeleteUser",
         "responses": {
-          "200": {
-            "description": "Nothing is returned.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
           "204": {
-            "description": "No Content"
+            "description": "No content"
           },
           "401": {
             "description": "Unauthorized",
@@ -459,24 +482,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                },
-                "examples": {
-                  "Example 1": {
-                    "value": {
-                      "status": 404,
-                      "message": "User not found!"
-                    }
-                  }
-                }
-              }
-            }
           }
         },
         "description": "Permanently delete an user.",
@@ -487,7 +492,7 @@
           {
             "description": "The user's identifier.",
             "in": "path",
-            "name": "userId",
+            "name": "_userId",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/UUID"

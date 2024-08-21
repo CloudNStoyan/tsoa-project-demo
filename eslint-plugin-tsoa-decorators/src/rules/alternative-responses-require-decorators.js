@@ -4,7 +4,7 @@ const meta = {
     returnTypeAsFirstTypeArg:
       "'{{ functionName }}' should have '{{ returnType }}' as first type argument",
     wrongFirstTypeArg:
-      "'{{ functionName }}' first type argument should be the same as the method return type",
+      "The first type argument of '{{ functionName }}' should be the same as method's return type",
     noCorrectResponseDecorator:
       "Using '{{ functionName }}' inside a method requires you to have '@Response({{ status }})' decorator on the method",
   },

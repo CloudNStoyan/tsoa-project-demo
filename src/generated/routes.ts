@@ -53,6 +53,15 @@ const models: TsoaRoute.Models = {
     },
   },
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  Cat: {
+    dataType: 'refObject',
+    properties: {
+      catId: { dataType: 'double', required: true },
+      catName: { dataType: 'string', required: true },
+    },
+    additionalProperties: false,
+  },
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   UserFromGroup: {
     dataType: 'refObject',
     properties: {
@@ -70,6 +79,11 @@ const models: TsoaRoute.Models = {
       phoneNumbers: {
         dataType: 'array',
         array: { dataType: 'string' },
+        required: true,
+      },
+      cat: {
+        dataType: 'array',
+        array: { dataType: 'refObject', ref: 'Cat' },
         required: true,
       },
       groupId: { dataType: 'integer', required: true },
@@ -94,6 +108,11 @@ const models: TsoaRoute.Models = {
       phoneNumbers: {
         dataType: 'array',
         array: { dataType: 'string' },
+        required: true,
+      },
+      cat: {
+        dataType: 'array',
+        array: { dataType: 'refObject', ref: 'Cat' },
         required: true,
       },
     },
@@ -251,7 +270,7 @@ export function RegisterRoutes(app: Router) {
   );
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   app.delete(
-    '/users/:userId',
+    '/users/:_userId',
     ...fetchMiddlewares<RequestHandler>(UserController),
     ...fetchMiddlewares<RequestHandler>(UserController.prototype.deleteUser),
 
@@ -261,7 +280,7 @@ export function RegisterRoutes(app: Router) {
       next: any
     ) {
       const args: Record<string, TsoaRoute.ParameterSchema> = {
-        userId: { in: 'path', name: 'userId', required: true, ref: 'UUID' },
+        _userId: { in: 'path', name: '_userId', required: true, ref: 'UUID' },
       };
 
       // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

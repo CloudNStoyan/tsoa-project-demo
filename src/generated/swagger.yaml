@@ -28,6 +28,23 @@ components:
       pattern:
         "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-\
         [0-9A-Fa-f]{12}"
+    Cat:
+      description: Cat description.
+      properties:
+        catId:
+          type: number
+          format: double
+          description: The cat's identifier.
+          example: 1
+        catName:
+          type: string
+          description: The cat's name.
+          example: Kozunak
+      required:
+        - catId
+        - catName
+      type: object
+      additionalProperties: false
     UserFromGroup:
       description: |-
         User objects allow you to associate actions performed
@@ -64,6 +81,13 @@ components:
           type: array
           description: The phone numbers associated with the user.
           example: []
+        cat:
+          items:
+            $ref: '#/components/schemas/Cat'
+          type: array
+          description: The user's cat.
+          example:
+            - {}
         groupId:
           type: integer
           format: int32
@@ -74,6 +98,7 @@ components:
         - name
         - isCat
         - phoneNumbers
+        - cat
         - groupId
       type: object
       additionalProperties: false
@@ -109,12 +134,20 @@ components:
           type: array
           description: The phone numbers associated with the user.
           example: []
+        cat:
+          items:
+            $ref: '#/components/schemas/Cat'
+          type: array
+          description: The user's cat.
+          example:
+            - {}
       required:
         - id
         - email
         - name
         - isCat
         - phoneNumbers
+        - cat
       type: object
       additionalProperties: false
     AuthUser:
@@ -166,6 +199,9 @@ paths:
                       phoneNumbers: []
                       groupId: 1
                       isCat: false
+                      cat:
+                        - catId: 2
+                          catName: Cat Name Here or smth
                     - id: c421afa9-08c7-491a-90a1-575bb656cffd
                       email: john@doe.com
                       name: John Doe
@@ -173,6 +209,9 @@ paths:
                       phoneNumbers: []
                       groupId: 1
                       isCat: false
+                      cat:
+                        - catId: 2
+                          catName: Cat Name Here or smth
         '401':
           description: Unauthorized
           content:
@@ -229,15 +268,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserFromGroup'
-              examples:
-                An example of a user.:
-                  value:
-                    id: 66ef17a1-af37-4f7b-8e82-b341e0241a30
-                    email: Example@doe.com
-                    name: Example Doe
-                    status: Sad
-                    phoneNumbers: []
-                    isCat: false
         '401':
           description: Unauthorized
           content:
@@ -285,15 +315,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-              examples:
-                An example of updated user.:
-                  value:
-                    id: 66ef17a1-af37-4f7b-8e82-b341e0241a30
-                    email: Updated@doe.com
-                    name: Updated Doe
-                    status: Sad
-                    phoneNumbers: []
-                    isCat: false
         '401':
           description: Unauthorized
           content:
@@ -340,17 +361,12 @@ paths:
             schema:
               $ref: '#/components/schemas/User'
               description: The user's data.
+  /users/{_userId}:
     delete:
       operationId: DeleteUser
       responses:
-        '200':
-          description: Nothing is returned.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
         '204':
-          description: No Content
+          description: No content
         '401':
           description: Unauthorized
           content:
@@ -362,17 +378,6 @@ paths:
                   value:
                     status: 401
                     message: Access denied!
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-              examples:
-                Example 1:
-                  value:
-                    status: 404
-                    message: User not found!
       description: Permanently delete an user.
       summary: Delete an user.
       tags:
@@ -381,7 +386,7 @@ paths:
       parameters:
         - description: The user's identifier.
           in: path
-          name: userId
+          name: _userId
           required: true
           schema:
             $ref: '#/components/schemas/UUID'
