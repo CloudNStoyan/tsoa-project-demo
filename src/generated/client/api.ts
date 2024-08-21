@@ -210,14 +210,18 @@ export class UserClientAPI extends ClientAPIBase {
     limit?: number,
     catLevel?: string
   ): Promise<UserFromGroup[]> {
+    if (Number.isNaN(groupId)) {
+      throw new Error("Invalid value NaN for 'path' param: 'groupId'.");
+    }
+
+    if (Number.isNaN(limit)) {
+      throw new Error("Invalid value NaN for 'query' param: 'limit'.");
+    }
+
     const urlParams = new URLSearchParams();
 
     if (limit !== undefined) {
       urlParams.set('limit', String(limit));
-    }
-
-    if (Number.isNaN(limit)) {
-      throw new Error("Invalid value NaN for query param: 'limit'.");
     }
 
     if (catLevel) {

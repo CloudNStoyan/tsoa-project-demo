@@ -8,6 +8,12 @@ const swaggerJson = await fs.readFile(SWAGGER_JSON_FILE_PATH, {
 
 const swaggerDocument = JSON.parse(swaggerJson);
 
+if (!swaggerDocument.openapi.startsWith('3')) {
+  throw new Error(
+    `Unsupported OpenAPI version that is not '3.X.X' was found: '${swaggerDocument.openapi}'.`
+  );
+}
+
 function lowercaseFirstLetter(string) {
   return string[0].toLowerCase() + string.slice(1);
 }
@@ -119,6 +125,9 @@ class TypescriptModel {
             allParams.push(param);
           }
         }
+
+        // Put optional params at the end of the params array.
+        allParams.sort((a, b) => Number(b.required) - Number(a.required));
 
         operation.allParams = allParams.length > 0 ? allParams : undefined;
 
@@ -548,6 +557,16 @@ class ModelRenderer {
 
     output += `${lowercaseFirstLetter(operation.operationId)}(${this.renderParams(operation.allParams, operation.body)}): Promise<${operation.returnType}> {\n`;
 
+    if (operation.allParams) {
+      for (const param of operation.allParams) {
+        if (param.resolvedType === 'number') {
+          output += `if (Number.isNaN(${param.name})) {\n`;
+          output += `throw new Error("Invalid value NaN for '${param.type}' param: '${param.name}'.")\n`;
+          output += '}\n\n';
+        }
+      }
+    }
+
     const queryParams = operation.allParams?.filter((p) => p.type === 'query');
 
     if (queryParams && queryParams.length > 0) {
@@ -557,9 +576,6 @@ class ModelRenderer {
         if (queryParam.resolvedType === 'number') {
           output += `if (${queryParam.name} !== undefined) {\n`;
           output += `urlParams.set("${queryParam.name}", String(${queryParam.name}));\n`;
-          output += '}\n\n';
-          output += `if (Number.isNaN(${queryParam.name})) {\n`;
-          output += `throw new Error("Invalid value NaN for query param: '${queryParam.name}'.")\n`;
           output += '}\n\n';
         } else if (queryParam.resolvedType === 'string') {
           output += `if (${queryParam.name}) {\n`;
