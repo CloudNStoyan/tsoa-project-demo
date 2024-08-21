@@ -31,6 +31,9 @@ export default tseslint.config(
   {
     files: ['src/routes/**'],
     extends: [jsdoc.configs['flat/recommended-typescript-error'], prettier],
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+    },
     rules: {
       'jsdoc/check-tag-names': [
         'error',
@@ -116,6 +119,7 @@ export default tseslint.config(
           ],
         },
       ],
+      '@typescript-eslint/explicit-function-return-type': 'error',
     },
   },
   { ignores: ['dist', 'src/generated/client'] }
