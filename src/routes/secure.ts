@@ -8,6 +8,7 @@ interface AuthUser {
   /**
    * The authenticated user's identifier.
    * @example 1
+   * @isInt
    */
   id: number;
 
@@ -24,7 +25,6 @@ interface AuthUser {
 interface ExpressRequestWithUser extends ExpressRequest {
   /**
    * Authenticated User.
-   * @example {}
    */
   user: AuthUser;
 }

@@ -28,7 +28,6 @@ type UUID = string;
 interface User {
   /**
    * The user's identifier.
-   * @example "66ef17a1-af37-4f7b-8e82-b341e0241a30"
    */
   id: UUID;
   /**
