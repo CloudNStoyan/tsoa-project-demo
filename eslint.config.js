@@ -87,7 +87,9 @@ export default tseslint.config(
       'jsdoc/require-example': [
         'error',
         {
-          contexts: ['TSInterfaceDeclaration TSPropertySignature'],
+          contexts: [
+            'TSInterfaceDeclaration TSPropertySignature:not([typeAnnotation.typeAnnotation.type="TSArrayType"])',
+          ],
         },
       ],
       'jsdoc/require-throws': 'error',
@@ -112,6 +114,12 @@ export default tseslint.config(
               comment: 'JsdocBlock:not(*:has(JsdocTag[tag=summary]))',
               context: 'MethodDefinition',
               message: 'Missing JSDoc @summary declaration.',
+            },
+            {
+              comment: 'JsdocBlock:has(JsdocTag[tag=example])',
+              context:
+                'TSPropertySignature[typeAnnotation.typeAnnotation.type="TSArrayType"]',
+              message: 'Using JSDoc @example on arrays is forbidden.',
             },
           ],
         },

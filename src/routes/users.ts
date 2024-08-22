@@ -56,7 +56,6 @@ interface User {
 
   /**
    * The phone numbers associated with the user.
-   * @example []
    */
   phoneNumbers: string[];
 }
