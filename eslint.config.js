@@ -88,7 +88,9 @@ export default tseslint.config(
       'jsdoc/require-example': [
         'error',
         {
-          contexts: ['TSInterfaceDeclaration TSPropertySignature'],
+          contexts: [
+            'TSInterfaceDeclaration TSPropertySignature:not([typeAnnotation.typeAnnotation.type="TSArrayType"], [typeAnnotation.typeAnnotation.type="TSTypeReference"])',
+          ],
         },
       ],
       'jsdoc/require-throws': 'error',
@@ -113,6 +115,26 @@ export default tseslint.config(
               comment: 'JsdocBlock:not(*:has(JsdocTag[tag=summary]))',
               context: 'MethodDefinition',
               message: 'Missing JSDoc @summary declaration.',
+            },
+            {
+              comment: 'JsdocBlock:has(JsdocTag[tag=example])',
+              context:
+                'TSPropertySignature[typeAnnotation.typeAnnotation.type="TSArrayType"]',
+              message: 'Using JSDoc @example on arrays is forbidden.',
+            },
+            {
+              comment: 'JsdocBlock:has(JsdocTag[tag=example])',
+              context:
+                'TSPropertySignature[typeAnnotation.typeAnnotation.type="TSTypeReference"]',
+              message: 'Using JSDoc @example on complex types is forbidden.',
+            },
+            {
+              comment:
+                'JsdocBlock:not(*:has(JsdocTag[tag=isInt], JsdocTag[tag=isFloat], JsdocTag[tag=isLong], JsdocTag[tag=isDouble]))',
+              context:
+                'TSPropertySignature[typeAnnotation.typeAnnotation.type="TSNumberKeyword"]',
+              message:
+                'Missing JSDoc one of [@isInt, @isFloat, @isLong, @isDouble] declaration.',
             },
           ],
         },
