@@ -97,7 +97,7 @@ class TypescriptModel {
 
         const operation = {
           httpMethod,
-          templatePath: path.replaceAll('{', '${'),
+          rawPath: path,
           operationId: openapiOperationData.operationId,
           tags: openapiOperationData.tags,
           jsdoc: this.resolveJsdoc(openapiOperationData),
@@ -599,7 +599,36 @@ class ModelRenderer {
       output += `<${operation.returnType}>`;
     }
 
-    output += `(\`${operation.templatePath}`;
+    const templatedPath = operation.rawPath
+      .split('/')
+      .map((pathPart) => {
+        const isPathParam = pathPart.startsWith('{') && pathPart.endsWith('}');
+
+        if (!isPathParam) {
+          return pathPart;
+        }
+
+        const pathParamName = pathPart.substring(1, pathPart.length - 1);
+
+        const pathParam = operation.allParams?.find(
+          (p) => p.name === pathParamName
+        );
+
+        if (!pathParam) {
+          throw new Error(
+            `Couldn't find path param: '${pathParamName}' in operation params for '${operation.rawPath}'.`
+          );
+        }
+
+        if (pathParam.resolvedType !== 'number') {
+          return `\${encodeURIComponent(${pathParam.name})}`;
+        }
+
+        return `\${${pathParam.name}}`;
+      })
+      .join('/');
+
+    output += `(\`${templatedPath}`;
 
     if (queryParams && queryParams.length > 0) {
       output += '${queryString}';

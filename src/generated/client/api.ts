@@ -242,7 +242,7 @@ export class UserClientAPI extends ClientAPIBase {
    * @summary Retrieve details of a user.
    */
   getUser(userId: UUID): Promise<UserFromGroup> {
-    return super.fetch<UserFromGroup>(`/users/${userId}`);
+    return super.fetch<UserFromGroup>(`/users/${encodeURIComponent(userId)}`);
   }
 
   /**
@@ -253,7 +253,7 @@ export class UserClientAPI extends ClientAPIBase {
    * @summary Update details of a user.
    */
   updateUser(userId: UUID, user: User): Promise<User> {
-    return super.fetch<User>(`/users/${userId}`, {
+    return super.fetch<User>(`/users/${encodeURIComponent(userId)}`, {
       method: 'PUT',
       body: JSON.stringify(user),
       headers: {
@@ -268,7 +268,7 @@ export class UserClientAPI extends ClientAPIBase {
    * @summary Delete an user.
    */
   deleteUser(userId: UUID): Promise<User | void> {
-    return super.fetch<User | void>(`/users/${userId}`, {
+    return super.fetch<User | void>(`/users/${encodeURIComponent(userId)}`, {
       method: 'DELETE',
     });
   }
@@ -301,7 +301,7 @@ export class CatClientAPI extends ClientAPIBase {
    * @summary Retrieve catId from the server.
    */
   postCatId(catId: string): Promise<string> {
-    return super.fetch<string>(`/cats/${catId}`, {
+    return super.fetch<string>(`/cats/${encodeURIComponent(catId)}`, {
       method: 'POST',
     });
   }
