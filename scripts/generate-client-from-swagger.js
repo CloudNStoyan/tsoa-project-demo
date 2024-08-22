@@ -620,11 +620,7 @@ class ModelRenderer {
           );
         }
 
-        if (pathParam.resolvedType !== 'number') {
-          return `\${encodeURIComponent(${pathParam.name})}`;
-        }
-
-        return `\${${pathParam.name}}`;
+        return `\${encodeURIComponent(${pathParam.name})}`;
       })
       .join('/');
 

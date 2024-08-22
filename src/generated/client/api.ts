@@ -232,7 +232,9 @@ export class UserClientAPI extends ClientAPIBase {
 
     const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
 
-    return super.fetch<UserFromGroup[]>(`/users/${groupId}/all${queryString}`);
+    return super.fetch<UserFromGroup[]>(
+      `/users/${encodeURIComponent(groupId)}/all${queryString}`
+    );
   }
 
   /**
