@@ -174,7 +174,7 @@ export class UserController extends BaseController {
   @Get('{groupId}/all')
   public async getUsers(
     @Path() groupId: number,
-    @Query() limit?: number,
+    @Query() limit: number = 5,
     @Query() catLevel?: string
   ): Promise<UserFromGroup[]> {
     const users: UserFromGroup[] = data.map((user) => {

@@ -353,6 +353,7 @@
             "name": "limit",
             "required": false,
             "schema": {
+              "default": 5,
               "format": "double",
               "type": "number"
             }

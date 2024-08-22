@@ -203,7 +203,7 @@ export function RegisterRoutes(app: Router) {
           required: true,
           dataType: 'double',
         },
-        limit: { in: 'query', name: 'limit', dataType: 'double' },
+        limit: { default: 5, in: 'query', name: 'limit', dataType: 'double' },
         catLevel: { in: 'query', name: 'catLevel', dataType: 'string' },
       };
 
