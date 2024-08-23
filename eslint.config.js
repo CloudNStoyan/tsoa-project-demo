@@ -16,13 +16,12 @@ export default tseslint.config(
       parser: tseslint.parser,
     },
     rules: {
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-unused-vars': 'off',
     },
   },
   prettier,
   {
     files: ['**/*.ts'],
-    extends: [jsdoc.configs['flat/recommended-typescript-error'], prettier],
     languageOptions: {
       parserOptions: {
         project: ['tsconfig.json'],
@@ -31,6 +30,10 @@ export default tseslint.config(
   },
   {
     files: ['src/routes/**'],
+    extends: [jsdoc.configs['flat/recommended-typescript-error'], prettier],
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+    },
     rules: {
       'jsdoc/check-tag-names': [
         'error',
@@ -131,14 +134,15 @@ export default tseslint.config(
               comment:
                 'JsdocBlock:not(*:has(JsdocTag[tag=isInt], JsdocTag[tag=isFloat], JsdocTag[tag=isLong], JsdocTag[tag=isDouble]))',
               context:
-                'TSPropertySignature[typeAnnotation.typeAnnotation.type="TSNumberKeyword"]',
+                'TSPropertySignature[typeAnnotation.typeAnnotation.type="TSNumberKeyword"],TSTypeAliasDeclaration[typeAnnotation.type="TSNumberKeyword"]',
               message:
-                'Missing JSDoc one of [@isInt, @isFloat, @isLong, @isDouble] declaration.',
+                'Missing JSDoc number type declaration (@isInt, @isFloat, @isLong, @isDouble).',
             },
           ],
         },
       ],
+      '@typescript-eslint/explicit-function-return-type': 'error',
     },
   },
-  { ignores: ['dist', 'src/generated/client'] }
+  { ignores: ['dist', 'src/generated/'] }
 );

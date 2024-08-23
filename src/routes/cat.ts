@@ -9,8 +9,8 @@ export class CatController extends Controller {
    * @summary Retrieve "add :)" from the server.
    */
   @Post('add')
-  postCat() {
-    return 'add :)';
+  postCat(): Promise<string> {
+    return Promise.resolve('add :)');
   }
 
   /**
@@ -20,7 +20,7 @@ export class CatController extends Controller {
    * @summary     Retrieve catId from the server.
    */
   @Post('{catId}')
-  postCatId(@Path() catId: string) {
-    return catId;
+  postCatId(@Path() catId: string): Promise<string> {
+    return Promise.resolve(catId);
   }
 }
