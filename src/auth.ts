@@ -2,13 +2,6 @@ import type { Request } from 'express';
 
 export class AuthError extends Error {}
 
-/**
- * TSOA Authentication Module.
- * @param request      Express Request.
- * @param securityName The name of the security method.
- * @param scopes       Authentication scopes.
- * @returns            an user object that will be put in the request.user.
- */
 export function expressAuthentication(
   request: Request,
   securityName: string,

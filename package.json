@@ -4,17 +4,19 @@
   "type": "module",
   "scripts": {
     "convert-swagger": "node ./scripts/convert-swagger-to-yaml.js",
-    "generate": "tsoa spec-and-routes && npm run convert-swagger && npm run generate-client-from-swagger && npm run format",
+    "generate": "tsoa spec-and-routes && npm run convert-swagger && npm run generate-client-from-swagger && npm run generate-http-files && npm run format-generated",
     "dev": "concurrently \"nodemon\" \"nodemon -x npm run generate\" \"npm run start:swagger-ui-live-reload\"",
     "build": "rimraf ./dist && npm run generate && tsc && copyfiles -f ./src/generated/swagger.yaml ./dist/generated/",
     "start": "npm run build && node dist/server.js",
     "start:swagger-ui-live-reload": "browser-sync start --config ./browsersync-config.cjs",
     "format": "prettier --cache --write .",
     "format-check": "prettier --cache --check .",
+    "format-generated": "prettier --cache --write ./src/generated",
     "lint": "eslint ./ --max-warnings 0",
     "lint:fix": "npm run lint -- --fix",
     "install-codegen-cli": "node ./scripts/install-codegen-cli.js",
-    "generate-client-from-swagger": "rimraf ./src/generated/client && node ./scripts/generate-client-from-swagger.js"
+    "generate-client-from-swagger": "rimraf ./src/generated/client && node ./scripts/generate-client-from-swagger.js",
+    "generate-http-files": "httpgenerator ./src/generated/swagger.json --base-url http://localhost:3000 --output ./src/generated/dot-http"
   },
   "dependencies": {
     "express": "^4.19.2",

@@ -53,13 +53,14 @@ const models: TsoaRoute.Models = {
     },
   },
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-  Cat: {
-    dataType: 'refObject',
-    properties: {
-      catId: { dataType: 'double', required: true },
-      catName: { dataType: 'string', required: true },
-    },
-    additionalProperties: false,
+  MySpecialNumber: {
+    dataType: 'refAlias',
+    type: { dataType: 'integer', validators: {} },
+  },
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  HappinessStatus: {
+    dataType: 'refEnum',
+    enums: ['Happy', 'Sad'],
   },
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   UserFromGroup: {
@@ -69,21 +70,46 @@ const models: TsoaRoute.Models = {
       email: { dataType: 'string', required: true },
       name: { dataType: 'string', required: true },
       isCat: { dataType: 'boolean', required: true },
-      status: {
+      mySpecialCat: { ref: 'MySpecialNumber', required: true },
+      status: { ref: 'HappinessStatus' },
+      manyStatuses: {
+        dataType: 'array',
+        array: { dataType: 'refEnum', ref: 'HappinessStatus' },
+      },
+      catLevel: {
         dataType: 'union',
         subSchemas: [
-          { dataType: 'enum', enums: ['Happy'] },
-          { dataType: 'enum', enums: ['Sad'] },
+          { dataType: 'enum', enums: ['Ultra Cat'] },
+          { dataType: 'enum', enums: ['Mega Cat'] },
         ],
+      },
+      catIndex: {
+        dataType: 'array',
+        array: {
+          dataType: 'union',
+          subSchemas: [
+            { dataType: 'string' },
+            { dataType: 'double' },
+            { ref: 'HappinessStatus' },
+            {
+              dataType: 'union',
+              subSchemas: [
+                { dataType: 'string' },
+                {
+                  dataType: 'union',
+                  subSchemas: [
+                    { dataType: 'string' },
+                    { ref: 'HappinessStatus' },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       },
       phoneNumbers: {
         dataType: 'array',
         array: { dataType: 'string' },
-        required: true,
-      },
-      cat: {
-        dataType: 'array',
-        array: { dataType: 'refObject', ref: 'Cat' },
         required: true,
       },
       groupId: { dataType: 'integer', required: true },
@@ -98,21 +124,46 @@ const models: TsoaRoute.Models = {
       email: { dataType: 'string', required: true },
       name: { dataType: 'string', required: true },
       isCat: { dataType: 'boolean', required: true },
-      status: {
+      mySpecialCat: { ref: 'MySpecialNumber', required: true },
+      status: { ref: 'HappinessStatus' },
+      manyStatuses: {
+        dataType: 'array',
+        array: { dataType: 'refEnum', ref: 'HappinessStatus' },
+      },
+      catLevel: {
         dataType: 'union',
         subSchemas: [
-          { dataType: 'enum', enums: ['Happy'] },
-          { dataType: 'enum', enums: ['Sad'] },
+          { dataType: 'enum', enums: ['Ultra Cat'] },
+          { dataType: 'enum', enums: ['Mega Cat'] },
         ],
+      },
+      catIndex: {
+        dataType: 'array',
+        array: {
+          dataType: 'union',
+          subSchemas: [
+            { dataType: 'string' },
+            { dataType: 'double' },
+            { ref: 'HappinessStatus' },
+            {
+              dataType: 'union',
+              subSchemas: [
+                { dataType: 'string' },
+                {
+                  dataType: 'union',
+                  subSchemas: [
+                    { dataType: 'string' },
+                    { ref: 'HappinessStatus' },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       },
       phoneNumbers: {
         dataType: 'array',
         array: { dataType: 'string' },
-        required: true,
-      },
-      cat: {
-        dataType: 'array',
-        array: { dataType: 'refObject', ref: 'Cat' },
         required: true,
       },
     },
@@ -122,7 +173,7 @@ const models: TsoaRoute.Models = {
   AuthUser: {
     dataType: 'refObject',
     properties: {
-      id: { dataType: 'double', required: true },
+      id: { dataType: 'integer', required: true },
       name: { dataType: 'string', required: true },
     },
     additionalProperties: false,
@@ -159,7 +210,8 @@ export function RegisterRoutes(app: Router) {
           required: true,
           dataType: 'double',
         },
-        limit: { in: 'query', name: 'limit', dataType: 'double' },
+        limit: { default: 5, in: 'query', name: 'limit', dataType: 'double' },
+        catLevel: { in: 'query', name: 'catLevel', dataType: 'string' },
       };
 
       // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -270,7 +322,7 @@ export function RegisterRoutes(app: Router) {
   );
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   app.delete(
-    '/users/:_userId',
+    '/users/:userId',
     ...fetchMiddlewares<RequestHandler>(UserController),
     ...fetchMiddlewares<RequestHandler>(UserController.prototype.deleteUser),
 
@@ -280,7 +332,7 @@ export function RegisterRoutes(app: Router) {
       next: any
     ) {
       const args: Record<string, TsoaRoute.ParameterSchema> = {
-        _userId: { in: 'path', name: '_userId', required: true, ref: 'UUID' },
+        userId: { in: 'path', name: 'userId', required: true, ref: 'UUID' },
       };
 
       // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

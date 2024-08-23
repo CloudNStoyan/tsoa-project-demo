@@ -9,9 +9,8 @@ export class CatController extends Controller {
    * @summary Retrieve "add :)" from the server.
    */
   @Post('add')
-  @Example<string>('add :)', 'An example of the add endpoint.')
-  postCat() {
-    return 'add :)';
+  postCat(): Promise<string> {
+    return Promise.resolve('add :)');
   }
 
   /**
@@ -22,7 +21,7 @@ export class CatController extends Controller {
    */
   @Example<string>('cat-4', 'An example of an catId.')
   @Post('{catId}')
-  postCatId(@Path() catId: string) {
-    return catId;
+  postCatId(@Path() catId: string): Promise<string> {
+    return Promise.resolve(catId);
   }
 }

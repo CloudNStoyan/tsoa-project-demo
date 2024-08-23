@@ -1,0 +1,36 @@
+@contentType = application/json
+
+##############################################################################################################################
+### Request: PUT /users/{userId}
+### Summary: Update details of a user.
+### Description: 
+###   Update the details of a user.
+###   Supply the unique user ID from either and receive corresponding user details.
+##############################################################################################################################
+
+### Path Parameter: The user's identifier.
+@userId = str
+
+
+PUT http://localhost:3000/users/{{userId}}
+Content-Type: {{contentType}}
+
+{
+  "id": "id",
+  "email": "email",
+  "name": "name",
+  "isCat": false,
+  "mySpecialCat": 0,
+  "status": "Happy",
+  "manyStatuses": [
+    "Happy"
+  ],
+  "catLevel": "Ultra Cat",
+  "catIndex": [
+    null
+  ],
+  "phoneNumbers": [
+    ""
+  ]
+}
+

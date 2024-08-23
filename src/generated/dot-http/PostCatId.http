@@ -1,0 +1,16 @@
+@contentType = application/json
+
+########################################################################
+### Request: POST /cats/{catId}
+### Summary: Retrieve catId from the server.
+### Description: Demonstrative cat endpoint that returns dynamic data.
+########################################################################
+
+### Path Parameter: The identification of a cat.
+@catId = str
+
+
+POST http://localhost:3000/cats/{{catId}}
+Content-Type: {{contentType}}
+
+

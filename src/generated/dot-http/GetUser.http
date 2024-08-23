@@ -1,0 +1,18 @@
+@contentType = application/json
+
+#################################################################################################################################
+### Request: GET /users/{userId}
+### Summary: Retrieve details of a user.
+### Description: 
+###   Retrieves the details of a user.
+###   Supply the unique user ID from either and receive corresponding user details.
+#################################################################################################################################
+
+### Path Parameter: The user's identifier.
+@userId = str
+
+
+GET http://localhost:3000/users/{{userId}}
+Content-Type: {{contentType}}
+
+

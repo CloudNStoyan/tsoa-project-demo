@@ -24,20 +24,17 @@ import { ApiError, BaseController } from '../utils.js';
 type UUID = string;
 
 /**
- * Cat description.
+ * My Special Number description.
+ * @isInt
  */
-interface Cat {
-  /**
-   * The cat's identifier.
-   * @example 1
-   */
-  catId: number;
+type MySpecialNumber = number;
 
-  /**
-   * The cat's name.
-   * @example "Kozunak"
-   */
-  catName: string;
+/**
+ * Happiness Status Enum that is very important.
+ */
+enum HappinessStatus {
+  Happy = 'Happy',
+  Sad = 'Sad',
 }
 
 /**
@@ -48,6 +45,7 @@ interface User {
    * The user's identifier.
    */
   id: UUID;
+
   /**
    * The email the user used to register his account.
    * @example "jane@doe.com"
@@ -66,21 +64,40 @@ interface User {
   isCat: boolean;
 
   /**
-   * The happiness status of the user.
-   * @example "Sad"
+   * My Special Special Cat.
    */
-  status?: 'Happy' | 'Sad';
+  mySpecialCat: MySpecialNumber;
+
+  /**
+   * The happiness status of the user.
+   */
+  status?: HappinessStatus;
+
+  /**
+   * An array of happiness statuses of the user.
+   */
+  manyStatuses?: HappinessStatus[];
+
+  /**
+   * The cat level of the user.
+   * @example "Ultra Cat"
+   */
+  catLevel?: 'Ultra Cat' | 'Mega Cat';
+
+  /**
+   * The cat index of the user.
+   */
+  catIndex?: (
+    | string
+    | number
+    | HappinessStatus
+    | (string | (string | HappinessStatus))
+  )[];
 
   /**
    * The phone numbers associated with the user.
    */
   phoneNumbers: string[];
-
-  /**
-   * The user's cat.
-   * @example [{}]
-   */
-  cat: Cat[];
 }
 
 /**
@@ -102,29 +119,19 @@ let data: User[] = [
     id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
     email: 'jane@doe.com',
     name: 'Jane Doe',
-    status: 'Happy',
+    status: HappinessStatus.Happy,
     phoneNumbers: [],
     isCat: false,
-    cat: [
-      {
-        catId: 2,
-        catName: 'Cat Name Here or smth',
-      },
-    ],
+    mySpecialCat: 44,
   },
   {
     id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
     email: 'john@doe.com',
     name: 'John Doe',
-    status: 'Sad',
+    status: HappinessStatus.Sad,
     phoneNumbers: [],
     isCat: false,
-    cat: [
-      {
-        catId: 2,
-        catName: 'Cat Name Here or smth',
-      },
-    ],
+    mySpecialCat: 44,
   },
 ];
 
@@ -139,10 +146,11 @@ export class UserController extends BaseController {
   /**
    * Retrieves the details of users.
    * Supply the unique group ID from either and receive corresponding user details.
-   * @param groupId The group's identifier.
-   * @param limit   Provide a limit to the result.
-   * @returns       An array with User Objects.
-   * @summary       Retrieve details of users.
+   * @param groupId  The group's identifier.
+   * @param limit    Provide a limit to the result.
+   * @param catLevel The =required cat level of users.
+   * @returns        An array with User Objects.
+   * @summary        Retrieve details of users.
    */
   @Example<UserFromGroup[]>(
     [
@@ -150,31 +158,21 @@ export class UserController extends BaseController {
         id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
         email: 'jane@doe.com',
         name: 'Jane Doe',
-        status: 'Happy',
+        status: HappinessStatus.Happy,
         phoneNumbers: [],
         groupId: 1,
         isCat: false,
-        cat: [
-          {
-            catId: 2,
-            catName: 'Cat Name Here or smth',
-          },
-        ],
+        mySpecialCat: 44,
       },
       {
         id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
         email: 'john@doe.com',
         name: 'John Doe',
-        status: 'Sad',
+        status: HappinessStatus.Sad,
         phoneNumbers: [],
         groupId: 1,
         isCat: false,
-        cat: [
-          {
-            catId: 2,
-            catName: 'Cat Name Here or smth',
-          },
-        ],
+        mySpecialCat: 44,
       },
     ],
     'An example of Users'
@@ -186,13 +184,16 @@ export class UserController extends BaseController {
   @Get('{groupId}/all')
   public async getUsers(
     @Path() groupId: number,
-    @Query() limit?: number
+    @Query() limit: number = 5,
+    @Query() catLevel?: string
   ): Promise<UserFromGroup[]> {
     const users: UserFromGroup[] = data.map((user) => {
       const userFromGroup = user as UserFromGroup;
       userFromGroup.groupId = groupId;
       return userFromGroup;
     });
+
+    console.log('users | catLevel', catLevel);
 
     return users.slice(0, limit || users.length);
   }
