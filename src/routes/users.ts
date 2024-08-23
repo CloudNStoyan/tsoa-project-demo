@@ -9,6 +9,7 @@ import {
   Put,
   Body,
   Tags,
+  Delete,
 } from 'tsoa';
 import { customLog } from '../middlewares/custom-log.js';
 import { ApiError, BaseController } from '../utils.js';
@@ -23,29 +24,75 @@ import { ApiError, BaseController } from '../utils.js';
 type UUID = string;
 
 /**
- * @example {
- *  "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
- *  "email": "jane@doe.com",
- *  "name": "Jane Doe",
- *  "status": "Sad",
- *  "phoneNumbers": []
- *  }
+ * My Special Number description.
+ * @isInt
+ */
+type MySpecialNumber = number;
+
+/**
+ * Happiness Status Enum that is very important.
+ */
+enum HappinessStatus {
+  Happy = 'Happy',
+  Sad = 'Sad',
+}
+
+/**
+ * User description written by yours truly Stoyan.
  */
 interface User {
+  /**
+   * The user's identifier.
+   */
   id: UUID;
+
   /**
    * The email the user used to register his account.
+   * @example "jane@doe.com"
    */
   email: string;
   /**
    * The name the user used to register his account.
+   * @example "Jane Doe The First"
    */
   name: string;
 
   /**
+   * Is the user a cat.
+   * @example false
+   */
+  isCat: boolean;
+
+  /**
+   * My Special Special Cat.
+   */
+  mySpecialCat: MySpecialNumber;
+
+  /**
    * The happiness status of the user.
    */
-  status?: 'Happy' | 'Sad';
+  status?: HappinessStatus;
+
+  /**
+   * An array of happiness statuses of the user.
+   */
+  manyStatuses?: HappinessStatus[];
+
+  /**
+   * The cat level of the user.
+   * @example "Ultra Cat"
+   */
+  catLevel?: 'Ultra Cat' | 'Mega Cat';
+
+  /**
+   * The cat index of the user.
+   */
+  catIndex?: (
+    | string
+    | number
+    | HappinessStatus
+    | (string | (string | HappinessStatus))
+  )[];
 
   /**
    * The phone numbers associated with the user.
@@ -58,36 +105,33 @@ interface User {
  * in the system with the user that performed them.
  * The User object contains common information across
  * every user in the system regardless of status and role.
- * @example {
- * "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
- *  "email": "jane@doe.com",
- *  "name": "Jane Doe",
- *  "status": "Sad",
- *  "phoneNumbers": [],
- *  "groupId": 1
- *  }
  */
 interface UserFromGroup extends User {
   /**
-   * @isInt We would kindly ask you to provide a number here.
+   * @isInt
+   * @example 113
    */
   groupId: number;
 }
 
-const data: User[] = [
+let data: User[] = [
   {
     id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
     email: 'jane@doe.com',
     name: 'Jane Doe',
-    status: 'Happy',
+    status: HappinessStatus.Happy,
     phoneNumbers: [],
+    isCat: false,
+    mySpecialCat: 44,
   },
   {
     id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
     email: 'john@doe.com',
     name: 'John Doe',
-    status: 'Sad',
+    status: HappinessStatus.Sad,
     phoneNumbers: [],
+    isCat: false,
+    mySpecialCat: 44,
   },
 ];
 
@@ -102,12 +146,11 @@ export class UserController extends BaseController {
   /**
    * Retrieves the details of users.
    * Supply the unique group ID from either and receive corresponding user details.
-   * @param groupId The group's identifier.
-   * @isInt groupId This message will show if the validation fails.
-   * @param limit   Provide a limit to the result.
-   * @isInt limit   This message will show if the validation fails.
-   * @returns       An array with User Objects.
-   * @summary       Retrieve details of users.
+   * @param groupId  The group's identifier.
+   * @param limit    Provide a limit to the result.
+   * @param catLevel The =required cat level of users.
+   * @returns        An array with User Objects.
+   * @summary        Retrieve details of users.
    */
   @Example<UserFromGroup[]>(
     [
@@ -115,17 +158,21 @@ export class UserController extends BaseController {
         id: '66ef17a1-af37-4f7b-8e82-b341e0241a30',
         email: 'jane@doe.com',
         name: 'Jane Doe',
-        status: 'Happy',
+        status: HappinessStatus.Happy,
         phoneNumbers: [],
         groupId: 1,
+        isCat: false,
+        mySpecialCat: 44,
       },
       {
         id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
         email: 'john@doe.com',
         name: 'John Doe',
-        status: 'Sad',
+        status: HappinessStatus.Sad,
         phoneNumbers: [],
         groupId: 1,
+        isCat: false,
+        mySpecialCat: 44,
       },
     ],
     'An example of Users'
@@ -137,13 +184,16 @@ export class UserController extends BaseController {
   @Get('{groupId}/all')
   public async getUsers(
     @Path() groupId: number,
-    @Query() limit?: number
+    @Query() limit: number = 5,
+    @Query() catLevel?: string
   ): Promise<UserFromGroup[]> {
     const users: UserFromGroup[] = data.map((user) => {
       const userFromGroup = user as UserFromGroup;
       userFromGroup.groupId = groupId;
       return userFromGroup;
     });
+
+    console.log('users | catLevel', catLevel);
 
     return users.slice(0, limit || users.length);
   }
@@ -160,11 +210,11 @@ export class UserController extends BaseController {
     message: 'User not found!',
   })
   @Get('{userId}')
-  public async getUser(@Path() userId: UUID): Promise<User> {
-    const user = data.find((u) => u.id === userId);
+  public async getUser(@Path() userId: UUID): Promise<UserFromGroup> {
+    const user = data.find((u) => u.id === userId) as UserFromGroup;
 
     if (!user) {
-      return this.errorResult<User>(404, {
+      return this.errorResult<UserFromGroup>(404, {
         message: 'User not found!',
       });
     }
@@ -198,5 +248,31 @@ export class UserController extends BaseController {
     }
 
     return userData;
+  }
+
+  /**
+   * Permanently delete an user.
+   * @param userId The user's identifier.
+   * @summary      Delete an user.
+   * @returns      Nothing is returned.
+   */
+  @Response(204, 'No Content')
+  @Response<ApiError>(404, 'Not Found', {
+    status: 404,
+    message: 'User not found!',
+  })
+  @Delete('{userId}')
+  public async deleteUser(@Path() userId: UUID): Promise<User> {
+    const user = data.find((u) => u.id === userId);
+
+    if (!user) {
+      return this.errorResult<User>(404, {
+        message: 'User not found!',
+      });
+    }
+
+    data = data.filter((u) => u.id !== userId);
+
+    return this.noContentResult<User>();
   }
 }

@@ -16,58 +16,133 @@ export default tseslint.config(
       parser: tseslint.parser,
     },
     rules: {
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-unused-vars': 'off',
     },
   },
   prettier,
   {
     files: ['**/*.ts'],
-    extends: [
-      jsdoc.configs['flat/recommended-typescript-error'],
-      {
-        rules: {
-          'jsdoc/check-tag-names': [
-            'error',
-            {
-              definedTags: ['pattern', 'format', 'isInt'],
-            },
-          ],
-          'jsdoc/check-indentation': 'error',
-          'jsdoc/check-line-alignment': [
-            'error',
-            'always',
-            {
-              tags: [
-                'param',
-                'arg',
-                'argument',
-                'property',
-                'prop',
-                'returns',
-                'return',
-                'summary',
-                'isInt',
-                'pattern',
-                'format',
-              ],
-            },
-          ],
-          'jsdoc/no-blank-block-descriptions': 'error',
-          'jsdoc/no-blank-blocks': ['error', { enableFixer: true }],
-          'jsdoc/require-asterisk-prefix': 'error',
-          'jsdoc/require-description': 'error',
-          'jsdoc/require-description-complete-sentence': 'error',
-          'jsdoc/require-example': ['error', { exemptedBy: ['summary'] }],
-          'jsdoc/require-throws': 'error',
-        },
-      },
-      prettier,
-    ],
     languageOptions: {
       parserOptions: {
         project: ['tsconfig.json'],
       },
     },
   },
-  { ignores: ['dist', 'src/generated/client'] }
+  {
+    files: ['src/routes/**'],
+    extends: [jsdoc.configs['flat/recommended-typescript-error'], prettier],
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+    },
+    rules: {
+      'jsdoc/check-tag-names': [
+        'error',
+        {
+          definedTags: [
+            'format',
+            'isDateTime',
+            'isDate',
+            'minDate',
+            'maxDate',
+            'isInt',
+            'isFloat',
+            'isLong',
+            'isDouble',
+            'minimum',
+            'maximum',
+            'isString',
+            'minLength',
+            'maxLength',
+            'pattern',
+            'isArray',
+            'minItems',
+            'maxItems',
+            'uniqueItems',
+            'isBool',
+          ],
+        },
+      ],
+      'jsdoc/check-indentation': 'error',
+      'jsdoc/check-line-alignment': [
+        'error',
+        'always',
+        {
+          tags: [
+            'param',
+            'arg',
+            'argument',
+            'property',
+            'prop',
+            'returns',
+            'return',
+            'summary',
+            'isInt',
+            'pattern',
+            'format',
+          ],
+        },
+      ],
+      'jsdoc/no-blank-block-descriptions': 'error',
+      'jsdoc/no-blank-blocks': ['error', { enableFixer: true }],
+      'jsdoc/require-asterisk-prefix': 'error',
+      'jsdoc/require-description': 'error',
+      'jsdoc/require-description-complete-sentence': 'error',
+      'jsdoc/require-example': [
+        'error',
+        {
+          contexts: [
+            'TSInterfaceDeclaration TSPropertySignature:not([typeAnnotation.typeAnnotation.type="TSArrayType"], [typeAnnotation.typeAnnotation.type="TSTypeReference"])',
+          ],
+        },
+      ],
+      'jsdoc/require-throws': 'error',
+      'jsdoc/require-jsdoc': [
+        'error',
+        {
+          require: {
+            MethodDefinition: true,
+          },
+          contexts: [
+            'TSTypeAliasDeclaration',
+            'TSInterfaceDeclaration',
+            'TSInterfaceDeclaration TSPropertySignature',
+          ],
+        },
+      ],
+      'jsdoc/no-restricted-syntax': [
+        'error',
+        {
+          contexts: [
+            {
+              comment: 'JsdocBlock:not(*:has(JsdocTag[tag=summary]))',
+              context: 'MethodDefinition',
+              message: 'Missing JSDoc @summary declaration.',
+            },
+            {
+              comment: 'JsdocBlock:has(JsdocTag[tag=example])',
+              context:
+                'TSPropertySignature[typeAnnotation.typeAnnotation.type="TSArrayType"]',
+              message: 'Using JSDoc @example on arrays is forbidden.',
+            },
+            {
+              comment: 'JsdocBlock:has(JsdocTag[tag=example])',
+              context:
+                'TSPropertySignature[typeAnnotation.typeAnnotation.type="TSTypeReference"]',
+              message: 'Using JSDoc @example on complex types is forbidden.',
+            },
+            {
+              comment:
+                'JsdocBlock:not(*:has(JsdocTag[tag=isInt], JsdocTag[tag=isFloat], JsdocTag[tag=isLong], JsdocTag[tag=isDouble]))',
+              context:
+                'TSPropertySignature[typeAnnotation.typeAnnotation.type="TSNumberKeyword"],TSTypeAliasDeclaration[typeAnnotation.type="TSNumberKeyword"]',
+              message:
+                'Missing JSDoc number type declaration (@isInt, @isFloat, @isLong, @isDouble).',
+            },
+          ],
+        },
+      ],
+      '@typescript-eslint/explicit-function-return-type': 'error',
+    },
+  },
+  { ignores: ['dist', 'src/generated/'] }
 );

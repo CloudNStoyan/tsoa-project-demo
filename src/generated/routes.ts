@@ -53,33 +53,66 @@ const models: TsoaRoute.Models = {
     },
   },
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  MySpecialNumber: {
+    dataType: 'refAlias',
+    type: { dataType: 'integer', validators: {} },
+  },
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  HappinessStatus: {
+    dataType: 'refEnum',
+    enums: ['Happy', 'Sad'],
+  },
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   UserFromGroup: {
     dataType: 'refObject',
     properties: {
       id: { ref: 'UUID', required: true },
       email: { dataType: 'string', required: true },
       name: { dataType: 'string', required: true },
-      status: {
+      isCat: { dataType: 'boolean', required: true },
+      mySpecialCat: { ref: 'MySpecialNumber', required: true },
+      status: { ref: 'HappinessStatus' },
+      manyStatuses: {
+        dataType: 'array',
+        array: { dataType: 'refEnum', ref: 'HappinessStatus' },
+      },
+      catLevel: {
         dataType: 'union',
         subSchemas: [
-          { dataType: 'enum', enums: ['Happy'] },
-          { dataType: 'enum', enums: ['Sad'] },
+          { dataType: 'enum', enums: ['Ultra Cat'] },
+          { dataType: 'enum', enums: ['Mega Cat'] },
         ],
+      },
+      catIndex: {
+        dataType: 'array',
+        array: {
+          dataType: 'union',
+          subSchemas: [
+            { dataType: 'string' },
+            { dataType: 'double' },
+            { ref: 'HappinessStatus' },
+            {
+              dataType: 'union',
+              subSchemas: [
+                { dataType: 'string' },
+                {
+                  dataType: 'union',
+                  subSchemas: [
+                    { dataType: 'string' },
+                    { ref: 'HappinessStatus' },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       },
       phoneNumbers: {
         dataType: 'array',
         array: { dataType: 'string' },
         required: true,
       },
-      groupId: {
-        dataType: 'integer',
-        required: true,
-        validators: {
-          isInt: {
-            errorMsg: 'We would kindly ask you to provide a number here.',
-          },
-        },
-      },
+      groupId: { dataType: 'integer', required: true },
     },
     additionalProperties: false,
   },
@@ -90,18 +123,58 @@ const models: TsoaRoute.Models = {
       id: { ref: 'UUID', required: true },
       email: { dataType: 'string', required: true },
       name: { dataType: 'string', required: true },
-      status: {
+      isCat: { dataType: 'boolean', required: true },
+      mySpecialCat: { ref: 'MySpecialNumber', required: true },
+      status: { ref: 'HappinessStatus' },
+      manyStatuses: {
+        dataType: 'array',
+        array: { dataType: 'refEnum', ref: 'HappinessStatus' },
+      },
+      catLevel: {
         dataType: 'union',
         subSchemas: [
-          { dataType: 'enum', enums: ['Happy'] },
-          { dataType: 'enum', enums: ['Sad'] },
+          { dataType: 'enum', enums: ['Ultra Cat'] },
+          { dataType: 'enum', enums: ['Mega Cat'] },
         ],
+      },
+      catIndex: {
+        dataType: 'array',
+        array: {
+          dataType: 'union',
+          subSchemas: [
+            { dataType: 'string' },
+            { dataType: 'double' },
+            { ref: 'HappinessStatus' },
+            {
+              dataType: 'union',
+              subSchemas: [
+                { dataType: 'string' },
+                {
+                  dataType: 'union',
+                  subSchemas: [
+                    { dataType: 'string' },
+                    { ref: 'HappinessStatus' },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       },
       phoneNumbers: {
         dataType: 'array',
         array: { dataType: 'string' },
         required: true,
       },
+    },
+    additionalProperties: false,
+  },
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  AuthUser: {
+    dataType: 'refObject',
+    properties: {
+      id: { dataType: 'integer', required: true },
+      name: { dataType: 'string', required: true },
     },
     additionalProperties: false,
   },
@@ -135,23 +208,10 @@ export function RegisterRoutes(app: Router) {
           in: 'path',
           name: 'groupId',
           required: true,
-          dataType: 'integer',
-          validators: {
-            isInt: {
-              errorMsg: 'This message will show if the validation fails.',
-            },
-          },
+          dataType: 'double',
         },
-        limit: {
-          in: 'query',
-          name: 'limit',
-          dataType: 'integer',
-          validators: {
-            isInt: {
-              errorMsg: 'This message will show if the validation fails.',
-            },
-          },
-        },
+        limit: { default: 5, in: 'query', name: 'limit', dataType: 'double' },
+        catLevel: { in: 'query', name: 'catLevel', dataType: 'string' },
       };
 
       // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -249,6 +309,46 @@ export function RegisterRoutes(app: Router) {
 
         await templateService.apiHandler({
           methodName: 'updateUser',
+          controller,
+          response,
+          next,
+          validatedArgs,
+          successStatus: undefined,
+        });
+      } catch (err) {
+        return next(err);
+      }
+    }
+  );
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  app.delete(
+    '/users/:userId',
+    ...fetchMiddlewares<RequestHandler>(UserController),
+    ...fetchMiddlewares<RequestHandler>(UserController.prototype.deleteUser),
+
+    async function UserController_deleteUser(
+      request: ExRequest,
+      response: ExResponse,
+      next: any
+    ) {
+      const args: Record<string, TsoaRoute.ParameterSchema> = {
+        userId: { in: 'path', name: 'userId', required: true, ref: 'UUID' },
+      };
+
+      // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+      let validatedArgs: any[] = [];
+      try {
+        validatedArgs = templateService.getValidatedArgs({
+          args,
+          request,
+          response,
+        });
+
+        const controller = new UserController();
+
+        await templateService.apiHandler({
+          methodName: 'deleteUser',
           controller,
           response,
           next,
