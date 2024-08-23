@@ -134,9 +134,9 @@ export default tseslint.config(
               comment:
                 'JsdocBlock:not(*:has(JsdocTag[tag=isInt], JsdocTag[tag=isFloat], JsdocTag[tag=isLong], JsdocTag[tag=isDouble]))',
               context:
-                'TSPropertySignature[typeAnnotation.typeAnnotation.type="TSNumberKeyword"]',
+                'TSPropertySignature[typeAnnotation.typeAnnotation.type="TSNumberKeyword"],TSTypeAliasDeclaration[typeAnnotation.type="TSNumberKeyword"]',
               message:
-                'Missing JSDoc one of [@isInt, @isFloat, @isLong, @isDouble] declaration.',
+                'Missing JSDoc number type declaration (@isInt, @isFloat, @isLong, @isDouble).',
             },
           ],
         },
@@ -144,5 +144,5 @@ export default tseslint.config(
       '@typescript-eslint/explicit-function-return-type': 'error',
     },
   },
-  { ignores: ['dist', 'src/generated/client'] }
+  { ignores: ['dist', 'src/generated/'] }
 );
