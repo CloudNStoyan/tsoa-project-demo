@@ -53,6 +53,11 @@ const models: TsoaRoute.Models = {
     },
   },
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  MySpecialNumber: {
+    dataType: 'refAlias',
+    type: { dataType: 'integer', validators: {} },
+  },
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   HappinessStatus: {
     dataType: 'refEnum',
     enums: ['Happy', 'Sad'],
@@ -65,6 +70,7 @@ const models: TsoaRoute.Models = {
       email: { dataType: 'string', required: true },
       name: { dataType: 'string', required: true },
       isCat: { dataType: 'boolean', required: true },
+      mySpecialCat: { ref: 'MySpecialNumber', required: true },
       status: { ref: 'HappinessStatus' },
       manyStatuses: {
         dataType: 'array',
@@ -118,6 +124,7 @@ const models: TsoaRoute.Models = {
       email: { dataType: 'string', required: true },
       name: { dataType: 'string', required: true },
       isCat: { dataType: 'boolean', required: true },
+      mySpecialCat: { ref: 'MySpecialNumber', required: true },
       status: { ref: 'HappinessStatus' },
       manyStatuses: {
         dataType: 'array',
@@ -166,7 +173,7 @@ const models: TsoaRoute.Models = {
   AuthUser: {
     dataType: 'refObject',
     properties: {
-      id: { dataType: 'double', required: true },
+      id: { dataType: 'integer', required: true },
       name: { dataType: 'string', required: true },
     },
     additionalProperties: false,

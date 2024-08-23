@@ -28,6 +28,11 @@
         "description": "Stringified UUIDv4.\nSee [RFC 4112](https://tools.ietf.org/html/rfc4122).",
         "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}"
       },
+      "MySpecialNumber": {
+        "type": "integer",
+        "format": "int32",
+        "description": "My Special Number description."
+      },
       "HappinessStatus": {
         "description": "Happiness Status Enum that is very important.",
         "enum": ["Happy", "Sad"],
@@ -38,8 +43,7 @@
         "properties": {
           "id": {
             "$ref": "#/components/schemas/UUID",
-            "description": "The user's identifier.",
-            "example": "66ef17a1-af37-4f7b-8e82-b341e0241a30"
+            "description": "The user's identifier."
           },
           "email": {
             "type": "string",
@@ -56,18 +60,20 @@
             "description": "Is the user a cat.",
             "example": false
           },
+          "mySpecialCat": {
+            "$ref": "#/components/schemas/MySpecialNumber",
+            "description": "My Special Special Cat."
+          },
           "status": {
             "$ref": "#/components/schemas/HappinessStatus",
-            "description": "The happiness status of the user.",
-            "example": "Sad"
+            "description": "The happiness status of the user."
           },
           "manyStatuses": {
             "items": {
               "$ref": "#/components/schemas/HappinessStatus"
             },
             "type": "array",
-            "description": "An array of happiness statuses of the user.",
-            "example": []
+            "description": "An array of happiness statuses of the user."
           },
           "catLevel": {
             "type": "string",
@@ -108,16 +114,14 @@
               ]
             },
             "type": "array",
-            "description": "The cat index of the user.",
-            "example": "cat index"
+            "description": "The cat index of the user."
           },
           "phoneNumbers": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "description": "The phone numbers associated with the user.",
-            "example": []
+            "description": "The phone numbers associated with the user."
           },
           "groupId": {
             "type": "integer",
@@ -125,7 +129,15 @@
             "example": 113
           }
         },
-        "required": ["id", "email", "name", "isCat", "phoneNumbers", "groupId"],
+        "required": [
+          "id",
+          "email",
+          "name",
+          "isCat",
+          "mySpecialCat",
+          "phoneNumbers",
+          "groupId"
+        ],
         "type": "object",
         "additionalProperties": false
       },
@@ -134,8 +146,7 @@
         "properties": {
           "id": {
             "$ref": "#/components/schemas/UUID",
-            "description": "The user's identifier.",
-            "example": "66ef17a1-af37-4f7b-8e82-b341e0241a30"
+            "description": "The user's identifier."
           },
           "email": {
             "type": "string",
@@ -152,18 +163,20 @@
             "description": "Is the user a cat.",
             "example": false
           },
+          "mySpecialCat": {
+            "$ref": "#/components/schemas/MySpecialNumber",
+            "description": "My Special Special Cat."
+          },
           "status": {
             "$ref": "#/components/schemas/HappinessStatus",
-            "description": "The happiness status of the user.",
-            "example": "Sad"
+            "description": "The happiness status of the user."
           },
           "manyStatuses": {
             "items": {
               "$ref": "#/components/schemas/HappinessStatus"
             },
             "type": "array",
-            "description": "An array of happiness statuses of the user.",
-            "example": []
+            "description": "An array of happiness statuses of the user."
           },
           "catLevel": {
             "type": "string",
@@ -204,19 +217,24 @@
               ]
             },
             "type": "array",
-            "description": "The cat index of the user.",
-            "example": "cat index"
+            "description": "The cat index of the user."
           },
           "phoneNumbers": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "description": "The phone numbers associated with the user.",
-            "example": []
+            "description": "The phone numbers associated with the user."
           }
         },
-        "required": ["id", "email", "name", "isCat", "phoneNumbers"],
+        "required": [
+          "id",
+          "email",
+          "name",
+          "isCat",
+          "mySpecialCat",
+          "phoneNumbers"
+        ],
         "type": "object",
         "additionalProperties": false
       },
@@ -224,8 +242,8 @@
         "description": "An authenticated user.",
         "properties": {
           "id": {
-            "type": "number",
-            "format": "double",
+            "type": "integer",
+            "format": "int32",
             "description": "The authenticated user's identifier.",
             "example": 1
           },
@@ -278,7 +296,8 @@
                         "status": "Happy",
                         "phoneNumbers": [],
                         "groupId": 1,
-                        "isCat": false
+                        "isCat": false,
+                        "mySpecialCat": 44
                       },
                       {
                         "id": "c421afa9-08c7-491a-90a1-575bb656cffd",
@@ -287,7 +306,8 @@
                         "status": "Sad",
                         "phoneNumbers": [],
                         "groupId": 1,
-                        "isCat": false
+                        "isCat": false,
+                        "mySpecialCat": 44
                       }
                     ]
                   }

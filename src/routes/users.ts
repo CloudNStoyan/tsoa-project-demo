@@ -24,6 +24,12 @@ import { ApiError, BaseController } from '../utils.js';
 type UUID = string;
 
 /**
+ * My Special Number description.
+ * @isInt
+ */
+type MySpecialNumber = number;
+
+/**
  * Happiness Status Enum that is very important.
  */
 enum HappinessStatus {
@@ -58,14 +64,17 @@ interface User {
   isCat: boolean;
 
   /**
+   * My Special Special Cat.
+   */
+  mySpecialCat: MySpecialNumber;
+
+  /**
    * The happiness status of the user.
-   * @example "Sad"
    */
   status?: HappinessStatus;
 
   /**
    * An array of happiness statuses of the user.
-   * @example []
    */
   manyStatuses?: HappinessStatus[];
 
@@ -77,7 +86,6 @@ interface User {
 
   /**
    * The cat index of the user.
-   * @example "cat index"
    */
   catIndex?: (
     | string
@@ -114,6 +122,7 @@ let data: User[] = [
     status: HappinessStatus.Happy,
     phoneNumbers: [],
     isCat: false,
+    mySpecialCat: 44,
   },
   {
     id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
@@ -122,6 +131,7 @@ let data: User[] = [
     status: HappinessStatus.Sad,
     phoneNumbers: [],
     isCat: false,
+    mySpecialCat: 44,
   },
 ];
 
@@ -152,6 +162,7 @@ export class UserController extends BaseController {
         phoneNumbers: [],
         groupId: 1,
         isCat: false,
+        mySpecialCat: 44,
       },
       {
         id: 'c421afa9-08c7-491a-90a1-575bb656cffd',
@@ -161,6 +172,7 @@ export class UserController extends BaseController {
         phoneNumbers: [],
         groupId: 1,
         isCat: false,
+        mySpecialCat: 44,
       },
     ],
     'An example of Users'

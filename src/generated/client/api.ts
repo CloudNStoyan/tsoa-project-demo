@@ -17,6 +17,12 @@ export enum HappinessStatus {
  */
 export type UUID = string;
 
+/**
+ * My Special Number description.
+ * @format int32
+ */
+export type MySpecialNumber = number;
+
 export interface ApiError {
   /**
    * @format double
@@ -35,7 +41,6 @@ export interface ApiError {
 export interface UserFromGroup {
   /**
    * The user's identifier.
-   * @example "66ef17a1-af37-4f7b-8e82-b341e0241a30"
    */
   id: UUID;
 
@@ -58,14 +63,17 @@ export interface UserFromGroup {
   isCat: boolean;
 
   /**
+   * My Special Special Cat.
+   */
+  mySpecialCat: MySpecialNumber;
+
+  /**
    * The happiness status of the user.
-   * @example "Sad"
    */
   status?: HappinessStatus;
 
   /**
    * An array of happiness statuses of the user.
-   * @example []
    */
   manyStatuses?: HappinessStatus[];
 
@@ -77,7 +85,6 @@ export interface UserFromGroup {
 
   /**
    * The cat index of the user.
-   * @example "cat index"
    */
   catIndex?: (
     | string
@@ -88,7 +95,6 @@ export interface UserFromGroup {
 
   /**
    * The phone numbers associated with the user.
-   * @example []
    */
   phoneNumbers: string[];
 
@@ -105,7 +111,6 @@ export interface UserFromGroup {
 export interface User {
   /**
    * The user's identifier.
-   * @example "66ef17a1-af37-4f7b-8e82-b341e0241a30"
    */
   id: UUID;
 
@@ -128,14 +133,17 @@ export interface User {
   isCat: boolean;
 
   /**
+   * My Special Special Cat.
+   */
+  mySpecialCat: MySpecialNumber;
+
+  /**
    * The happiness status of the user.
-   * @example "Sad"
    */
   status?: HappinessStatus;
 
   /**
    * An array of happiness statuses of the user.
-   * @example []
    */
   manyStatuses?: HappinessStatus[];
 
@@ -147,7 +155,6 @@ export interface User {
 
   /**
    * The cat index of the user.
-   * @example "cat index"
    */
   catIndex?: (
     | string
@@ -158,7 +165,6 @@ export interface User {
 
   /**
    * The phone numbers associated with the user.
-   * @example []
    */
   phoneNumbers: string[];
 }
@@ -169,7 +175,7 @@ export interface User {
 export interface AuthUser {
   /**
    * The authenticated user's identifier.
-   * @format double
+   * @format int32
    * @example 1
    */
   id: number;

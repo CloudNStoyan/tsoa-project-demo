@@ -28,6 +28,10 @@ components:
       pattern:
         "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-\
         [0-9A-Fa-f]{12}"
+    MySpecialNumber:
+      type: integer
+      format: int32
+      description: My Special Number description.
     HappinessStatus:
       description: Happiness Status Enum that is very important.
       enum:
@@ -44,7 +48,6 @@ components:
         id:
           $ref: '#/components/schemas/UUID'
           description: The user's identifier.
-          example: 66ef17a1-af37-4f7b-8e82-b341e0241a30
         email:
           type: string
           description: The email the user used to register his account.
@@ -57,16 +60,17 @@ components:
           type: boolean
           description: Is the user a cat.
           example: false
+        mySpecialCat:
+          $ref: '#/components/schemas/MySpecialNumber'
+          description: My Special Special Cat.
         status:
           $ref: '#/components/schemas/HappinessStatus'
           description: The happiness status of the user.
-          example: Sad
         manyStatuses:
           items:
             $ref: '#/components/schemas/HappinessStatus'
           type: array
           description: An array of happiness statuses of the user.
-          example: []
         catLevel:
           type: string
           enum:
@@ -88,13 +92,11 @@ components:
                       - $ref: '#/components/schemas/HappinessStatus'
           type: array
           description: The cat index of the user.
-          example: cat index
         phoneNumbers:
           items:
             type: string
           type: array
           description: The phone numbers associated with the user.
-          example: []
         groupId:
           type: integer
           format: int32
@@ -104,6 +106,7 @@ components:
         - email
         - name
         - isCat
+        - mySpecialCat
         - phoneNumbers
         - groupId
       type: object
@@ -114,7 +117,6 @@ components:
         id:
           $ref: '#/components/schemas/UUID'
           description: The user's identifier.
-          example: 66ef17a1-af37-4f7b-8e82-b341e0241a30
         email:
           type: string
           description: The email the user used to register his account.
@@ -127,16 +129,17 @@ components:
           type: boolean
           description: Is the user a cat.
           example: false
+        mySpecialCat:
+          $ref: '#/components/schemas/MySpecialNumber'
+          description: My Special Special Cat.
         status:
           $ref: '#/components/schemas/HappinessStatus'
           description: The happiness status of the user.
-          example: Sad
         manyStatuses:
           items:
             $ref: '#/components/schemas/HappinessStatus'
           type: array
           description: An array of happiness statuses of the user.
-          example: []
         catLevel:
           type: string
           enum:
@@ -158,18 +161,17 @@ components:
                       - $ref: '#/components/schemas/HappinessStatus'
           type: array
           description: The cat index of the user.
-          example: cat index
         phoneNumbers:
           items:
             type: string
           type: array
           description: The phone numbers associated with the user.
-          example: []
       required:
         - id
         - email
         - name
         - isCat
+        - mySpecialCat
         - phoneNumbers
       type: object
       additionalProperties: false
@@ -177,8 +179,8 @@ components:
       description: An authenticated user.
       properties:
         id:
-          type: number
-          format: double
+          type: integer
+          format: int32
           description: The authenticated user's identifier.
           example: 1
         name:
@@ -222,6 +224,7 @@ paths:
                       phoneNumbers: []
                       groupId: 1
                       isCat: false
+                      mySpecialCat: 44
                     - id: c421afa9-08c7-491a-90a1-575bb656cffd
                       email: john@doe.com
                       name: John Doe
@@ -229,6 +232,7 @@ paths:
                       phoneNumbers: []
                       groupId: 1
                       isCat: false
+                      mySpecialCat: 44
         '401':
           description: Unauthorized
           content:
