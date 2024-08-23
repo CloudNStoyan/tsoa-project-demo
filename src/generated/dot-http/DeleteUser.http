@@ -1,0 +1,16 @@
+@contentType = application/json
+
+##############################################
+### Request: DELETE /users/{userId}
+### Summary: Delete an user.
+### Description: Permanently delete an user.
+##############################################
+
+### Path Parameter: The user's identifier.
+@userId = str
+
+
+DELETE http://localhost:3000/users/{{userId}}
+Content-Type: {{contentType}}
+
+

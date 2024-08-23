@@ -19,7 +19,16 @@ Content-Type: {{contentType}}
   "id": "id",
   "email": "email",
   "name": "name",
+  "isCat": false,
+  "mySpecialCat": 0,
   "status": "Happy",
+  "manyStatuses": [
+    "Happy"
+  ],
+  "catLevel": "Ultra Cat",
+  "catIndex": [
+    null
+  ],
   "phoneNumbers": [
     ""
   ]

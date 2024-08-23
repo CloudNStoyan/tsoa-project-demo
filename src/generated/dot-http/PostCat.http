@@ -1,8 +1,10 @@
 @contentType = application/json
 
-#############################
+#######################################################################
 ### Request: POST /cats/add
-#############################
+### Summary: Retrieve "add :)" from the server.
+### Description: Demonstrative cat endpoint that returns static data.
+#######################################################################
 
 
 POST http://localhost:3000/cats/add
