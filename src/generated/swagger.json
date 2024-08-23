@@ -42,8 +42,12 @@
         "description": "User objects allow you to associate actions performed\nin the system with the user that performed them.\nThe User object contains common information across\nevery user in the system regardless of status and role.",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/UUID",
-            "description": "The user's identifier."
+            "description": "The user's identifier.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UUID"
+              }
+            ]
           },
           "email": {
             "type": "string",
@@ -61,12 +65,20 @@
             "example": false
           },
           "mySpecialCat": {
-            "$ref": "#/components/schemas/MySpecialNumber",
-            "description": "My Special Special Cat."
+            "description": "My Special Special Cat.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MySpecialNumber"
+              }
+            ]
           },
           "status": {
-            "$ref": "#/components/schemas/HappinessStatus",
-            "description": "The happiness status of the user."
+            "description": "The happiness status of the user.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HappinessStatus"
+              }
+            ]
           },
           "manyStatuses": {
             "items": {
@@ -145,8 +157,12 @@
         "description": "User description written by yours truly Stoyan.",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/UUID",
-            "description": "The user's identifier."
+            "description": "The user's identifier.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UUID"
+              }
+            ]
           },
           "email": {
             "type": "string",
@@ -164,12 +180,20 @@
             "example": false
           },
           "mySpecialCat": {
-            "$ref": "#/components/schemas/MySpecialNumber",
-            "description": "My Special Special Cat."
+            "description": "My Special Special Cat.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MySpecialNumber"
+              }
+            ]
           },
           "status": {
-            "$ref": "#/components/schemas/HappinessStatus",
-            "description": "The happiness status of the user."
+            "description": "The happiness status of the user.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HappinessStatus"
+              }
+            ]
           },
           "manyStatuses": {
             "items": {

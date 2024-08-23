@@ -46,8 +46,9 @@ components:
         every user in the system regardless of status and role.
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
           description: The user's identifier.
+          allOf:
+            - $ref: '#/components/schemas/UUID'
         email:
           type: string
           description: The email the user used to register his account.
@@ -61,11 +62,13 @@ components:
           description: Is the user a cat.
           example: false
         mySpecialCat:
-          $ref: '#/components/schemas/MySpecialNumber'
           description: My Special Special Cat.
+          allOf:
+            - $ref: '#/components/schemas/MySpecialNumber'
         status:
-          $ref: '#/components/schemas/HappinessStatus'
           description: The happiness status of the user.
+          allOf:
+            - $ref: '#/components/schemas/HappinessStatus'
         manyStatuses:
           items:
             $ref: '#/components/schemas/HappinessStatus'
@@ -115,8 +118,9 @@ components:
       description: User description written by yours truly Stoyan.
       properties:
         id:
-          $ref: '#/components/schemas/UUID'
           description: The user's identifier.
+          allOf:
+            - $ref: '#/components/schemas/UUID'
         email:
           type: string
           description: The email the user used to register his account.
@@ -130,11 +134,13 @@ components:
           description: Is the user a cat.
           example: false
         mySpecialCat:
-          $ref: '#/components/schemas/MySpecialNumber'
           description: My Special Special Cat.
+          allOf:
+            - $ref: '#/components/schemas/MySpecialNumber'
         status:
-          $ref: '#/components/schemas/HappinessStatus'
           description: The happiness status of the user.
+          allOf:
+            - $ref: '#/components/schemas/HappinessStatus'
         manyStatuses:
           items:
             $ref: '#/components/schemas/HappinessStatus'

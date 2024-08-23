@@ -14,7 +14,7 @@ npm install
 npm run convert-swagger
 ```
 
-- Generate swagger spec and express routes
+- Run all generator scripts in the correct order
 
 ```shell
 npm run generate
@@ -72,4 +72,10 @@ npm run generate-client-from-swagger
 
 ```shell
 npm run generate-http-files
+```
+
+- Run the post-processing on the swagger.json
+
+```shell
+npm run post-process-swagger
 ```

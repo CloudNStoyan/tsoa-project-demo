@@ -239,6 +239,16 @@ class TypescriptModel {
       return this.resolveUnion(property);
     }
 
+    if (Array.isArray(property.allOf)) {
+      if (property.allOf.length !== 1) {
+        throw new Error(
+          `Found an 'allOf' that doesn't have only one element in it:\n${JSON.stringify(property.allOf, null, 2)}`
+        );
+      }
+
+      return this.resolveType(property.allOf[0]);
+    }
+
     if (property.$ref) {
       if (!property.$ref.startsWith('#/components/schemas/')) {
         throw new Error(
@@ -265,7 +275,9 @@ class TypescriptModel {
       return 'number';
     }
 
-    throw new Error(`Invalid property type: '${property.type}'.`);
+    throw new Error(
+      `Invalid property type: '${property.type}' in:\n${JSON.stringify(property, null, 2)}`
+    );
   }
 
   resolveJsdoc(property) {
