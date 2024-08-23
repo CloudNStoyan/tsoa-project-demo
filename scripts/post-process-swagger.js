@@ -16,7 +16,7 @@ for (const schemaName in schemas) {
   for (const propertyName in schema.properties) {
     const property = schema.properties[propertyName];
 
-    if (property['$ref']) {
+    if (property['$ref'] && property['description']) {
       const cachedRef = property['$ref'];
 
       delete property['$ref'];
