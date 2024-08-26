@@ -6,14 +6,17 @@ export interface ApiError {
 }
 
 export class BaseController extends Controller {
-  errorResult<TSuccess>(status: number, error: Omit<ApiError, 'status'>) {
+  errorResult<TSuccess>(
+    status: number,
+    error: Omit<ApiError, 'status'>
+  ): Promise<TSuccess> {
     this.setStatus(status);
     const errorWithStatus: ApiError = { ...error, status };
-    return errorWithStatus as unknown as TSuccess;
+    return errorWithStatus as unknown as Promise<TSuccess>;
   }
 
-  noContentResult<TSuccess>(): TSuccess {
+  noContentResult<TSuccess>(): Promise<TSuccess> {
     this.setStatus(204);
-    return undefined as unknown as TSuccess;
+    return undefined as unknown as Promise<TSuccess>;
   }
 }
