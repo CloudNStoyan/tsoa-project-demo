@@ -663,26 +663,28 @@ class ModelRenderer {
   }
 
   renderParams(params, body) {
-    if (!params) {
+    if (!params && !body) {
       return '';
     }
 
     let output = '';
 
-    for (let i = 0; i < params.length; i++) {
-      const param = params[i];
+    if (params) {
+      for (let i = 0; i < params.length; i++) {
+        const param = params[i];
 
-      if (i !== 0) {
-        output += ',';
+        if (i !== 0) {
+          output += ',';
+        }
+
+        output += param.name;
+
+        if (!param.required) {
+          output += '?';
+        }
+
+        output += `: ${param.resolvedType}`;
       }
-
-      output += param.name;
-
-      if (!param.required) {
-        output += '?';
-      }
-
-      output += `: ${param.resolvedType}`;
     }
 
     if (body) {
