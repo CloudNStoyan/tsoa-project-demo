@@ -126,6 +126,13 @@ class TypescriptModel {
               param.paramType.isEnum = true;
             }
 
+            if (
+              param.paramType.type === 'array' &&
+              this.isTypeEnum(param.paramType.itemType.resolvedType)
+            ) {
+              param.paramType.itemType.isEnum = true;
+            }
+
             allParams.push(param);
           }
         }
@@ -619,6 +626,7 @@ class ModelRenderer {
       output += `urlParams.${urlParamMethod}("${key}", ${value});\n`;
       output += '}\n\n';
     } else {
+      console.log(paramType);
       throw new Error(
         `Query param type can only be 'number', 'string' or 'enum', got: '${paramType.resolvedType}'.`
       );
