@@ -1,0 +1,16 @@
+@contentType = application/json
+
+#######################################
+### Request: DELETE /pet/{petId}
+### Summary: Deletes a pet.
+### Description: Deletes a pet by ID.
+#######################################
+
+### Path Parameter: Pet ID to delete.
+@petId = str
+
+
+DELETE http://localhost:3000/pet/{{petId}}
+Content-Type: {{contentType}}
+
+

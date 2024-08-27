@@ -59,7 +59,7 @@ export default tseslint.config(
             'minItems',
             'maxItems',
             'uniqueItems',
-            'isBool',
+            'isBoolean',
           ],
         },
       ],

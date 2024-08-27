@@ -1,0 +1,19 @@
+@contentType = application/json
+
+########################################################################
+### Request: GET /pet/all
+### Summary: Returns all pets.
+### Description: Returns all pets with limit and offset functionality.
+########################################################################
+
+### Query Parameter: Offset to discard elements.
+@offset = str
+
+### Query Parameter: How many records to return.
+@limit = str
+
+
+GET http://localhost:3000/pet/all
+Content-Type: {{contentType}}
+
+

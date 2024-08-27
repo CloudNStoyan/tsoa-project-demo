@@ -1,0 +1,27 @@
+@contentType = application/json
+
+################################################
+### Request: PUT /pet
+### Summary: Update an existing pet.
+### Description: Update an existing pet by ID.
+################################################
+
+
+PUT http://localhost:3000/pet
+Content-Type: {{contentType}}
+
+{
+  "id": "id",
+  "name": "name",
+  "breed": "breed",
+  "notes": "notes",
+  "kind": "Cat",
+  "age": 0,
+  "healthProblems": false,
+  "addedDate": "2024-08-27",
+  "status": "Adopted",
+  "tags": [
+    ""
+  ]
+}
+

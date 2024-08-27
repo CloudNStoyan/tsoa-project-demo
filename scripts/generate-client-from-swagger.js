@@ -113,13 +113,24 @@ class TypescriptModel {
               jsdoc: this.resolveJsdoc(operationParam),
               required: operationParam.required,
               type: operationParam.in,
-              resolvedType: this.resolveType(operationParam.schema),
+              paramType: this.resolveTypeWithDetails(operationParam.schema),
             };
 
             const schemaJsdoc = this.resolveJsdoc(operationParam.schema);
 
             if (schemaJsdoc) {
               param.jsdoc = { ...schemaJsdoc, ...param.jsdoc };
+            }
+
+            if (this.isTypeEnum(param.paramType.resolvedType)) {
+              param.paramType.isEnum = true;
+            }
+
+            if (
+              param.paramType.type === 'array' &&
+              this.isTypeEnum(param.paramType.itemType.resolvedType)
+            ) {
+              param.paramType.itemType.isEnum = true;
             }
 
             allParams.push(param);
@@ -201,6 +212,71 @@ class TypescriptModel {
     return tags;
   }
 
+  isTypeEnum(typeName) {
+    for (const tsEnum of this.enums) {
+      if (tsEnum.name === typeName) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  resolveTypeWithDetails(property) {
+    if (this.isPropertyAnUnion(property)) {
+      return { resolvedType: this.resolveUnion(property), type: 'union' };
+    }
+
+    if (Array.isArray(property.allOf)) {
+      if (property.allOf.length !== 1) {
+        throw new Error(
+          `Found an 'allOf' that doesn't have only one element in it:\n${JSON.stringify(property.allOf, null, 2)}`
+        );
+      }
+
+      return this.resolveTypeWithDetails(property.allOf[0]);
+    }
+
+    if (property.$ref) {
+      if (!property.$ref.startsWith('#/components/schemas/')) {
+        throw new Error(
+          "Found a ref that doesn't point to #/components/schema"
+        );
+      }
+
+      return {
+        resolvedType: property.$ref.split('#/components/schemas/')[1],
+        type: 'complex',
+      };
+    }
+
+    if (property.type === 'array') {
+      const itemTypeInfo = this.resolveTypeWithDetails(property.items);
+
+      return {
+        resolvedType: `${itemTypeInfo.resolvedType}[]`,
+        type: 'array',
+        itemType: itemTypeInfo,
+      };
+    }
+
+    if (
+      property.type === 'string' ||
+      property.type === 'number' ||
+      property.type === 'boolean'
+    ) {
+      return { resolvedType: property.type, type: 'literal' };
+    }
+
+    if (property.type === 'integer') {
+      return { resolvedType: 'number', type: 'literal' };
+    }
+
+    throw new Error(
+      `Invalid property type: '${property.type}' in:\n${JSON.stringify(property, null, 2)}`
+    );
+  }
+
   resolveUnion(union) {
     if (Array.isArray(union.anyOf)) {
       const resolvedUnionValues = [];
@@ -235,37 +311,7 @@ class TypescriptModel {
   }
 
   resolveType(property) {
-    if (this.isPropertyAnUnion(property)) {
-      return this.resolveUnion(property);
-    }
-
-    if (property.$ref) {
-      if (!property.$ref.startsWith('#/components/schemas/')) {
-        throw new Error(
-          "Found a ref that doesn't point to #/components/schema"
-        );
-      }
-
-      return property.$ref.split('#/components/schemas/')[1];
-    }
-
-    if (property.type === 'array') {
-      return `(${this.resolveType(property.items)})[]`;
-    }
-
-    if (
-      property.type === 'string' ||
-      property.type === 'number' ||
-      property.type === 'boolean'
-    ) {
-      return property.type;
-    }
-
-    if (property.type === 'integer') {
-      return 'number';
-    }
-
-    throw new Error(`Invalid property type: '${property.type}'.`);
+    return this.resolveTypeWithDetails(property).resolvedType;
   }
 
   resolveJsdoc(property) {
@@ -548,6 +594,47 @@ class ModelRenderer {
     return output;
   }
 
+  renderAddQueryParamToUrl(options) {
+    const { urlParamMethod, key, value, paramType } = options;
+
+    if (urlParamMethod !== 'set' && urlParamMethod !== 'append') {
+      throw new Error(
+        `URLParamMethod must be either 'set' or 'append', got: '${urlParamMethod}'`
+      );
+    }
+
+    if (!key) {
+      throw new Error(
+        "'key' in AddQueryParamToURL's options was either empty or null."
+      );
+    }
+
+    if (!value) {
+      throw new Error(
+        "'value' in AddQueryParamToURL's options was either empty or null."
+      );
+    }
+
+    let output = '';
+
+    if (paramType.resolvedType === 'number') {
+      output += `if (${value} !== undefined) {\n`;
+      output += `urlParams.${urlParamMethod}("${key}", String(${value}));\n`;
+      output += '}\n\n';
+    } else if (paramType.resolvedType === 'string' || paramType.isEnum) {
+      output += `if (${value}) {\n`;
+      output += `urlParams.${urlParamMethod}("${key}", ${value});\n`;
+      output += '}\n\n';
+    } else {
+      console.log(paramType);
+      throw new Error(
+        `Query param type can only be 'number', 'string' or 'enum', got: '${paramType.resolvedType}'.`
+      );
+    }
+
+    return output;
+  }
+
   renderOperation(operation) {
     let output = '';
 
@@ -559,9 +646,15 @@ class ModelRenderer {
 
     if (operation.allParams) {
       for (const param of operation.allParams) {
-        if (param.resolvedType === 'number') {
+        if (param.paramType.resolvedType === 'number') {
           output += `if (Number.isNaN(${param.name})) {\n`;
           output += `throw new Error("Invalid value NaN for '${param.type}' param: '${param.name}'.")\n`;
+          output += '}\n\n';
+        }
+
+        if (param.paramType.type === 'array') {
+          output += `if (!Array.isArray(${param.name})) {\n`;
+          output += `throw new Error(\`Invalid value type '\${typeof ${param.name}}' for '${param.type}' param: '${param.name}'.\`)\n`;
           output += '}\n\n';
         }
       }
@@ -573,18 +666,22 @@ class ModelRenderer {
       output += 'const urlParams = new URLSearchParams();\n\n';
 
       for (const queryParam of queryParams) {
-        if (queryParam.resolvedType === 'number') {
-          output += `if (${queryParam.name} !== undefined) {\n`;
-          output += `urlParams.set("${queryParam.name}", String(${queryParam.name}));\n`;
-          output += '}\n\n';
-        } else if (queryParam.resolvedType === 'string') {
-          output += `if (${queryParam.name}) {\n`;
-          output += `urlParams.set("${queryParam.name}", ${queryParam.name});\n`;
-          output += '}\n\n';
+        if (queryParam.paramType.type !== 'array') {
+          output += this.renderAddQueryParamToUrl({
+            urlParamMethod: 'set',
+            key: queryParam.name,
+            value: queryParam.name,
+            paramType: queryParam.paramType,
+          });
         } else {
-          throw new Error(
-            `Query param type can only be 'number' or 'string', got: '${queryParam.resolvedType}'.`
-          );
+          output += `for (const item of ${queryParam.name}) {\n`;
+          output += this.renderAddQueryParamToUrl({
+            urlParamMethod: 'append',
+            key: queryParam.name,
+            value: 'item',
+            paramType: queryParam.paramType.itemType,
+          });
+          output += '}\n\n';
         }
       }
 
@@ -651,26 +748,28 @@ class ModelRenderer {
   }
 
   renderParams(params, body) {
-    if (!params) {
+    if (!params && !body) {
       return '';
     }
 
     let output = '';
 
-    for (let i = 0; i < params.length; i++) {
-      const param = params[i];
+    if (params) {
+      for (let i = 0; i < params.length; i++) {
+        const param = params[i];
 
-      if (i !== 0) {
-        output += ',';
+        if (i !== 0) {
+          output += ',';
+        }
+
+        output += param.name;
+
+        if (!param.required) {
+          output += '?';
+        }
+
+        output += `: ${param.paramType.resolvedType}`;
       }
-
-      output += param.name;
-
-      if (!param.required) {
-        output += '?';
-      }
-
-      output += `: ${param.resolvedType}`;
     }
 
     if (body) {

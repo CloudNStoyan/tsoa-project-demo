@@ -14,7 +14,7 @@ npm install
 npm run convert-swagger
 ```
 
-- Generate swagger spec and express routes
+- Run all generator scripts in the correct order
 
 ```shell
 npm run generate
@@ -44,14 +44,38 @@ npm run format
 npm run format-check
 ```
 
-- Install Swagger Codegen CLI
+- Run prettier format only on the generated folder
 
 ```shell
-npm run install-codegen-cli
+npm run format-generated
+```
+
+- Run ESLint
+
+```shell
+npm run lint
+```
+
+- Run ESLint with auto-fixer
+
+```shell
+npm run lint:fix
 ```
 
 - Generate client from the swagger schema
 
 ```shell
 npm run generate-client-from-swagger
+```
+
+- Generate .http files from swagger schema
+
+```shell
+npm run generate-http-files
+```
+
+- Run the post-processing on the swagger.json
+
+```shell
+npm run post-process-swagger
 ```

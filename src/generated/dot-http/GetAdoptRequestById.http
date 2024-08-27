@@ -1,0 +1,16 @@
+@contentType = application/json
+
+###############################################
+### Request: GET /store/adopt/{requestId}
+### Summary: Find adoption request by ID.
+### Description: Find adoption request by ID.
+###############################################
+
+### Path Parameter: The adoption request's ID.
+@requestId = str
+
+
+GET http://localhost:3000/store/adopt/{{requestId}}
+Content-Type: {{contentType}}
+
+

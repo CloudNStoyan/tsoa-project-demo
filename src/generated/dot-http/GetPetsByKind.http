@@ -1,0 +1,16 @@
+@contentType = application/json
+
+####################################################################
+### Request: GET /pet/findByKinds
+### Summary: Finds Pets by set of kinds.
+### Description: Returns pets that are of a specific set of kinds.
+####################################################################
+
+### Query Parameter: The set of kinds of pet.
+@kinds = str
+
+
+GET http://localhost:3000/pet/findByKinds
+Content-Type: {{contentType}}
+
+

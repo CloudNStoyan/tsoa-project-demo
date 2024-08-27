@@ -1,0 +1,16 @@
+@contentType = application/json
+
+#################################################
+### Request: DELETE /store/adopt/{requestId}
+### Summary: Delete adoption request by ID.
+### Description: Delete adoption request by ID.
+#################################################
+
+### Path Parameter: The adoption request's ID.
+@requestId = str
+
+
+DELETE http://localhost:3000/store/adopt/{{requestId}}
+Content-Type: {{contentType}}
+
+

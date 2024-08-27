@@ -6,10 +6,13 @@
     "spec": {
       "servers": []
     },
+    "name": "TSOA Demo Pet Store - OpenAPI 3.0",
+    "description": "Pet Store Server OpenAPI 3.0 specification.\n\nSome useful links:\n- [The TSOA Demo Pet Store repository](https://github.com/CloudNStoyan/tsoa-project-demo)\n- [The source API definition for the Pet Store](https://github.com/CloudNStoyan/tsoa-project-demo/blob/main/src/generated/swagger.yaml)",
     "outputDirectory": "src/generated/",
     "specVersion": 3,
     "securityDefinitions": {
       "api_key": {
+        "description": "The TSOA Demo Pet Store API Key is:\n\n`simple-pet-token`",
         "type": "apiKey",
         "name": "access_token",
         "in": "query"
@@ -17,10 +20,18 @@
     },
     "tags": [
       {
-        "name": "User",
-        "description": "Operations about users",
+        "name": "Pet",
+        "description": "Everything about your Pets",
         "externalDocs": {
-          "description": "Find out more about users",
+          "description": "Find out more",
+          "url": "http://swagger.io"
+        }
+      },
+      {
+        "name": "Store",
+        "description": "Access to Petstore orders",
+        "externalDocs": {
+          "description": "Find out more about our store",
           "url": "http://swagger.io"
         }
       }
