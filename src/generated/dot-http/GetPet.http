@@ -1,0 +1,16 @@
+@contentType = application/json
+
+########################################
+### Request: GET /pet/{petId}
+### Summary: Find pet by ID.
+### Description: Returns a single pet.
+########################################
+
+### Path Parameter: The pet's id.
+@petId = str
+
+
+GET http://localhost:3000/pet/{{petId}}
+Content-Type: {{contentType}}
+
+

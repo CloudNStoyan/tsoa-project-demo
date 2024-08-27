@@ -1,0 +1,16 @@
+@contentType = application/json
+
+#######################################################################
+### Request: GET /pet/findByStatus
+### Summary: Finds Pets by status.
+### Description: Returns pets that have the selected adoption status.
+#######################################################################
+
+### Query Parameter: The adoption status.
+@status = str
+
+
+GET http://localhost:3000/pet/findByStatus
+Content-Type: {{contentType}}
+
+

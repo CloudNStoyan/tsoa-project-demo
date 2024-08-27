@@ -1,11 +1,12 @@
 import type { Request } from 'express';
+import { state } from './state.js';
 
 export class AuthError extends Error {}
 
 export function expressAuthentication(
   request: Request,
   securityName: string,
-  scopes?: string[]
+  _scopes?: string[]
 ) {
   if (securityName === 'api_key') {
     let token;
@@ -13,15 +14,12 @@ export function expressAuthentication(
       token = request.query.access_token;
     }
 
-    console.log(scopes);
+    // This is where I'd put my scopes if I had any
 
-    if (token === 'my-encrypted-password-fr-fr') {
-      return Promise.resolve({
-        id: 1,
-        name: 'Ironman',
-      });
+    if (token === 'simple-pet-token') {
+      return Promise.resolve(state.users[0]);
     } else {
-      return Promise.reject(new AuthError('No token provided.'));
+      return Promise.reject(new AuthError('Invalid token.'));
     }
   }
 }

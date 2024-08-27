@@ -7,11 +7,9 @@ import {
   ExpressTemplateService,
 } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { UserController } from './../routes/users.js';
+import { PetController } from './../routes/pet.js';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { SecureController } from './../routes/secure.js';
-// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { CatController } from './../routes/cat.js';
+import { StoreController } from './../routes/store.js';
 import { expressAuthentication } from './../auth.js';
 // @ts-ignore - no great way to install types from subpackage
 import type {
@@ -53,115 +51,34 @@ const models: TsoaRoute.Models = {
     },
   },
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-  MySpecialNumber: {
-    dataType: 'refAlias',
-    type: { dataType: 'integer', validators: {} },
-  },
-  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-  HappinessStatus: {
+  AnimalKind: {
     dataType: 'refEnum',
-    enums: ['Happy', 'Sad'],
+    enums: ['Cat', 'Dog', 'Parrot'],
   },
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-  UserFromGroup: {
+  ISODateString: {
+    dataType: 'refAlias',
+    type: { dataType: 'string', validators: {} },
+  },
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  AdoptionStatus: {
+    dataType: 'refEnum',
+    enums: ['Adopted', 'Available', 'Pending'],
+  },
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  Pet: {
     dataType: 'refObject',
     properties: {
       id: { ref: 'UUID', required: true },
-      email: { dataType: 'string', required: true },
       name: { dataType: 'string', required: true },
-      isCat: { dataType: 'boolean', required: true },
-      mySpecialCat: { ref: 'MySpecialNumber', required: true },
-      status: { ref: 'HappinessStatus' },
-      manyStatuses: {
-        dataType: 'array',
-        array: { dataType: 'refEnum', ref: 'HappinessStatus' },
-      },
-      catLevel: {
-        dataType: 'union',
-        subSchemas: [
-          { dataType: 'enum', enums: ['Ultra Cat'] },
-          { dataType: 'enum', enums: ['Mega Cat'] },
-        ],
-      },
-      catIndex: {
-        dataType: 'array',
-        array: {
-          dataType: 'union',
-          subSchemas: [
-            { dataType: 'string' },
-            { dataType: 'double' },
-            { ref: 'HappinessStatus' },
-            {
-              dataType: 'union',
-              subSchemas: [
-                { dataType: 'string' },
-                {
-                  dataType: 'union',
-                  subSchemas: [
-                    { dataType: 'string' },
-                    { ref: 'HappinessStatus' },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      },
-      phoneNumbers: {
-        dataType: 'array',
-        array: { dataType: 'string' },
-        required: true,
-      },
-      groupId: { dataType: 'integer', required: true },
-    },
-    additionalProperties: false,
-  },
-  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-  User: {
-    dataType: 'refObject',
-    properties: {
-      id: { ref: 'UUID', required: true },
-      email: { dataType: 'string', required: true },
-      name: { dataType: 'string', required: true },
-      isCat: { dataType: 'boolean', required: true },
-      mySpecialCat: { ref: 'MySpecialNumber', required: true },
-      status: { ref: 'HappinessStatus' },
-      manyStatuses: {
-        dataType: 'array',
-        array: { dataType: 'refEnum', ref: 'HappinessStatus' },
-      },
-      catLevel: {
-        dataType: 'union',
-        subSchemas: [
-          { dataType: 'enum', enums: ['Ultra Cat'] },
-          { dataType: 'enum', enums: ['Mega Cat'] },
-        ],
-      },
-      catIndex: {
-        dataType: 'array',
-        array: {
-          dataType: 'union',
-          subSchemas: [
-            { dataType: 'string' },
-            { dataType: 'double' },
-            { ref: 'HappinessStatus' },
-            {
-              dataType: 'union',
-              subSchemas: [
-                { dataType: 'string' },
-                {
-                  dataType: 'union',
-                  subSchemas: [
-                    { dataType: 'string' },
-                    { ref: 'HappinessStatus' },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      },
-      phoneNumbers: {
+      breed: { dataType: 'string', required: true },
+      notes: { dataType: 'string', required: true },
+      kind: { ref: 'AnimalKind', required: true },
+      age: { dataType: 'integer', required: true },
+      healthProblems: { dataType: 'boolean', required: true },
+      addedDate: { ref: 'ISODateString', required: true },
+      status: { ref: 'AdoptionStatus', required: true },
+      tags: {
         dataType: 'array',
         array: { dataType: 'string' },
         required: true,
@@ -170,11 +87,28 @@ const models: TsoaRoute.Models = {
     additionalProperties: false,
   },
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-  AuthUser: {
+  InventoryMap: {
     dataType: 'refObject',
     properties: {
-      id: { dataType: 'integer', required: true },
-      name: { dataType: 'string', required: true },
+      Adopted: { dataType: 'double', required: true },
+      Available: { dataType: 'double', required: true },
+      Pending: { dataType: 'double', required: true },
+    },
+    additionalProperties: false,
+  },
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  AdoptionRequestStatus: {
+    dataType: 'refEnum',
+    enums: ['Approved', 'Pending', 'Denied'],
+  },
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  AdoptionRequest: {
+    dataType: 'refObject',
+    properties: {
+      id: { ref: 'UUID', required: true },
+      petId: { ref: 'UUID', required: true },
+      dateOfSubmission: { ref: 'ISODateString', required: true },
+      status: { ref: 'AdoptionRequestStatus', required: true },
     },
     additionalProperties: false,
   },
@@ -193,25 +127,18 @@ export function RegisterRoutes(app: Router) {
   //      Please look into the "controllerPathGlobs" config option described in the readme: https://github.com/lukeautry/tsoa
   // ###########################################################################################################
 
-  app.get(
-    '/users/:groupId/all',
-    ...fetchMiddlewares<RequestHandler>(UserController),
-    ...fetchMiddlewares<RequestHandler>(UserController.prototype.getUsers),
+  app.post(
+    '/pet',
+    ...fetchMiddlewares<RequestHandler>(PetController),
+    ...fetchMiddlewares<RequestHandler>(PetController.prototype.createPet),
 
-    async function UserController_getUsers(
+    async function PetController_createPet(
       request: ExRequest,
       response: ExResponse,
       next: any
     ) {
       const args: Record<string, TsoaRoute.ParameterSchema> = {
-        groupId: {
-          in: 'path',
-          name: 'groupId',
-          required: true,
-          dataType: 'double',
-        },
-        limit: { default: 5, in: 'query', name: 'limit', dataType: 'double' },
-        catLevel: { in: 'query', name: 'catLevel', dataType: 'string' },
+        pet: { in: 'body', name: 'pet', required: true, ref: 'Pet' },
       };
 
       // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -224,10 +151,10 @@ export function RegisterRoutes(app: Router) {
           response,
         });
 
-        const controller = new UserController();
+        const controller = new PetController();
 
         await templateService.apiHandler({
-          methodName: 'getUsers',
+          methodName: 'createPet',
           controller,
           response,
           next,
@@ -241,17 +168,18 @@ export function RegisterRoutes(app: Router) {
   );
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   app.get(
-    '/users/:userId',
-    ...fetchMiddlewares<RequestHandler>(UserController),
-    ...fetchMiddlewares<RequestHandler>(UserController.prototype.getUser),
+    '/pet/all',
+    ...fetchMiddlewares<RequestHandler>(PetController),
+    ...fetchMiddlewares<RequestHandler>(PetController.prototype.getAllPets),
 
-    async function UserController_getUser(
+    async function PetController_getAllPets(
       request: ExRequest,
       response: ExResponse,
       next: any
     ) {
       const args: Record<string, TsoaRoute.ParameterSchema> = {
-        userId: { in: 'path', name: 'userId', required: true, ref: 'UUID' },
+        offset: { default: 0, in: 'query', name: 'offset', dataType: 'double' },
+        limit: { default: 10, in: 'query', name: 'limit', dataType: 'double' },
       };
 
       // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -264,10 +192,189 @@ export function RegisterRoutes(app: Router) {
           response,
         });
 
-        const controller = new UserController();
+        const controller = new PetController();
 
         await templateService.apiHandler({
-          methodName: 'getUser',
+          methodName: 'getAllPets',
+          controller,
+          response,
+          next,
+          validatedArgs,
+          successStatus: undefined,
+        });
+      } catch (err) {
+        return next(err);
+      }
+    }
+  );
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  app.get(
+    '/pet/findByStatus',
+    ...fetchMiddlewares<RequestHandler>(PetController),
+    ...fetchMiddlewares<RequestHandler>(
+      PetController.prototype.getPetsByStatus
+    ),
+
+    async function PetController_getPetsByStatus(
+      request: ExRequest,
+      response: ExResponse,
+      next: any
+    ) {
+      const args: Record<string, TsoaRoute.ParameterSchema> = {
+        status: {
+          in: 'query',
+          name: 'status',
+          required: true,
+          ref: 'AdoptionStatus',
+        },
+      };
+
+      // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+      let validatedArgs: any[] = [];
+      try {
+        validatedArgs = templateService.getValidatedArgs({
+          args,
+          request,
+          response,
+        });
+
+        const controller = new PetController();
+
+        await templateService.apiHandler({
+          methodName: 'getPetsByStatus',
+          controller,
+          response,
+          next,
+          validatedArgs,
+          successStatus: undefined,
+        });
+      } catch (err) {
+        return next(err);
+      }
+    }
+  );
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  app.get(
+    '/pet/findByKinds',
+    ...fetchMiddlewares<RequestHandler>(PetController),
+    ...fetchMiddlewares<RequestHandler>(PetController.prototype.getPetsByKind),
+
+    async function PetController_getPetsByKind(
+      request: ExRequest,
+      response: ExResponse,
+      next: any
+    ) {
+      const args: Record<string, TsoaRoute.ParameterSchema> = {
+        kinds: {
+          in: 'query',
+          name: 'kinds',
+          required: true,
+          dataType: 'array',
+          array: { dataType: 'refEnum', ref: 'AnimalKind' },
+        },
+      };
+
+      // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+      let validatedArgs: any[] = [];
+      try {
+        validatedArgs = templateService.getValidatedArgs({
+          args,
+          request,
+          response,
+        });
+
+        const controller = new PetController();
+
+        await templateService.apiHandler({
+          methodName: 'getPetsByKind',
+          controller,
+          response,
+          next,
+          validatedArgs,
+          successStatus: undefined,
+        });
+      } catch (err) {
+        return next(err);
+      }
+    }
+  );
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  app.get(
+    '/pet/findByTags',
+    ...fetchMiddlewares<RequestHandler>(PetController),
+    ...fetchMiddlewares<RequestHandler>(PetController.prototype.getPetsByTags),
+
+    async function PetController_getPetsByTags(
+      request: ExRequest,
+      response: ExResponse,
+      next: any
+    ) {
+      const args: Record<string, TsoaRoute.ParameterSchema> = {
+        tags: {
+          in: 'query',
+          name: 'tags',
+          required: true,
+          dataType: 'array',
+          array: { dataType: 'string' },
+        },
+      };
+
+      // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+      let validatedArgs: any[] = [];
+      try {
+        validatedArgs = templateService.getValidatedArgs({
+          args,
+          request,
+          response,
+        });
+
+        const controller = new PetController();
+
+        await templateService.apiHandler({
+          methodName: 'getPetsByTags',
+          controller,
+          response,
+          next,
+          validatedArgs,
+          successStatus: undefined,
+        });
+      } catch (err) {
+        return next(err);
+      }
+    }
+  );
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  app.get(
+    '/pet/:petId',
+    ...fetchMiddlewares<RequestHandler>(PetController),
+    ...fetchMiddlewares<RequestHandler>(PetController.prototype.getPet),
+
+    async function PetController_getPet(
+      request: ExRequest,
+      response: ExResponse,
+      next: any
+    ) {
+      const args: Record<string, TsoaRoute.ParameterSchema> = {
+        petId: { in: 'path', name: 'petId', required: true, ref: 'UUID' },
+      };
+
+      // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+      let validatedArgs: any[] = [];
+      try {
+        validatedArgs = templateService.getValidatedArgs({
+          args,
+          request,
+          response,
+        });
+
+        const controller = new PetController();
+
+        await templateService.apiHandler({
+          methodName: 'getPet',
           controller,
           response,
           next,
@@ -281,18 +388,22 @@ export function RegisterRoutes(app: Router) {
   );
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   app.put(
-    '/users/:userId',
-    ...fetchMiddlewares<RequestHandler>(UserController),
-    ...fetchMiddlewares<RequestHandler>(UserController.prototype.updateUser),
+    '/pet',
+    ...fetchMiddlewares<RequestHandler>(PetController),
+    ...fetchMiddlewares<RequestHandler>(PetController.prototype.updatePet),
 
-    async function UserController_updateUser(
+    async function PetController_updatePet(
       request: ExRequest,
       response: ExResponse,
       next: any
     ) {
       const args: Record<string, TsoaRoute.ParameterSchema> = {
-        userId: { in: 'path', name: 'userId', required: true, ref: 'UUID' },
-        userData: { in: 'body', name: 'userData', required: true, ref: 'User' },
+        petToUpdate: {
+          in: 'body',
+          name: 'petToUpdate',
+          required: true,
+          ref: 'Pet',
+        },
       };
 
       // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -305,10 +416,10 @@ export function RegisterRoutes(app: Router) {
           response,
         });
 
-        const controller = new UserController();
+        const controller = new PetController();
 
         await templateService.apiHandler({
-          methodName: 'updateUser',
+          methodName: 'updatePet',
           controller,
           response,
           next,
@@ -322,17 +433,17 @@ export function RegisterRoutes(app: Router) {
   );
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   app.delete(
-    '/users/:userId',
-    ...fetchMiddlewares<RequestHandler>(UserController),
-    ...fetchMiddlewares<RequestHandler>(UserController.prototype.deleteUser),
+    '/pet/:petId',
+    ...fetchMiddlewares<RequestHandler>(PetController),
+    ...fetchMiddlewares<RequestHandler>(PetController.prototype.deletePet),
 
-    async function UserController_deleteUser(
+    async function PetController_deletePet(
       request: ExRequest,
       response: ExResponse,
       next: any
     ) {
       const args: Record<string, TsoaRoute.ParameterSchema> = {
-        userId: { in: 'path', name: 'userId', required: true, ref: 'UUID' },
+        petId: { in: 'path', name: 'petId', required: true, ref: 'UUID' },
       };
 
       // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -345,10 +456,10 @@ export function RegisterRoutes(app: Router) {
           response,
         });
 
-        const controller = new UserController();
+        const controller = new PetController();
 
         await templateService.apiHandler({
-          methodName: 'deleteUser',
+          methodName: 'deletePet',
           controller,
           response,
           next,
@@ -362,20 +473,20 @@ export function RegisterRoutes(app: Router) {
   );
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   app.get(
-    '/secure',
-    authenticateMiddleware([{ api_key: ['cat', 'dog'] }]),
-    ...fetchMiddlewares<RequestHandler>(SecureController),
-    ...fetchMiddlewares<RequestHandler>(SecureController.prototype.getTreasure),
+    '/store/inventory',
+    authenticateMiddleware([{ api_key: [] }]),
+    ...fetchMiddlewares<RequestHandler>(StoreController),
+    ...fetchMiddlewares<RequestHandler>(StoreController.prototype.getInventory),
 
-    async function SecureController_getTreasure(
+    async function StoreController_getInventory(
       request: ExRequest,
       response: ExResponse,
       next: any
     ) {
       const args: Record<string, TsoaRoute.ParameterSchema> = {
-        request: {
+        _request: {
           in: 'request',
-          name: 'request',
+          name: '_request',
           required: true,
           dataType: 'object',
         },
@@ -391,10 +502,10 @@ export function RegisterRoutes(app: Router) {
           response,
         });
 
-        const controller = new SecureController();
+        const controller = new StoreController();
 
         await templateService.apiHandler({
-          methodName: 'getTreasure',
+          methodName: 'getInventory',
           controller,
           response,
           next,
@@ -408,59 +519,22 @@ export function RegisterRoutes(app: Router) {
   );
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   app.post(
-    '/cats/add',
-    ...fetchMiddlewares<RequestHandler>(CatController),
-    ...fetchMiddlewares<RequestHandler>(CatController.prototype.postCat),
+    '/store/adopt',
+    authenticateMiddleware([{ api_key: [] }]),
+    ...fetchMiddlewares<RequestHandler>(StoreController),
+    ...fetchMiddlewares<RequestHandler>(StoreController.prototype.adoptPet),
 
-    async function CatController_postCat(
-      request: ExRequest,
-      response: ExResponse,
-      next: any
-    ) {
-      const args: Record<string, TsoaRoute.ParameterSchema> = {};
-
-      // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-      let validatedArgs: any[] = [];
-      try {
-        validatedArgs = templateService.getValidatedArgs({
-          args,
-          request,
-          response,
-        });
-
-        const controller = new CatController();
-
-        await templateService.apiHandler({
-          methodName: 'postCat',
-          controller,
-          response,
-          next,
-          validatedArgs,
-          successStatus: undefined,
-        });
-      } catch (err) {
-        return next(err);
-      }
-    }
-  );
-  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-  app.post(
-    '/cats/:catId',
-    ...fetchMiddlewares<RequestHandler>(CatController),
-    ...fetchMiddlewares<RequestHandler>(CatController.prototype.postCatId),
-
-    async function CatController_postCatId(
+    async function StoreController_adoptPet(
       request: ExRequest,
       response: ExResponse,
       next: any
     ) {
       const args: Record<string, TsoaRoute.ParameterSchema> = {
-        catId: {
-          in: 'path',
-          name: 'catId',
+        adoptionRequest: {
+          in: 'body',
+          name: 'adoptionRequest',
           required: true,
-          dataType: 'string',
+          ref: 'AdoptionRequest',
         },
       };
 
@@ -474,10 +548,106 @@ export function RegisterRoutes(app: Router) {
           response,
         });
 
-        const controller = new CatController();
+        const controller = new StoreController();
 
         await templateService.apiHandler({
-          methodName: 'postCatId',
+          methodName: 'adoptPet',
+          controller,
+          response,
+          next,
+          validatedArgs,
+          successStatus: undefined,
+        });
+      } catch (err) {
+        return next(err);
+      }
+    }
+  );
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  app.get(
+    '/store/adopt/:requestId',
+    authenticateMiddleware([{ api_key: [] }]),
+    ...fetchMiddlewares<RequestHandler>(StoreController),
+    ...fetchMiddlewares<RequestHandler>(
+      StoreController.prototype.getAdoptRequestById
+    ),
+
+    async function StoreController_getAdoptRequestById(
+      request: ExRequest,
+      response: ExResponse,
+      next: any
+    ) {
+      const args: Record<string, TsoaRoute.ParameterSchema> = {
+        requestId: {
+          in: 'path',
+          name: 'requestId',
+          required: true,
+          ref: 'UUID',
+        },
+      };
+
+      // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+      let validatedArgs: any[] = [];
+      try {
+        validatedArgs = templateService.getValidatedArgs({
+          args,
+          request,
+          response,
+        });
+
+        const controller = new StoreController();
+
+        await templateService.apiHandler({
+          methodName: 'getAdoptRequestById',
+          controller,
+          response,
+          next,
+          validatedArgs,
+          successStatus: undefined,
+        });
+      } catch (err) {
+        return next(err);
+      }
+    }
+  );
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  app.delete(
+    '/store/adopt/:requestId',
+    authenticateMiddleware([{ api_key: [] }]),
+    ...fetchMiddlewares<RequestHandler>(StoreController),
+    ...fetchMiddlewares<RequestHandler>(
+      StoreController.prototype.deleteAdoptRequestById
+    ),
+
+    async function StoreController_deleteAdoptRequestById(
+      request: ExRequest,
+      response: ExResponse,
+      next: any
+    ) {
+      const args: Record<string, TsoaRoute.ParameterSchema> = {
+        requestId: {
+          in: 'path',
+          name: 'requestId',
+          required: true,
+          ref: 'UUID',
+        },
+      };
+
+      // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+      let validatedArgs: any[] = [];
+      try {
+        validatedArgs = templateService.getValidatedArgs({
+          args,
+          request,
+          response,
+        });
+
+        const controller = new StoreController();
+
+        await templateService.apiHandler({
+          methodName: 'deleteAdoptRequestById',
           controller,
           response,
           next,

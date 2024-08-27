@@ -23,267 +23,176 @@
       },
       "UUID": {
         "type": "string",
-        "example": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
+        "example": "7312cc99-f99f-445e-a939-eb66c0c6724c",
         "format": "uuid",
         "description": "Stringified UUIDv4.\nSee [RFC 4112](https://tools.ietf.org/html/rfc4122).",
         "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}"
       },
-      "MySpecialNumber": {
-        "type": "integer",
-        "format": "int32",
-        "description": "My Special Number description."
-      },
-      "HappinessStatus": {
-        "description": "Happiness Status Enum that is very important.",
-        "enum": ["Happy", "Sad"],
+      "AnimalKind": {
+        "enum": ["Cat", "Dog", "Parrot"],
         "type": "string"
       },
-      "UserFromGroup": {
-        "description": "User objects allow you to associate actions performed\nin the system with the user that performed them.\nThe User object contains common information across\nevery user in the system regardless of status and role.",
+      "ISODateString": {
+        "type": "string",
+        "example": "2020-08-21T00:00:00.000Z",
+        "description": "A date serialized in the ISO standard.\nSee [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)."
+      },
+      "AdoptionStatus": {
+        "enum": ["Adopted", "Available", "Pending"],
+        "type": "string"
+      },
+      "Pet": {
+        "description": "Pet characteristics.",
         "properties": {
           "id": {
-            "description": "The user's identifier.",
+            "description": "The pet's identifier.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/UUID"
               }
             ]
           },
-          "email": {
-            "type": "string",
-            "description": "The email the user used to register his account.",
-            "example": "jane@doe.com"
-          },
           "name": {
             "type": "string",
-            "description": "The name the user used to register his account.",
-            "example": "Jane Doe The First"
+            "description": "The name of the pet.",
+            "example": "Max"
           },
-          "isCat": {
-            "type": "boolean",
-            "description": "Is the user a cat.",
-            "example": false
+          "breed": {
+            "type": "string",
+            "description": "The kind of breed the pet is.",
+            "example": "European Domestic Cat"
           },
-          "mySpecialCat": {
-            "description": "My Special Special Cat.",
+          "notes": {
+            "type": "string",
+            "description": "Free form text associated with the pet.",
+            "example": "Likes to scratch a lot."
+          },
+          "kind": {
+            "description": "What kind of pet it is.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/MySpecialNumber"
+                "$ref": "#/components/schemas/AnimalKind"
+              }
+            ]
+          },
+          "age": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The age of the pet.",
+            "example": 2
+          },
+          "healthProblems": {
+            "type": "boolean",
+            "description": "Whether or not the pet has any health problems.",
+            "example": false
+          },
+          "addedDate": {
+            "description": "When the pet was added to the system.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISODateString"
               }
             ]
           },
           "status": {
-            "description": "The happiness status of the user.",
+            "description": "Pet's adoption status in the store.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/HappinessStatus"
+                "$ref": "#/components/schemas/AdoptionStatus"
               }
             ]
           },
-          "manyStatuses": {
-            "items": {
-              "$ref": "#/components/schemas/HappinessStatus"
-            },
-            "type": "array",
-            "description": "An array of happiness statuses of the user."
-          },
-          "catLevel": {
-            "type": "string",
-            "enum": ["Ultra Cat", "Mega Cat"],
-            "description": "The cat level of the user.",
-            "example": "Ultra Cat"
-          },
-          "catIndex": {
-            "items": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number",
-                  "format": "double"
-                },
-                {
-                  "$ref": "#/components/schemas/HappinessStatus"
-                },
-                {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "anyOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "$ref": "#/components/schemas/HappinessStatus"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            "type": "array",
-            "description": "The cat index of the user."
-          },
-          "phoneNumbers": {
+          "tags": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "description": "The phone numbers associated with the user."
-          },
-          "groupId": {
-            "type": "integer",
-            "format": "int32",
-            "example": 113
+            "description": "The pet's tags."
           }
         },
         "required": [
           "id",
-          "email",
           "name",
-          "isCat",
-          "mySpecialCat",
-          "phoneNumbers",
-          "groupId"
+          "breed",
+          "notes",
+          "kind",
+          "age",
+          "healthProblems",
+          "addedDate",
+          "status",
+          "tags"
         ],
         "type": "object",
         "additionalProperties": false
       },
-      "User": {
-        "description": "User description written by yours truly Stoyan.",
+      "InventoryMap": {
+        "description": "Inventory map of adoption status to quantities.",
+        "properties": {
+          "Adopted": {
+            "type": "number",
+            "format": "double"
+          },
+          "Available": {
+            "type": "number",
+            "format": "double"
+          },
+          "Pending": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": ["Adopted", "Available", "Pending"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "AdoptionRequestStatus": {
+        "enum": ["Approved", "Pending", "Denied"],
+        "type": "string"
+      },
+      "AdoptionRequest": {
+        "description": "Adoption request information.",
         "properties": {
           "id": {
-            "description": "The user's identifier.",
+            "description": "The adoption's ID.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/UUID"
               }
             ]
           },
-          "email": {
-            "type": "string",
-            "description": "The email the user used to register his account.",
-            "example": "jane@doe.com"
-          },
-          "name": {
-            "type": "string",
-            "description": "The name the user used to register his account.",
-            "example": "Jane Doe The First"
-          },
-          "isCat": {
-            "type": "boolean",
-            "description": "Is the user a cat.",
-            "example": false
-          },
-          "mySpecialCat": {
-            "description": "My Special Special Cat.",
+          "petId": {
+            "description": "The adoptee's ID.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/MySpecialNumber"
+                "$ref": "#/components/schemas/UUID"
+              }
+            ]
+          },
+          "dateOfSubmission": {
+            "description": "The date of submission of the adoption request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISODateString"
               }
             ]
           },
           "status": {
-            "description": "The happiness status of the user.",
+            "description": "The adoption request status.",
             "allOf": [
               {
-                "$ref": "#/components/schemas/HappinessStatus"
+                "$ref": "#/components/schemas/AdoptionRequestStatus"
               }
             ]
-          },
-          "manyStatuses": {
-            "items": {
-              "$ref": "#/components/schemas/HappinessStatus"
-            },
-            "type": "array",
-            "description": "An array of happiness statuses of the user."
-          },
-          "catLevel": {
-            "type": "string",
-            "enum": ["Ultra Cat", "Mega Cat"],
-            "description": "The cat level of the user.",
-            "example": "Ultra Cat"
-          },
-          "catIndex": {
-            "items": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number",
-                  "format": "double"
-                },
-                {
-                  "$ref": "#/components/schemas/HappinessStatus"
-                },
-                {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "anyOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "$ref": "#/components/schemas/HappinessStatus"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            "type": "array",
-            "description": "The cat index of the user."
-          },
-          "phoneNumbers": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "description": "The phone numbers associated with the user."
           }
         },
-        "required": [
-          "id",
-          "email",
-          "name",
-          "isCat",
-          "mySpecialCat",
-          "phoneNumbers"
-        ],
-        "type": "object",
-        "additionalProperties": false
-      },
-      "AuthUser": {
-        "description": "An authenticated user.",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32",
-            "description": "The authenticated user's identifier.",
-            "example": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "The authenticated user's name.",
-            "example": "Joe Done"
-          }
-        },
-        "required": ["id", "name"],
+        "required": ["id", "petId", "dateOfSubmission", "status"],
         "type": "object",
         "additionalProperties": false
       }
     },
     "securitySchemes": {
       "api_key": {
+        "description": "The TSOA Demo Pet Store API Key is:\n\n`simple-pet-token`",
         "type": "apiKey",
         "name": "access_token",
         "in": "query"
@@ -291,289 +200,459 @@
     }
   },
   "info": {
-    "title": "tsoa-project-demo",
+    "title": "TSOA Demo Pet Store - OpenAPI 3.0",
     "version": "1.0.0",
+    "description": "Pet Store Server OpenAPI 3.0 specification.\n\nSome useful links:\n- [The TSOA Demo Pet Store repository](https://github.com/CloudNStoyan/tsoa-project-demo)\n- [The source API definition for the Pet Store](https://github.com/CloudNStoyan/tsoa-project-demo/blob/main/src/generated/swagger.yaml)",
     "contact": {}
   },
   "paths": {
-    "/users/{groupId}/all": {
-      "get": {
-        "operationId": "GetUsers",
+    "/pet": {
+      "post": {
+        "operationId": "CreatePet",
         "responses": {
           "200": {
-            "description": "An array with User Objects.",
+            "description": "Successful creation of a pet.",
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/UserFromGroup"
-                  },
-                  "type": "array"
-                },
-                "examples": {
-                  "An example of Users": {
-                    "value": [
-                      {
-                        "id": "66ef17a1-af37-4f7b-8e82-b341e0241a30",
-                        "email": "jane@doe.com",
-                        "name": "Jane Doe",
-                        "status": "Happy",
-                        "phoneNumbers": [],
-                        "groupId": 1,
-                        "isCat": false,
-                        "mySpecialCat": 44
-                      },
-                      {
-                        "id": "c421afa9-08c7-491a-90a1-575bb656cffd",
-                        "email": "john@doe.com",
-                        "name": "John Doe",
-                        "status": "Sad",
-                        "phoneNumbers": [],
-                        "groupId": 1,
-                        "isCat": false,
-                        "mySpecialCat": 44
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                },
-                "examples": {
-                  "Example 1": {
-                    "value": {
-                      "status": 401,
-                      "message": "Access denied!"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                },
-                "examples": {
-                  "Example 1": {
-                    "value": {
-                      "status": 404,
-                      "message": "Users with this groupId have not be found!"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Pet"
                 }
               }
             }
           }
         },
-        "description": "Retrieves the details of users.\nSupply the unique group ID from either and receive corresponding user details.",
-        "summary": "Retrieve details of users.",
-        "tags": ["User"],
+        "description": "Add a new pet to the store.",
+        "summary": "Add a new pet to the store.",
+        "tags": ["Pet"],
         "security": [],
-        "parameters": [
-          {
-            "description": "The group's identifier.",
-            "in": "path",
-            "name": "groupId",
-            "required": true,
-            "schema": {
-              "format": "double",
-              "type": "number"
-            }
-          },
-          {
-            "description": "Provide a limit to the result.",
-            "in": "query",
-            "name": "limit",
-            "required": false,
-            "schema": {
-              "default": 5,
-              "format": "double",
-              "type": "number"
-            }
-          },
-          {
-            "description": "The =required cat level of users.",
-            "in": "query",
-            "name": "catLevel",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/users/{userId}": {
-      "get": {
-        "operationId": "GetUser",
-        "responses": {
-          "200": {
-            "description": "details of the user in the form of an User Object.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserFromGroup"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                },
-                "examples": {
-                  "Example 1": {
-                    "value": {
-                      "status": 401,
-                      "message": "Access denied!"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                },
-                "examples": {
-                  "Example 1": {
-                    "value": {
-                      "status": 404,
-                      "message": "User not found!"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "description": "Retrieves the details of a user.\nSupply the unique user ID from either and receive corresponding user details.",
-        "summary": "Retrieve details of a user.",
-        "tags": ["User"],
-        "security": [],
-        "parameters": [
-          {
-            "description": "The user's identifier.",
-            "in": "path",
-            "name": "userId",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/UUID"
-            }
-          }
-        ]
-      },
-      "put": {
-        "operationId": "UpdateUser",
-        "responses": {
-          "200": {
-            "description": "the updated details of the user.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                },
-                "examples": {
-                  "Example 1": {
-                    "value": {
-                      "status": 401,
-                      "message": "Access denied!"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                },
-                "examples": {
-                  "Example 1": {
-                    "value": {
-                      "status": 404,
-                      "message": "User not found!"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "description": "Update the details of a user.\nSupply the unique user ID from either and receive corresponding user details.",
-        "summary": "Update details of a user.",
-        "tags": ["User"],
-        "security": [],
-        "parameters": [
-          {
-            "description": "The user's identifier.",
-            "in": "path",
-            "name": "userId",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/UUID"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
-          "description": "The user's data.",
+          "description": "Create a new pet in the store.",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/User",
-                "description": "The user's data."
+                "$ref": "#/components/schemas/Pet",
+                "description": "Create a new pet in the store."
               }
             }
           }
         }
       },
-      "delete": {
-        "operationId": "DeleteUser",
+      "put": {
+        "operationId": "UpdatePet",
         "responses": {
           "200": {
-            "description": "Nothing is returned.",
+            "description": "Successful update of a pet.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/Pet"
                 }
               }
             }
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "status": 404,
+                      "message": "Pet not found!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Update an existing pet by ID.",
+        "summary": "Update an existing pet.",
+        "tags": ["Pet"],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "description": "The pet's information that should be used in the update.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Pet",
+                "description": "The pet's information that should be used in the update."
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pet/all": {
+      "get": {
+        "operationId": "GetAllPets",
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of pets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Pet"
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "description": "Returns all pets with limit and offset functionality.",
+        "summary": "Returns all pets.",
+        "tags": ["Pet"],
+        "security": [],
+        "parameters": [
+          {
+            "description": "Offset to discard elements.",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "description": "How many records to return.",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/pet/findByStatus": {
+      "get": {
+        "operationId": "GetPetsByStatus",
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of pets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Pet"
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "description": "Returns pets that have the selected adoption status.",
+        "summary": "Finds Pets by status.",
+        "tags": ["Pet"],
+        "security": [],
+        "parameters": [
+          {
+            "description": "The adoption status.",
+            "in": "query",
+            "name": "status",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AdoptionStatus"
+            }
+          }
+        ]
+      }
+    },
+    "/pet/findByKinds": {
+      "get": {
+        "operationId": "GetPetsByKind",
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of pets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Pet"
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "description": "Returns pets that are of a specific set of kinds.",
+        "summary": "Finds Pets by set of kinds.",
+        "tags": ["Pet"],
+        "security": [],
+        "parameters": [
+          {
+            "description": "The set of kinds of pet.",
+            "in": "query",
+            "name": "kinds",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/AnimalKind"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "/pet/findByTags": {
+      "get": {
+        "operationId": "GetPetsByTags",
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of pets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Pet"
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "description": "Returns pets that include the filter tags.",
+        "summary": "Finds Pets by tags.",
+        "tags": ["Pet"],
+        "security": [],
+        "parameters": [
+          {
+            "description": "The tags to filter by.",
+            "in": "query",
+            "name": "tags",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "/pet/{petId}": {
+      "get": {
+        "operationId": "GetPet",
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of a pet.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pet"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "status": 404,
+                      "message": "Pet not found!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Returns a single pet.",
+        "summary": "Find pet by ID.",
+        "tags": ["Pet"],
+        "security": [],
+        "parameters": [
+          {
+            "description": "The pet's id.",
+            "in": "path",
+            "name": "petId",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UUID"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "DeletePet",
+        "responses": {
           "204": {
-            "description": "No Content"
+            "description": "No content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "status": 404,
+                      "message": "Pet not found!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Deletes a pet by ID.",
+        "summary": "Deletes a pet.",
+        "tags": ["Pet"],
+        "security": [],
+        "parameters": [
+          {
+            "description": "Pet ID to delete.",
+            "in": "path",
+            "name": "petId",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UUID"
+            }
+          }
+        ]
+      }
+    },
+    "/store/inventory": {
+      "get": {
+        "operationId": "GetInventory",
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of inventory.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryMap"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "status": 401,
+                      "message": "Access denied!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Returns a map of adoption status to quantities.",
+        "summary": "Returns pet inventories by adoption status.",
+        "tags": ["Store"],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "parameters": []
+      }
+    },
+    "/store/adopt": {
+      "post": {
+        "operationId": "AdoptPet",
+        "responses": {
+          "200": {
+            "description": "Successful creation of adoption request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdoptionRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "status": 401,
+                      "message": "Access denied!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Place an adoption request for a pet.",
+        "summary": "Request an adoption of a pet.",
+        "tags": ["Store"],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "The adoption request.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdoptionRequest",
+                "description": "The adoption request."
+              }
+            }
+          }
+        }
+      }
+    },
+    "/store/adopt/{requestId}": {
+      "get": {
+        "operationId": "GetAdoptRequestById",
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of adoption request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdoptionRequest"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -604,7 +683,7 @@
                   "Example 1": {
                     "value": {
                       "status": 404,
-                      "message": "User not found!"
+                      "message": "Adoption request not found!"
                     }
                   }
                 }
@@ -612,98 +691,85 @@
             }
           }
         },
-        "description": "Permanently delete an user.",
-        "summary": "Delete an user.",
-        "tags": ["User"],
-        "security": [],
+        "description": "Find adoption request by ID.",
+        "summary": "Find adoption request by ID.",
+        "tags": ["Store"],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "parameters": [
           {
-            "description": "The user's identifier.",
+            "description": "The adoption request's ID.",
             "in": "path",
-            "name": "userId",
+            "name": "requestId",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/UUID"
             }
           }
         ]
-      }
-    },
-    "/secure": {
-      "get": {
-        "operationId": "GetTreasure",
+      },
+      "delete": {
+        "operationId": "DeleteAdoptRequestById",
         "responses": {
-          "200": {
-            "description": "An AuthUser.",
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuthUser"
+                  "$ref": "#/components/schemas/ApiError"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "status": 401,
+                      "message": "Access denied!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "status": 404,
+                      "message": "Adoption request not found!"
+                    }
+                  }
                 }
               }
             }
           }
         },
-        "description": "Get the biggest treasure.",
-        "summary": "Retrieve treasure.",
-        "tags": ["Secure"],
+        "description": "Delete adoption request by ID.",
+        "summary": "Delete adoption request by ID.",
+        "tags": ["Store"],
         "security": [
           {
-            "api_key": ["cat", "dog"]
+            "api_key": []
           }
         ],
-        "parameters": []
-      }
-    },
-    "/cats/add": {
-      "post": {
-        "operationId": "PostCat",
-        "responses": {
-          "200": {
-            "description": "\"add :)\".",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "description": "Demonstrative cat endpoint that returns static data.",
-        "summary": "Retrieve \"add :)\" from the server.",
-        "tags": ["Cat"],
-        "security": [],
-        "parameters": []
-      }
-    },
-    "/cats/{catId}": {
-      "post": {
-        "operationId": "PostCatId",
-        "responses": {
-          "200": {
-            "description": "The given catId.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "description": "Demonstrative cat endpoint that returns dynamic data.",
-        "summary": "Retrieve catId from the server.",
-        "tags": ["Cat"],
-        "security": [],
         "parameters": [
           {
-            "description": "The identification of a cat.",
+            "description": "The adoption request's ID.",
             "in": "path",
-            "name": "catId",
+            "name": "requestId",
             "required": true,
             "schema": {
-              "type": "string"
+              "$ref": "#/components/schemas/UUID"
             }
           }
         ]
@@ -713,10 +779,18 @@
   "servers": [],
   "tags": [
     {
-      "name": "User",
-      "description": "Operations about users",
+      "name": "Pet",
+      "description": "Everything about your Pets",
       "externalDocs": {
-        "description": "Find out more about users",
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "Store",
+      "description": "Access to Petstore orders",
+      "externalDocs": {
+        "description": "Find out more about our store",
         "url": "http://swagger.io"
       }
     }

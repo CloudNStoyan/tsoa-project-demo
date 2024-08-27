@@ -1,11 +1,21 @@
 import { ClientAPIBase } from '../../client-base.js';
 
-/**
- * Happiness Status Enum that is very important.
- */
-export enum HappinessStatus {
-  Happy = 'Happy',
-  Sad = 'Sad',
+export enum AnimalKind {
+  Cat = 'Cat',
+  Dog = 'Dog',
+  Parrot = 'Parrot',
+}
+
+export enum AdoptionStatus {
+  Adopted = 'Adopted',
+  Available = 'Available',
+  Pending = 'Pending',
+}
+
+export enum AdoptionRequestStatus {
+  Approved = 'Approved',
+  Pending = 'Pending',
+  Denied = 'Denied',
 }
 
 /**
@@ -13,15 +23,16 @@ export enum HappinessStatus {
  * See [RFC 4112](https://tools.ietf.org/html/rfc4122).
  * @pattern [0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}
  * @format uuid
- * @example "66ef17a1-af37-4f7b-8e82-b341e0241a30"
+ * @example "7312cc99-f99f-445e-a939-eb66c0c6724c"
  */
 export type UUID = string;
 
 /**
- * My Special Number description.
- * @format int32
+ * A date serialized in the ISO standard.
+ * See [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
+ * @example "2020-08-21T00:00:00.000Z"
  */
-export type MySpecialNumber = number;
+export type ISODateString = string;
 
 export interface ApiError {
   /**
@@ -33,191 +44,164 @@ export interface ApiError {
 }
 
 /**
- * User objects allow you to associate actions performed
- * in the system with the user that performed them.
- * The User object contains common information across
- * every user in the system regardless of status and role.
+ * Pet characteristics.
  */
-export interface UserFromGroup {
+export interface Pet {
   /**
-   * The user's identifier.
+   * The pet's identifier.
    */
   id: UUID;
 
   /**
-   * The email the user used to register his account.
-   * @example "jane@doe.com"
-   */
-  email: string;
-
-  /**
-   * The name the user used to register his account.
-   * @example "Jane Doe The First"
+   * The name of the pet.
+   * @example "Max"
    */
   name: string;
 
   /**
-   * Is the user a cat.
+   * The kind of breed the pet is.
+   * @example "European Domestic Cat"
+   */
+  breed: string;
+
+  /**
+   * Free form text associated with the pet.
+   * @example "Likes to scratch a lot."
+   */
+  notes: string;
+
+  /**
+   * What kind of pet it is.
+   */
+  kind: AnimalKind;
+
+  /**
+   * The age of the pet.
+   * @format int32
+   * @example 2
+   */
+  age: number;
+
+  /**
+   * Whether or not the pet has any health problems.
    * @example false
    */
-  isCat: boolean;
+  healthProblems: boolean;
 
   /**
-   * My Special Special Cat.
+   * When the pet was added to the system.
    */
-  mySpecialCat: MySpecialNumber;
+  addedDate: ISODateString;
 
   /**
-   * The happiness status of the user.
+   * Pet's adoption status in the store.
    */
-  status?: HappinessStatus;
+  status: AdoptionStatus;
 
   /**
-   * An array of happiness statuses of the user.
+   * The pet's tags.
    */
-  manyStatuses?: HappinessStatus[];
-
-  /**
-   * The cat level of the user.
-   * @example "Ultra Cat"
-   */
-  catLevel?: 'Ultra Cat' | 'Mega Cat';
-
-  /**
-   * The cat index of the user.
-   */
-  catIndex?: (
-    | string
-    | number
-    | HappinessStatus
-    | (string | (string | HappinessStatus))
-  )[];
-
-  /**
-   * The phone numbers associated with the user.
-   */
-  phoneNumbers: string[];
-
-  /**
-   * @format int32
-   * @example 113
-   */
-  groupId: number;
+  tags: string[];
 }
 
 /**
- * User description written by yours truly Stoyan.
+ * Inventory map of adoption status to quantities.
  */
-export interface User {
+export interface InventoryMap {
   /**
-   * The user's identifier.
+   * @format double
+   */
+  Adopted: number;
+
+  /**
+   * @format double
+   */
+  Available: number;
+
+  /**
+   * @format double
+   */
+  Pending: number;
+}
+
+/**
+ * Adoption request information.
+ */
+export interface AdoptionRequest {
+  /**
+   * The adoption's ID.
    */
   id: UUID;
 
   /**
-   * The email the user used to register his account.
-   * @example "jane@doe.com"
+   * The adoptee's ID.
    */
-  email: string;
+  petId: UUID;
 
   /**
-   * The name the user used to register his account.
-   * @example "Jane Doe The First"
+   * The date of submission of the adoption request.
    */
-  name: string;
+  dateOfSubmission: ISODateString;
 
   /**
-   * Is the user a cat.
-   * @example false
+   * The adoption request status.
    */
-  isCat: boolean;
-
-  /**
-   * My Special Special Cat.
-   */
-  mySpecialCat: MySpecialNumber;
-
-  /**
-   * The happiness status of the user.
-   */
-  status?: HappinessStatus;
-
-  /**
-   * An array of happiness statuses of the user.
-   */
-  manyStatuses?: HappinessStatus[];
-
-  /**
-   * The cat level of the user.
-   * @example "Ultra Cat"
-   */
-  catLevel?: 'Ultra Cat' | 'Mega Cat';
-
-  /**
-   * The cat index of the user.
-   */
-  catIndex?: (
-    | string
-    | number
-    | HappinessStatus
-    | (string | (string | HappinessStatus))
-  )[];
-
-  /**
-   * The phone numbers associated with the user.
-   */
-  phoneNumbers: string[];
-}
-
-/**
- * An authenticated user.
- */
-export interface AuthUser {
-  /**
-   * The authenticated user's identifier.
-   * @format int32
-   * @example 1
-   */
-  id: number;
-
-  /**
-   * The authenticated user's name.
-   * @example "Joe Done"
-   */
-  name: string;
+  status: AdoptionRequestStatus;
 }
 
 export class ClientAPI {
-  user: UserClientAPI;
-  secure: SecureClientAPI;
-  cat: CatClientAPI;
+  pet: PetClientAPI;
+  store: StoreClientAPI;
 
   constructor(...options: unknown[]) {
-    this.user = new UserClientAPI(...options);
-    this.secure = new SecureClientAPI(...options);
-    this.cat = new CatClientAPI(...options);
+    this.pet = new PetClientAPI(...options);
+    this.store = new StoreClientAPI(...options);
   }
 }
 
 /**
- * Operations about users
+ * Everything about your Pets
  */
-export class UserClientAPI extends ClientAPIBase {
+export class PetClientAPI extends ClientAPIBase {
   /**
-   * Retrieves the details of users.
-   * Supply the unique group ID from either and receive corresponding user details.
-   * @param groupId The group's identifier.
-   * @param limit Provide a limit to the result.
-   * @param catLevel The =required cat level of users.
-   * @summary Retrieve details of users.
+   * Add a new pet to the store.
+   * @param pet Create a new pet in the store.
+   * @summary Add a new pet to the store.
    */
-  getUsers(
-    groupId: number,
-    limit?: number,
-    catLevel?: string
-  ): Promise<UserFromGroup[]> {
-    if (Number.isNaN(groupId)) {
-      throw new Error("Invalid value NaN for 'path' param: 'groupId'.");
+  createPet(pet: Pet): Promise<Pet> {
+    return super.fetch<Pet>(`/pet`, {
+      method: 'POST',
+      body: JSON.stringify(pet),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+
+  /**
+   * Update an existing pet by ID.
+   * @param pet The pet's information that should be used in the update.
+   * @summary Update an existing pet.
+   */
+  updatePet(pet: Pet): Promise<Pet> {
+    return super.fetch<Pet>(`/pet`, {
+      method: 'PUT',
+      body: JSON.stringify(pet),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+
+  /**
+   * Returns all pets with limit and offset functionality.
+   * @param offset Offset to discard elements.
+   * @param limit How many records to return.
+   * @summary Returns all pets.
+   */
+  getAllPets(offset?: number, limit?: number): Promise<Pet[]> {
+    if (Number.isNaN(offset)) {
+      throw new Error("Invalid value NaN for 'query' param: 'offset'.");
     }
 
     if (Number.isNaN(limit)) {
@@ -226,44 +210,136 @@ export class UserClientAPI extends ClientAPIBase {
 
     const urlParams = new URLSearchParams();
 
-    if (limit !== undefined) {
-      urlParams.set('limit', String(limit));
+    if (offset !== undefined) {
+      urlParams.set('offset', String(offset));
     }
 
-    if (catLevel) {
-      urlParams.set('catLevel', catLevel);
+    if (limit !== undefined) {
+      urlParams.set('limit', String(limit));
     }
 
     const urlParamsString = urlParams.toString();
 
     const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
 
-    return super.fetch<UserFromGroup[]>(
-      `/users/${encodeURIComponent(groupId)}/all${queryString}`
-    );
+    return super.fetch<Pet[]>(`/pet/all${queryString}`);
   }
 
   /**
-   * Retrieves the details of a user.
-   * Supply the unique user ID from either and receive corresponding user details.
-   * @param userId The user's identifier.
-   * @summary Retrieve details of a user.
+   * Returns pets that have the selected adoption status.
+   * @param status The adoption status.
+   * @summary Finds Pets by status.
    */
-  getUser(userId: UUID): Promise<UserFromGroup> {
-    return super.fetch<UserFromGroup>(`/users/${encodeURIComponent(userId)}`);
+  getPetsByStatus(status: AdoptionStatus): Promise<Pet[]> {
+    const urlParams = new URLSearchParams();
+
+    if (status) {
+      urlParams.set('status', status);
+    }
+
+    const urlParamsString = urlParams.toString();
+
+    const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
+
+    return super.fetch<Pet[]>(`/pet/findByStatus${queryString}`);
   }
 
   /**
-   * Update the details of a user.
-   * Supply the unique user ID from either and receive corresponding user details.
-   * @param userId The user's identifier.
-   * @param user The user's data.
-   * @summary Update details of a user.
+   * Returns pets that are of a specific set of kinds.
+   * @param kinds The set of kinds of pet.
+   * @summary Finds Pets by set of kinds.
    */
-  updateUser(userId: UUID, user: User): Promise<User> {
-    return super.fetch<User>(`/users/${encodeURIComponent(userId)}`, {
-      method: 'PUT',
-      body: JSON.stringify(user),
+  getPetsByKind(kinds: AnimalKind[]): Promise<Pet[]> {
+    if (!Array.isArray(kinds)) {
+      throw new Error(
+        `Invalid value type '${typeof kinds}' for 'query' param: 'kinds'.`
+      );
+    }
+
+    const urlParams = new URLSearchParams();
+
+    for (const item of kinds) {
+      if (item) {
+        urlParams.append('kinds', item);
+      }
+    }
+
+    const urlParamsString = urlParams.toString();
+
+    const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
+
+    return super.fetch<Pet[]>(`/pet/findByKinds${queryString}`);
+  }
+
+  /**
+   * Returns pets that include the filter tags.
+   * @param tags The tags to filter by.
+   * @summary Finds Pets by tags.
+   */
+  getPetsByTags(tags: string[]): Promise<Pet[]> {
+    if (!Array.isArray(tags)) {
+      throw new Error(
+        `Invalid value type '${typeof tags}' for 'query' param: 'tags'.`
+      );
+    }
+
+    const urlParams = new URLSearchParams();
+
+    for (const item of tags) {
+      if (item) {
+        urlParams.append('tags', item);
+      }
+    }
+
+    const urlParamsString = urlParams.toString();
+
+    const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
+
+    return super.fetch<Pet[]>(`/pet/findByTags${queryString}`);
+  }
+
+  /**
+   * Returns a single pet.
+   * @param petId The pet's id.
+   * @summary Find pet by ID.
+   */
+  getPet(petId: UUID): Promise<Pet> {
+    return super.fetch<Pet>(`/pet/${encodeURIComponent(petId)}`);
+  }
+
+  /**
+   * Deletes a pet by ID.
+   * @param petId Pet ID to delete.
+   * @summary Deletes a pet.
+   */
+  deletePet(petId: UUID): Promise<void> {
+    return super.fetch(`/pet/${encodeURIComponent(petId)}`, {
+      method: 'DELETE',
+    });
+  }
+}
+
+/**
+ * Access to Petstore orders
+ */
+export class StoreClientAPI extends ClientAPIBase {
+  /**
+   * Returns a map of adoption status to quantities.
+   * @summary Returns pet inventories by adoption status.
+   */
+  getInventory(): Promise<InventoryMap> {
+    return super.fetch<InventoryMap>(`/store/inventory`);
+  }
+
+  /**
+   * Place an adoption request for a pet.
+   * @param adoptionRequest The adoption request.
+   * @summary Request an adoption of a pet.
+   */
+  adoptPet(adoptionRequest: AdoptionRequest): Promise<AdoptionRequest> {
+    return super.fetch<AdoptionRequest>(`/store/adopt`, {
+      method: 'POST',
+      body: JSON.stringify(adoptionRequest),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -271,46 +347,24 @@ export class UserClientAPI extends ClientAPIBase {
   }
 
   /**
-   * Permanently delete an user.
-   * @param userId The user's identifier.
-   * @summary Delete an user.
+   * Find adoption request by ID.
+   * @param requestId The adoption request's ID.
+   * @summary Find adoption request by ID.
    */
-  deleteUser(userId: UUID): Promise<User | void> {
-    return super.fetch<User | void>(`/users/${encodeURIComponent(userId)}`, {
+  getAdoptRequestById(requestId: UUID): Promise<AdoptionRequest> {
+    return super.fetch<AdoptionRequest>(
+      `/store/adopt/${encodeURIComponent(requestId)}`
+    );
+  }
+
+  /**
+   * Delete adoption request by ID.
+   * @param requestId The adoption request's ID.
+   * @summary Delete adoption request by ID.
+   */
+  deleteAdoptRequestById(requestId: UUID): Promise<void> {
+    return super.fetch(`/store/adopt/${encodeURIComponent(requestId)}`, {
       method: 'DELETE',
-    });
-  }
-}
-
-export class SecureClientAPI extends ClientAPIBase {
-  /**
-   * Get the biggest treasure.
-   * @summary Retrieve treasure.
-   */
-  getTreasure(): Promise<AuthUser> {
-    return super.fetch<AuthUser>(`/secure`);
-  }
-}
-
-export class CatClientAPI extends ClientAPIBase {
-  /**
-   * Demonstrative cat endpoint that returns static data.
-   * @summary Retrieve "add :)" from the server.
-   */
-  postCat(): Promise<string> {
-    return super.fetch<string>(`/cats/add`, {
-      method: 'POST',
-    });
-  }
-
-  /**
-   * Demonstrative cat endpoint that returns dynamic data.
-   * @param catId The identification of a cat.
-   * @summary Retrieve catId from the server.
-   */
-  postCatId(catId: string): Promise<string> {
-    return super.fetch<string>(`/cats/${encodeURIComponent(catId)}`, {
-      method: 'POST',
     });
   }
 }
