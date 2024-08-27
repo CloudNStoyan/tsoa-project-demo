@@ -29,18 +29,14 @@ components:
         "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-\
         [0-9A-Fa-f]{12}"
     AnimalKind:
+      description: The pet's animal kind.
       enum:
         - Cat
         - Dog
         - Parrot
       type: string
-    ISODateString:
-      type: string
-      example: 2020-08-21T00:00:00.000Z
-      description: |-
-        A date serialized in the ISO standard.
-        See [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
     AdoptionStatus:
+      description: The pet's adoption status.
       enum:
         - Adopted
         - Available
@@ -57,6 +53,8 @@ components:
           type: string
           description: The name of the pet.
           example: Max
+          minLength: 3
+          maxLength: 20
         breed:
           type: string
           description: The kind of breed the pet is.
@@ -74,14 +72,16 @@ components:
           format: int32
           description: The age of the pet.
           example: 2
+          minimum: 0
+          maximum: 99
         healthProblems:
           type: boolean
           description: Whether or not the pet has any health problems.
           example: false
         addedDate:
+          type: string
+          format: date
           description: When the pet was added to the system.
-          allOf:
-            - $ref: '#/components/schemas/ISODateString'
         status:
           description: Pet's adoption status in the store.
           allOf:
@@ -91,6 +91,8 @@ components:
             type: string
           type: array
           description: The pet's tags.
+          minItems: 1
+          maxItems: 5
       required:
         - id
         - name
@@ -123,6 +125,7 @@ components:
       type: object
       additionalProperties: false
     AdoptionRequestStatus:
+      description: The adoption request's status.
       enum:
         - Approved
         - Pending
@@ -140,9 +143,9 @@ components:
           allOf:
             - $ref: '#/components/schemas/UUID'
         dateOfSubmission:
+          type: string
+          format: date-time
           description: The date of submission of the adoption request.
-          allOf:
-            - $ref: '#/components/schemas/ISODateString'
         status:
           description: The adoption request status.
           allOf:

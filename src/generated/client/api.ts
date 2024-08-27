@@ -1,17 +1,26 @@
 import { ClientAPIBase } from '../../client-base.js';
 
+/**
+ * The pet's animal kind.
+ */
 export enum AnimalKind {
   Cat = 'Cat',
   Dog = 'Dog',
   Parrot = 'Parrot',
 }
 
+/**
+ * The pet's adoption status.
+ */
 export enum AdoptionStatus {
   Adopted = 'Adopted',
   Available = 'Available',
   Pending = 'Pending',
 }
 
+/**
+ * The adoption request's status.
+ */
 export enum AdoptionRequestStatus {
   Approved = 'Approved',
   Pending = 'Pending',
@@ -26,13 +35,6 @@ export enum AdoptionRequestStatus {
  * @example "7312cc99-f99f-445e-a939-eb66c0c6724c"
  */
 export type UUID = string;
-
-/**
- * A date serialized in the ISO standard.
- * See [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
- * @example "2020-08-21T00:00:00.000Z"
- */
-export type ISODateString = string;
 
 export interface ApiError {
   /**
@@ -90,8 +92,9 @@ export interface Pet {
 
   /**
    * When the pet was added to the system.
+   * @format date
    */
-  addedDate: ISODateString;
+  addedDate: string;
 
   /**
    * Pet's adoption status in the store.
@@ -140,8 +143,9 @@ export interface AdoptionRequest {
 
   /**
    * The date of submission of the adoption request.
+   * @format date-time
    */
-  dateOfSubmission: ISODateString;
+  dateOfSubmission: string;
 
   /**
    * The adoption request status.

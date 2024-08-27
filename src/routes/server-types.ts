@@ -1,17 +1,26 @@
 import type { Request } from 'express';
 
+/**
+ * The pet's animal kind.
+ */
 export enum AnimalKind {
   Cat = 'Cat',
   Dog = 'Dog',
   Parrot = 'Parrot',
 }
 
+/**
+ * The pet's adoption status.
+ */
 export enum AdoptionStatus {
   Adopted = 'Adopted',
   Available = 'Available',
   Pending = 'Pending',
 }
 
+/**
+ * The adoption request's status.
+ */
 export enum AdoptionRequestStatus {
   Approved = 'Approved',
   Pending = 'Pending',
@@ -28,18 +37,27 @@ export enum AdoptionRequestStatus {
 export type UUID = string;
 
 /**
- * A date serialized in the ISO standard.
- * See [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
- * @isDate
- * @example "2020-08-21T00:00:00.000Z"
+ * An authenticated user.
  */
-export type ISODateString = string;
-
 export interface AuthUser {
+  /**
+   * The user's identifier.
+   */
   id: UUID;
+
+  /**
+   * The user's name.
+   * @example "Stoyan"
+   */
   name: string;
 }
 
+/**
+ * Express Request with a user field.
+ */
 export interface ExpressRequestWithUser extends Request {
+  /**
+   * The authenticated user.
+   */
   user: AuthUser;
 }

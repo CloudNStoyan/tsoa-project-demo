@@ -56,11 +56,6 @@ const models: TsoaRoute.Models = {
     enums: ['Cat', 'Dog', 'Parrot'],
   },
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-  ISODateString: {
-    dataType: 'refAlias',
-    type: { dataType: 'string', validators: {} },
-  },
-  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   AdoptionStatus: {
     dataType: 'refEnum',
     enums: ['Adopted', 'Available', 'Pending'],
@@ -70,18 +65,80 @@ const models: TsoaRoute.Models = {
     dataType: 'refObject',
     properties: {
       id: { ref: 'UUID', required: true },
-      name: { dataType: 'string', required: true },
+      name: {
+        dataType: 'string',
+        required: true,
+        validators: {
+          minLength: {
+            errorMsg: "Pet's name should be at least 3 characters long.",
+            value: 3,
+          },
+          maxLength: {
+            errorMsg: "Pet's name should be no more than 20 characters long.",
+            value: 20,
+          },
+          isString: { errorMsg: "Pet's name should be a string." },
+        },
+      },
       breed: { dataType: 'string', required: true },
       notes: { dataType: 'string', required: true },
       kind: { ref: 'AnimalKind', required: true },
-      age: { dataType: 'integer', required: true },
-      healthProblems: { dataType: 'boolean', required: true },
-      addedDate: { ref: 'ISODateString', required: true },
+      age: {
+        dataType: 'integer',
+        required: true,
+        validators: {
+          isInt: { errorMsg: "Pet's age should be a valid integer number." },
+          minimum: {
+            errorMsg: "Pet's age should be a positive integer number.",
+            value: 0,
+          },
+          maximum: {
+            errorMsg: "Pet's age should be a number that is no bigger than 99.",
+            value: 99,
+          },
+        },
+      },
+      healthProblems: {
+        dataType: 'boolean',
+        required: true,
+        validators: {
+          isBoolean: {
+            errorMsg: "Pet's health problems flag should be a boolean.",
+          },
+        },
+      },
+      addedDate: {
+        dataType: 'date',
+        required: true,
+        validators: {
+          minDate: {
+            errorMsg: "Pet's added date should be no earlier than 2024-08-01.",
+            value: '2024-08-01',
+          },
+          maxDate: {
+            errorMsg: "Pet's added date should be no later than 2024-08-28.",
+            value: '2024-08-27',
+          },
+        },
+      },
       status: { ref: 'AdoptionStatus', required: true },
       tags: {
         dataType: 'array',
         array: { dataType: 'string' },
         required: true,
+        validators: {
+          minItems: {
+            errorMsg: "Pet's tags should contain at least one tag.",
+            value: 1,
+          },
+          maxItems: {
+            errorMsg: "Pet's tags should contain no more than 5 tags.",
+            value: 5,
+          },
+          uniqueItems: {
+            errorMsg: "Pet's tags should contain only unique tags.",
+          },
+        },
       },
     },
     additionalProperties: false,
@@ -107,7 +164,11 @@ const models: TsoaRoute.Models = {
     properties: {
       id: { ref: 'UUID', required: true },
       petId: { ref: 'UUID', required: true },
-      dateOfSubmission: { ref: 'ISODateString', required: true },
+      dateOfSubmission: {
+        dataType: 'datetime',
+        required: true,
+        validators: { maxDate: { value: '2024-08-27' } },
+      },
       status: { ref: 'AdoptionRequestStatus', required: true },
     },
     additionalProperties: false,

@@ -13,7 +13,7 @@ Content-Type: {{contentType}}
 {
   "id": "id",
   "petId": "petId",
-  "dateOfSubmission": "dateOfSubmission",
+  "dateOfSubmission": "2024-08-27T15:08:11.0690371+00:00",
   "status": "Approved"
 }
 

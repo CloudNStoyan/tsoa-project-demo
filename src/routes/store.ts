@@ -16,9 +16,8 @@ import {
   AdoptionStatus,
   AdoptionRequestStatus,
   UUID,
-  ISODateString,
   ExpressRequestWithUser,
-} from '../server-types.js';
+} from './server-types.js';
 
 /**
  * Adoption request information.
@@ -36,8 +35,10 @@ export interface AdoptionRequest {
 
   /**
    * The date of submission of the adoption request.
+   * @isDateTime
+   * @maxDate 2024-08-27
    */
-  dateOfSubmission: ISODateString;
+  dateOfSubmission: Date;
 
   /**
    * The adoption request status.

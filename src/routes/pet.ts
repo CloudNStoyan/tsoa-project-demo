@@ -12,12 +12,7 @@ import {
 } from 'tsoa';
 import { ApiError, BaseController, limitOffset } from '../utils.js';
 import { state } from '../state.js';
-import {
-  AdoptionStatus,
-  AnimalKind,
-  ISODateString,
-  UUID,
-} from '../server-types.js';
+import { AdoptionStatus, AnimalKind, UUID } from './server-types.js';
 
 /**
  * Pet characteristics.
@@ -31,6 +26,9 @@ export interface Pet {
   /**
    * The name of the pet.
    * @example "Max"
+   * @minLength 3 Pet's name should be at least 3 characters long.
+   * @maxLength 20 Pet's name should be no more than 20 characters long.
+   * @isString Pet's name should be a string.
    */
   name: string;
 
@@ -54,20 +52,26 @@ export interface Pet {
   /**
    * The age of the pet.
    * @example 2
-   * @isInt
+   * @isInt   Pet's age should be a valid integer number.
+   * @minimum 0 Pet's age should be a positive integer number.
+   * @maximum 99 Pet's age should be a number that is no bigger than 99.
    */
   age: number;
 
   /**
    * Whether or not the pet has any health problems.
    * @example false
+   * @isBoolean Pet's health problems flag should be a boolean.
    */
   healthProblems: boolean;
 
   /**
    * When the pet was added to the system.
+   * @isDate
+   * @minDate 2024-08-01 Pet's added date should be no earlier than 2024-08-01.
+   * @maxDate 2024-08-27 Pet's added date should be no later than 2024-08-28.
    */
-  addedDate: ISODateString;
+  addedDate: Date;
 
   /**
    * Pet's adoption status in the store.
@@ -76,6 +80,10 @@ export interface Pet {
 
   /**
    * The pet's tags.
+   * @isArray Pet's tags should be an array.
+   * @minItems 1 Pet's tags should contain at least one tag.
+   * @maxItems 5 Pet's tags should contain no more than 5 tags.
+   * @uniqueItems Pet's tags should contain only unique tags.
    */
   tags: string[];
 }

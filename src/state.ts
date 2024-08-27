@@ -5,7 +5,7 @@ import {
   AdoptionStatus,
   AnimalKind,
   AuthUser,
-} from './server-types.js';
+} from './routes/server-types.js';
 
 export interface PetStoreState {
   pets: Pet[];
@@ -29,7 +29,7 @@ export const state: PetStoreState = {
       kind: AnimalKind.Cat,
       age: 4,
       healthProblems: false,
-      addedDate: '2020-08-21T00:00:00.000Z',
+      addedDate: new Date('2020-08-21'),
       status: AdoptionStatus.Adopted,
       tags: ['cat', 'orange'],
     },
@@ -41,7 +41,7 @@ export const state: PetStoreState = {
       kind: AnimalKind.Cat,
       age: 1,
       healthProblems: false,
-      addedDate: '2023-08-08T00:00:00.000Z',
+      addedDate: new Date('2023-08-08'),
       status: AdoptionStatus.Adopted,
       tags: ['cat', 'annoying', 'white'],
     },
@@ -53,7 +53,7 @@ export const state: PetStoreState = {
       kind: AnimalKind.Cat,
       age: 2,
       healthProblems: true,
-      addedDate: '2022-03-01T00:00:00.000Z',
+      addedDate: new Date('2022-03-01'),
       status: AdoptionStatus.Available,
       tags: ['cat', 'beige', 'cream'],
     },
@@ -65,7 +65,7 @@ export const state: PetStoreState = {
       kind: AnimalKind.Dog,
       age: 4,
       healthProblems: false,
-      addedDate: '2020-07-02T00:00:00.000Z',
+      addedDate: new Date('2020-07-02'),
       status: AdoptionStatus.Adopted,
       tags: ['dog', 'sand', 'brown', 'orange', 'big nose'],
     },
@@ -77,7 +77,7 @@ export const state: PetStoreState = {
       kind: AnimalKind.Parrot,
       age: 10,
       healthProblems: false,
-      addedDate: '2024-08-20T00:00:00.000Z',
+      addedDate: new Date('2024-08-20'),
       status: AdoptionStatus.Pending,
       tags: ['parrot', 'squeak', 'mixed colors'],
     },
@@ -89,7 +89,7 @@ export const state: PetStoreState = {
       kind: AnimalKind.Cat,
       age: 2,
       healthProblems: false,
-      addedDate: '2022-08-21T00:00:00.000Z',
+      addedDate: new Date('2022-08-21'),
       status: AdoptionStatus.Adopted,
       tags: ['cat', 'white'],
     },
@@ -98,7 +98,7 @@ export const state: PetStoreState = {
     {
       id: '67120cf3-1434-44be-b660-b02df64db677',
       petId: '39ccecc8-9344-49ac-b953-b1b271c089fc',
-      dateOfSubmission: '2024-08-25T00:00:00.000Z',
+      dateOfSubmission: new Date('2024-08-25'),
       status: AdoptionRequestStatus.Approved,
     },
   ],
