@@ -15,6 +15,33 @@ import { ApiError, BaseController, limitOffset } from '../utils.js';
 import { state } from '../state.js';
 import { AdoptionStatus, AnimalKind, UUID } from './server-types.js';
 
+const PETS_EXAMPLE = [
+  {
+    id: '90dbbed9-bd3d-40ae-ad1c-86602844d4c1',
+    name: 'Kozunak',
+    breed: 'Orange Tabby',
+    notes: 'Likes to bite a lot.',
+    kind: AnimalKind.Cat,
+    age: 4,
+    healthProblems: false,
+    addedDate: new Date('2020-08-21'),
+    status: AdoptionStatus.Adopted,
+    tags: ['cat', 'orange'],
+  },
+  {
+    id: 'd4c8d1c2-3928-468f-8e34-b3166a56f9ce',
+    name: 'Happy',
+    breed: 'European Domestic Cat',
+    notes: 'Very annoying.',
+    kind: AnimalKind.Cat,
+    age: 1,
+    healthProblems: false,
+    addedDate: new Date('2023-08-08'),
+    status: AdoptionStatus.Adopted,
+    tags: ['cat', 'annoying', 'white'],
+  },
+];
+
 /**
  * Pet characteristics.
  */
@@ -114,7 +141,7 @@ export class PetController extends BaseController {
    * @summary      Returns all pets.
    * @returns      Successful retrieval of pets.
    */
-  @Example<Pet[]>([state.pets[0], state.pets[1]])
+  @Example<Pet[]>(PETS_EXAMPLE)
   @Get('all')
   async getAllPets(
     @Query() offset: number = 0,
@@ -129,7 +156,7 @@ export class PetController extends BaseController {
    * @summary      Finds Pets by status.
    * @returns      Successful retrieval of pets.
    */
-  @Example<Pet[]>([state.pets[0], state.pets[1]])
+  @Example<Pet[]>(PETS_EXAMPLE)
   @Get('findByStatus')
   async getPetsByStatus(@Query() status: AdoptionStatus): Promise<Pet[]> {
     const filteredPets = state.pets.filter((p) => p.status === status);
@@ -143,7 +170,7 @@ export class PetController extends BaseController {
    * @summary     Finds Pets by set of kinds.
    * @returns     Successful retrieval of pets.
    */
-  @Example<Pet[]>([state.pets[0], state.pets[1]])
+  @Example<Pet[]>(PETS_EXAMPLE)
   @Get('findByKinds')
   async getPetsByKind(@Query() kinds: AnimalKind[]): Promise<Pet[]> {
     const filteredPets = state.pets.filter((p) => kinds.includes(p.kind));
@@ -157,7 +184,7 @@ export class PetController extends BaseController {
    * @summary    Finds Pets by tags.
    * @returns    Successful retrieval of pets.
    */
-  @Example<Pet[]>([state.pets[0], state.pets[1]])
+  @Example<Pet[]>(PETS_EXAMPLE)
   @Get('findByTags')
   async getPetsByTags(
     @Query()

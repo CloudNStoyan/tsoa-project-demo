@@ -18,7 +18,7 @@ Content-Type: {{contentType}}
   "kind": "Cat",
   "age": 0,
   "healthProblems": false,
-  "addedDate": "2024-08-27",
+  "addedDate": "2024-08-30",
   "status": "Adopted",
   "tags": [
     ""
