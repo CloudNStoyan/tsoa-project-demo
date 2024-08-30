@@ -4,6 +4,7 @@ import validSecurityDecoratorRule from './rules/valid-security-decorator.js';
 import validExampleDecoratorTypeRule from './rules/valid-example-decorator-type.js';
 import validAlternativeResponseTypeRule from './rules/valid-alternative-response-type.js';
 import validResponseDecoratorTypeRule from './rules/valid-response-decorator-type.js';
+import requireJsdocExampleForEnumTypeRule from './rules/require-jsdoc-example-for-enum-type.js';
 
 /** @type {import('eslint').ESLint.Plugin} */
 const plugin = {
@@ -19,6 +20,7 @@ const plugin = {
     'valid-security-decorator': validSecurityDecoratorRule,
     'valid-example-decorator-type': validExampleDecoratorTypeRule,
     'valid-response-decorator-type': validResponseDecoratorTypeRule,
+    'require-jsdoc-example-for-enum-type': requireJsdocExampleForEnumTypeRule,
   },
   processors: {},
 };
@@ -30,6 +32,7 @@ const recommendedRules = {
   'tsoa/valid-security-decorator': 'error',
   'tsoa/valid-example-decorator-type': 'error',
   'tsoa/valid-response-decorator-type': 'error',
+  'tsoa/require-jsdoc-example-for-enum-type': 'error',
 };
 
 plugin.configs = {

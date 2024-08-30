@@ -42,6 +42,7 @@ export interface AdoptionRequest {
 
   /**
    * The adoption request status.
+   * @example "Pending"
    */
   status: AdoptionRequestStatus;
 }
