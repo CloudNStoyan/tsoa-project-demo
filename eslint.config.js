@@ -3,7 +3,7 @@ import prettier from 'eslint-config-prettier';
 import tseslint from 'typescript-eslint';
 import globals from 'globals';
 import jsdoc from 'eslint-plugin-jsdoc';
-import tsoaDecorators from './eslint-plugin-tsoa-decorators/src/eslint-plugin-tsoa-decorators.js';
+import tsoa from './eslint-plugin-tsoa/src/eslint-plugin-tsoa.js';
 
 export default tseslint.config(
   js.configs.recommended,
@@ -147,12 +147,9 @@ export default tseslint.config(
   },
   {
     files: ['src/routes/**'],
-    plugins: {
-      'tsoa-decorators': tsoaDecorators,
-    },
+    plugins: tsoa.configs.recommended.plugins,
     rules: {
-      'tsoa-decorators/require-tsoa-decorators': 'error',
-      'tsoa-decorators/alternative-responses-require-decorators': 'error',
+      ...tsoa.configs.recommended.rules,
     },
   },
   { ignores: ['dist', 'src/generated/'] }

@@ -1,6 +1,7 @@
 import {
   Body,
   Delete,
+  Example,
   Get,
   Path,
   Post,
@@ -98,10 +99,10 @@ export class PetController extends BaseController {
    * @returns   Successful creation of a pet.
    */
   @Post()
-  createPet(@Body() pet: Pet): Promise<Pet> {
+  async createPet(@Body() pet: Pet): Promise<Pet> {
     state.pets.push(pet);
 
-    return Promise.resolve(pet);
+    return pet;
   }
 
   /**
@@ -111,12 +112,13 @@ export class PetController extends BaseController {
    * @summary      Returns all pets.
    * @returns      Successful retrieval of pets.
    */
+  @Example<Pet[]>([state.pets[0], state.pets[1]])
   @Get('all')
-  getAllPets(
+  async getAllPets(
     @Query() offset: number = 0,
     @Query() limit: number = 10
   ): Promise<Pet[]> {
-    return Promise.resolve(limitOffset(state.pets, limit, offset));
+    return limitOffset(state.pets, limit, offset);
   }
 
   /**
@@ -125,11 +127,12 @@ export class PetController extends BaseController {
    * @summary      Finds Pets by status.
    * @returns      Successful retrieval of pets.
    */
+  @Example<Pet[]>([state.pets[0], state.pets[1]])
   @Get('findByStatus')
-  getPetsByStatus(@Query() status: AdoptionStatus): Promise<Pet[]> {
+  async getPetsByStatus(@Query() status: AdoptionStatus): Promise<Pet[]> {
     const filteredPets = state.pets.filter((p) => p.status === status);
 
-    return Promise.resolve(filteredPets);
+    return filteredPets;
   }
 
   /**
@@ -138,11 +141,12 @@ export class PetController extends BaseController {
    * @summary     Finds Pets by set of kinds.
    * @returns     Successful retrieval of pets.
    */
+  @Example<Pet[]>([state.pets[0], state.pets[1]])
   @Get('findByKinds')
-  getPetsByKind(@Query() kinds: AnimalKind[]): Promise<Pet[]> {
+  async getPetsByKind(@Query() kinds: AnimalKind[]): Promise<Pet[]> {
     const filteredPets = state.pets.filter((p) => kinds.includes(p.kind));
 
-    return Promise.resolve(filteredPets);
+    return filteredPets;
   }
 
   /**
@@ -151,8 +155,9 @@ export class PetController extends BaseController {
    * @summary    Finds Pets by tags.
    * @returns    Successful retrieval of pets.
    */
+  @Example<Pet[]>([state.pets[0], state.pets[1]])
   @Get('findByTags')
-  getPetsByTags(
+  async getPetsByTags(
     @Query()
     tags: string[]
   ): Promise<Pet[]> {
@@ -167,7 +172,7 @@ export class PetController extends BaseController {
       }
     }
 
-    return Promise.resolve(filteredPets);
+    return filteredPets;
   }
 
   /**
@@ -181,14 +186,14 @@ export class PetController extends BaseController {
     message: 'Pet not found!',
   })
   @Get('{petId}')
-  getPet(@Path() petId: UUID): Promise<Pet> {
+  async getPet(@Path() petId: UUID): Promise<Pet> {
     const pet = state.pets.find((p) => p.id === petId);
 
     if (!pet) {
       return this.errorResult<Pet>(404, { message: 'Pet not found!' });
     }
 
-    return Promise.resolve(pet);
+    return pet;
   }
 
   /**
@@ -202,7 +207,7 @@ export class PetController extends BaseController {
     message: 'Pet not found!',
   })
   @Put()
-  updatePet(@Body() petToUpdate: Pet): Promise<Pet> {
+  async updatePet(@Body() petToUpdate: Pet): Promise<Pet> {
     const pet = state.pets.find((p) => p.id === petToUpdate.id);
 
     if (!pet) {
@@ -211,7 +216,7 @@ export class PetController extends BaseController {
 
     state.pets = [pet, ...state.pets.filter((p) => p.id !== pet.id)];
 
-    return Promise.resolve(pet);
+    return pet;
   }
 
   // FIXME: `@returns` JSDoc's declaration only transfers to the swagger.json if the method returns `200`.
@@ -221,18 +226,19 @@ export class PetController extends BaseController {
    * @param petId Pet ID to delete.
    * @summary     Deletes a pet.
    */
+  @Response(204, 'No Content')
+  @Delete('{petId}')
   @Response<ApiError>(404, 'Not Found', {
     status: 404,
     message: 'Pet not found!',
   })
-  @Delete('{petId}')
-  deletePet(@Path() petId: UUID): Promise<void> {
+  async deletePet(@Path() petId: UUID): Promise<void> {
     const pet = state.pets.find((p) => p.id === petId);
     if (!pet) {
-      return this.errorResult(404, { message: 'Pet not found!' });
+      return this.errorResult<void>(404, { message: 'Pet not found!' });
     }
 
     state.pets = state.pets.filter((p) => p.id !== petId);
-    return this.noContentResult();
+    return this.noContentResult<void>();
   }
 }
