@@ -2,6 +2,7 @@ import fs from 'node:fs';
 
 const TSOA_CONFIG_FILEPATH = './tsoa.json';
 
+/** @type {import('eslint').Rule.RuleModule} */
 export default {
   meta: {
     messages: {

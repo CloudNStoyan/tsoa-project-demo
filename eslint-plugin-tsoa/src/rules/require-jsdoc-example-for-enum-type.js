@@ -2,6 +2,7 @@ import { ESLintUtils } from '@typescript-eslint/utils';
 import { getJSDocComment, parseComment } from '@es-joy/jsdoccomment';
 import ts from 'typescript';
 
+/** @type {import('eslint').Rule.RuleModule} */
 export default {
   meta: {
     messages: {
