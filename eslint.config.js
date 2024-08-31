@@ -144,6 +144,10 @@ export default tseslint.config(
     plugins: tsoa.configs.recommended.plugins,
     rules: {
       ...tsoa.configs.recommended.rules,
+      'tsoa/valid-response-decorator-type': [
+        'error',
+        { allowedTypes: ['ApiError'] },
+      ],
     },
   },
   { ignores: ['dist', 'src/generated/'] }

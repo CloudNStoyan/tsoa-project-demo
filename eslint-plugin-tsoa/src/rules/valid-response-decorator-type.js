@@ -1,7 +1,7 @@
 import { getTypeName } from '@typescript-eslint/type-utils';
 import { ESLintUtils } from '@typescript-eslint/utils';
 
-const DEFAULT_ALLOWED_TYPES = ['ApiError'];
+const DEFAULT_ALLOWED_TYPES = 'any';
 
 /** @type {import('eslint').Rule.RuleModule} */
 export default {
