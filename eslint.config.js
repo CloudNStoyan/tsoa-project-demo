@@ -4,6 +4,7 @@ import tseslint from 'typescript-eslint';
 import globals from 'globals';
 import jsdoc from 'eslint-plugin-jsdoc';
 import tsoa from './eslint-plugin-tsoa/src/eslint-plugin-tsoa.js';
+import enumNameAndValueMatch from './eslint-plugin-enum-name-and-value-match/src/eslint-plugin-enum-name-and-value-match.js';
 
 export default tseslint.config(
   js.configs.recommended,
@@ -149,6 +150,11 @@ export default tseslint.config(
         { allowedTypes: ['ApiError'] },
       ],
     },
+  },
+  {
+    files: ['src/routes/**'],
+    plugins: enumNameAndValueMatch.configs.recommended.plugins,
+    rules: { ...enumNameAndValueMatch.configs.recommended.rules },
   },
   { ignores: ['dist', 'src/generated/'] }
 );
