@@ -65,6 +65,7 @@ components:
           example: Likes to scratch a lot.
         kind:
           description: What kind of pet it is.
+          example: Dog
           allOf:
             - $ref: '#/components/schemas/AnimalKind'
         age:
@@ -84,6 +85,7 @@ components:
           description: When the pet was added to the system.
         status:
           description: Pet's adoption status in the store.
+          example: Pending
           allOf:
             - $ref: '#/components/schemas/AdoptionStatus'
         tags:
@@ -148,6 +150,7 @@ components:
           description: The date of submission of the adoption request.
         status:
           description: The adoption request status.
+          example: Pending
           allOf:
             - $ref: '#/components/schemas/AdoptionRequestStatus'
       required:
@@ -252,6 +255,34 @@ paths:
                 items:
                   $ref: '#/components/schemas/Pet'
                 type: array
+              examples:
+                Example 1:
+                  value:
+                    - id: 90dbbed9-bd3d-40ae-ad1c-86602844d4c1
+                      name: Kozunak
+                      breed: Orange Tabby
+                      notes: Likes to bite a lot.
+                      kind: Cat
+                      age: 4
+                      healthProblems: false
+                      addedDate: 2020-08-21T00:00:00.000Z
+                      status: Adopted
+                      tags:
+                        - cat
+                        - orange
+                    - id: d4c8d1c2-3928-468f-8e34-b3166a56f9ce
+                      name: Happy
+                      breed: European Domestic Cat
+                      notes: Very annoying.
+                      kind: Cat
+                      age: 1
+                      healthProblems: false
+                      addedDate: 2023-08-08T00:00:00.000Z
+                      status: Adopted
+                      tags:
+                        - cat
+                        - annoying
+                        - white
       description: Returns all pets with limit and offset functionality.
       summary: Returns all pets.
       tags:
@@ -286,6 +317,34 @@ paths:
                 items:
                   $ref: '#/components/schemas/Pet'
                 type: array
+              examples:
+                Example 1:
+                  value:
+                    - id: 90dbbed9-bd3d-40ae-ad1c-86602844d4c1
+                      name: Kozunak
+                      breed: Orange Tabby
+                      notes: Likes to bite a lot.
+                      kind: Cat
+                      age: 4
+                      healthProblems: false
+                      addedDate: 2020-08-21T00:00:00.000Z
+                      status: Adopted
+                      tags:
+                        - cat
+                        - orange
+                    - id: d4c8d1c2-3928-468f-8e34-b3166a56f9ce
+                      name: Happy
+                      breed: European Domestic Cat
+                      notes: Very annoying.
+                      kind: Cat
+                      age: 1
+                      healthProblems: false
+                      addedDate: 2023-08-08T00:00:00.000Z
+                      status: Adopted
+                      tags:
+                        - cat
+                        - annoying
+                        - white
       description: Returns pets that have the selected adoption status.
       summary: Finds Pets by status.
       tags:
@@ -310,6 +369,34 @@ paths:
                 items:
                   $ref: '#/components/schemas/Pet'
                 type: array
+              examples:
+                Example 1:
+                  value:
+                    - id: 90dbbed9-bd3d-40ae-ad1c-86602844d4c1
+                      name: Kozunak
+                      breed: Orange Tabby
+                      notes: Likes to bite a lot.
+                      kind: Cat
+                      age: 4
+                      healthProblems: false
+                      addedDate: 2020-08-21T00:00:00.000Z
+                      status: Adopted
+                      tags:
+                        - cat
+                        - orange
+                    - id: d4c8d1c2-3928-468f-8e34-b3166a56f9ce
+                      name: Happy
+                      breed: European Domestic Cat
+                      notes: Very annoying.
+                      kind: Cat
+                      age: 1
+                      healthProblems: false
+                      addedDate: 2023-08-08T00:00:00.000Z
+                      status: Adopted
+                      tags:
+                        - cat
+                        - annoying
+                        - white
       description: Returns pets that are of a specific set of kinds.
       summary: Finds Pets by set of kinds.
       tags:
@@ -336,6 +423,34 @@ paths:
                 items:
                   $ref: '#/components/schemas/Pet'
                 type: array
+              examples:
+                Example 1:
+                  value:
+                    - id: 90dbbed9-bd3d-40ae-ad1c-86602844d4c1
+                      name: Kozunak
+                      breed: Orange Tabby
+                      notes: Likes to bite a lot.
+                      kind: Cat
+                      age: 4
+                      healthProblems: false
+                      addedDate: 2020-08-21T00:00:00.000Z
+                      status: Adopted
+                      tags:
+                        - cat
+                        - orange
+                    - id: d4c8d1c2-3928-468f-8e34-b3166a56f9ce
+                      name: Happy
+                      breed: European Domestic Cat
+                      notes: Very annoying.
+                      kind: Cat
+                      age: 1
+                      healthProblems: false
+                      addedDate: 2023-08-08T00:00:00.000Z
+                      status: Adopted
+                      tags:
+                        - cat
+                        - annoying
+                        - white
       description: Returns pets that include the filter tags.
       summary: Finds Pets by tags.
       tags:

@@ -125,12 +125,6 @@ export default tseslint.config(
               message: 'Using JSDoc @example on arrays is forbidden.',
             },
             {
-              comment: 'JsdocBlock:has(JsdocTag[tag=example])',
-              context:
-                'TSPropertySignature[typeAnnotation.typeAnnotation.type="TSTypeReference"]',
-              message: 'Using JSDoc @example on complex types is forbidden.',
-            },
-            {
               comment:
                 'JsdocBlock:not(*:has(JsdocTag[tag=isInt], JsdocTag[tag=isFloat], JsdocTag[tag=isLong], JsdocTag[tag=isDouble]))',
               context:

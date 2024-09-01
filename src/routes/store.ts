@@ -42,6 +42,7 @@ export interface AdoptionRequest {
 
   /**
    * The adoption request status.
+   * @example "Pending"
    */
   status: AdoptionRequestStatus;
 }
@@ -66,7 +67,7 @@ export class StoreController extends BaseController {
    * @returns        Successful retrieval of inventory.
    */
   @Get('inventory')
-  getInventory(
+  async getInventory(
     @Request() _request: ExpressRequestWithUser
   ): Promise<InventoryMap> {
     const inventoryMap: InventoryMap = {
@@ -79,7 +80,7 @@ export class StoreController extends BaseController {
       inventoryMap[pet.status] += 1;
     }
 
-    return Promise.resolve(inventoryMap);
+    return inventoryMap;
   }
 
   /**
@@ -89,7 +90,9 @@ export class StoreController extends BaseController {
    * @returns               Successful creation of adoption request.
    */
   @Post('adopt')
-  adoptPet(@Body() adoptionRequest: AdoptionRequest): Promise<AdoptionRequest> {
+  async adoptPet(
+    @Body() adoptionRequest: AdoptionRequest
+  ): Promise<AdoptionRequest> {
     adoptionRequest.id = crypto.randomUUID();
 
     state.adoptionRequests.push(adoptionRequest);
@@ -108,7 +111,7 @@ export class StoreController extends BaseController {
     message: 'Adoption request not found!',
   })
   @Get('adopt/{requestId}')
-  getAdoptRequestById(@Path() requestId: UUID): Promise<AdoptionRequest> {
+  async getAdoptRequestById(@Path() requestId: UUID): Promise<AdoptionRequest> {
     const adoptionRequest = state.adoptionRequests.find(
       (r) => r.id === requestId
     );
@@ -128,12 +131,13 @@ export class StoreController extends BaseController {
    * @summary         Delete adoption request by ID.
    * @returns         Successful deletion of adoption request.
    */
+  @Response(204, 'No Content')
   @Response<ApiError>(404, 'Not Found', {
     status: 404,
     message: 'Adoption request not found!',
   })
   @Delete('adopt/{requestId}')
-  deleteAdoptRequestById(@Path() requestId: UUID): Promise<void> {
+  async deleteAdoptRequestById(@Path() requestId: UUID): Promise<void> {
     const adoptionRequest = state.adoptionRequests.find(
       (r) => r.id === requestId
     );
@@ -144,6 +148,6 @@ export class StoreController extends BaseController {
       });
     }
 
-    return this.noContentResult();
+    return this.noContentResult<void>();
   }
 }

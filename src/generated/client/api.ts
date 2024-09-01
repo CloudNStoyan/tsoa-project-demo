@@ -74,6 +74,7 @@ export interface Pet {
 
   /**
    * What kind of pet it is.
+   * @example "Dog"
    */
   kind: AnimalKind;
 
@@ -98,6 +99,7 @@ export interface Pet {
 
   /**
    * Pet's adoption status in the store.
+   * @example "Pending"
    */
   status: AdoptionStatus;
 
@@ -149,6 +151,7 @@ export interface AdoptionRequest {
 
   /**
    * The adoption request status.
+   * @example "Pending"
    */
   status: AdoptionRequestStatus;
 }
