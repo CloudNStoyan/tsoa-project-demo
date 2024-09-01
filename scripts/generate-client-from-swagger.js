@@ -14,6 +14,10 @@ if (!swaggerDocument.openapi.startsWith('3')) {
   );
 }
 
+function uppercaseFirstLetter(string) {
+  return string[0].toUpperCase() + string.slice(1);
+}
+
 function lowercaseFirstLetter(string) {
   return string[0].toLowerCase() + string.slice(1);
 }
@@ -520,13 +524,13 @@ class ModelRenderer {
     output += 'export class ClientAPI {\n';
 
     for (const tag of this.model.tags) {
-      output += `${tag.name.toLowerCase()}: ${tag.name}ClientAPI;\n`;
+      output += `${tag.name.toLowerCase()}: ${uppercaseFirstLetter(tag.name)}ClientAPI;\n`;
     }
 
     output += '\n\nconstructor(...options: unknown[]) {\n';
 
     for (const tag of this.model.tags) {
-      output += `this.${tag.name.toLowerCase()} = new ${tag.name}ClientAPI(...options);\n`;
+      output += `this.${tag.name.toLowerCase()} = new ${uppercaseFirstLetter(tag.name)}ClientAPI(...options);\n`;
     }
 
     output += '}\n}\n';
@@ -542,7 +546,7 @@ class ModelRenderer {
         output += this.renderJsdoc(tag.jsdoc);
       }
 
-      output += `export class ${tag.name}ClientAPI extends ClientAPIBase {\n`;
+      output += `export class ${uppercaseFirstLetter(tag.name)}ClientAPI extends ClientAPIBase {\n`;
 
       const tagOperations = this.model.operations.filter((op) =>
         op.tags.includes(tag.name)
