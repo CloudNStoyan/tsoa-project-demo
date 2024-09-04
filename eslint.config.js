@@ -19,6 +19,7 @@ export default tseslint.config(
     },
     rules: {
       'no-unused-vars': 'off',
+      'no-dupe-class-members': 'off',
     },
   },
   prettier,
