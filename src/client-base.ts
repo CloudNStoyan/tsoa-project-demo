@@ -73,7 +73,7 @@ export type UrlParam = (
       type: 'number';
       required: false;
     }
-) & { name: string; method?: 'append' | 'set' };
+) & { name: string };
 
 export type UrlParamArray = (
   | { values: string[]; type: 'string'; required: true }
@@ -130,13 +130,13 @@ export class ClientAPIBase {
 
           if (!value) {
             throw new Error(
-              `Required ${paramType} param ${name} was not a truthy string value.`
+              `Required ${paramType} param '${name}' was not a truthy string value.`
             );
           }
 
           if (Array.isArray(enumValues) && !enumValues.includes(value)) {
             throw new Error(
-              `Required ${paramType} param ${name} has invalid enum value '${value}'. Allowed values are '${enumValues.join(', ')}'`
+              `Required ${paramType} param '${name}' has invalid enum value '${value}'. Allowed values are '${enumValues.join(', ')}'`
             );
           }
         } else {
@@ -149,13 +149,13 @@ export class ClientAPIBase {
           if (typeof value === 'string') {
             if (!value) {
               throw new Error(
-                `Optional ${paramType} param ${name} was not a truthy string value.`
+                `Optional ${paramType} param '${name}' was not a truthy string value.`
               );
             }
 
             if (Array.isArray(enumValues) && !enumValues.includes(value)) {
               throw new Error(
-                `Optional ${paramType} param ${name} has invalid enum value '${value}'. Allowed values are '${enumValues.join(', ')}'`
+                `Optional ${paramType} param '${name}' has invalid enum value '${value}'. Allowed values are '${enumValues.join(', ')}'`
               );
             }
           }
@@ -164,7 +164,7 @@ export class ClientAPIBase {
       }
       default: {
         throw new Error(
-          `Unexpected value type '${type}' for ${paramType} param ${name}.`
+          `Unexpected value type '${type}' for ${paramType} param '${name}'.`
         );
       }
     }
@@ -179,7 +179,7 @@ export class ClientAPIBase {
   }: ParameterInfoArray) {
     if (!Array.isArray(values)) {
       throw new Error(
-        `Unexpected value type '${typeof values}' for ${paramType} param ${name}.`
+        `Unexpected value type '${typeof values}' for ${paramType} param '${name}'.`
       );
     }
 
@@ -194,19 +194,16 @@ export class ClientAPIBase {
     }
   }
 
-  appendUrlParam(
-    urlParams: URLSearchParams,
-    { name, value, type, method = 'set' }: UrlParam
-  ) {
+  appendUrlParam(urlParams: URLSearchParams, { name, value, type }: UrlParam) {
     if (type === 'number') {
       if (value !== undefined) {
-        urlParams[method](name, String(value));
+        urlParams.append(name, String(value));
       }
     }
 
     if (type === 'string') {
       if (value) {
-        urlParams[method](name, value);
+        urlParams.append(name, value);
       }
     }
   }
@@ -221,7 +218,6 @@ export class ClientAPIBase {
           name,
           value,
           type,
-          method: 'append',
         } as UrlParam);
       }
     }

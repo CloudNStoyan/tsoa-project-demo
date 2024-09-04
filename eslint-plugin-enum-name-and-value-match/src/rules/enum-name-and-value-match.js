@@ -3,12 +3,12 @@ export default {
   meta: {
     messages: {
       enumNameAndValueMismatch:
-        'Enum values are required to be equal to the enum key',
+        'Enum values are required to be the same as the enum keys',
     },
     type: 'problem',
     hasSuggestions: true,
     docs: {
-      description: 'Enforce enum values to be equal to the enum key.',
+      description: 'Enforce enum values to equal enum keys.',
       recommended: true,
     },
     schema: [],
@@ -32,7 +32,7 @@ export default {
             messageId: 'enumNameAndValueMismatch',
             suggest: [
               {
-                desc: 'Put the enum name as the enum value.',
+                desc: 'Set the enum value as the enum name.',
                 fix: (fixer) => {
                   return fixer.replaceText(node.initializer, `"${enumName}"`);
                 },
