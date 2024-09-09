@@ -214,6 +214,7 @@ export class PetClientAPI extends ClientAPIBase {
       required: false,
       paramType: 'query',
       type: 'number',
+      numberFormat: 'integer',
     });
 
     super.validateParam(limit, {
@@ -221,6 +222,7 @@ export class PetClientAPI extends ClientAPIBase {
       required: false,
       paramType: 'query',
       type: 'number',
+      numberFormat: 'integer',
     });
 
     const urlParams = new URLSearchParams();
@@ -336,6 +338,8 @@ export class PetClientAPI extends ClientAPIBase {
       required: true,
       paramType: 'path',
       type: 'string',
+      pattern:
+        '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}',
     });
 
     return super.fetch<Pet>(`/pet/${encodeURIComponent(petId)}`);
@@ -352,6 +356,8 @@ export class PetClientAPI extends ClientAPIBase {
       required: true,
       paramType: 'path',
       type: 'string',
+      pattern:
+        '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}',
     });
 
     return super.fetch(`/pet/${encodeURIComponent(petId)}`, {
@@ -398,6 +404,8 @@ export class StoreClientAPI extends ClientAPIBase {
       required: true,
       paramType: 'path',
       type: 'string',
+      pattern:
+        '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}',
     });
 
     return super.fetch<AdoptionRequest>(
@@ -416,6 +424,8 @@ export class StoreClientAPI extends ClientAPIBase {
       required: true,
       paramType: 'path',
       type: 'string',
+      pattern:
+        '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}',
     });
 
     return super.fetch(`/store/adopt/${encodeURIComponent(requestId)}`, {

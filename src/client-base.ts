@@ -2,6 +2,8 @@ export interface BaseParameterInfo {
   name: string;
   paramType: 'query' | 'path';
   enumValues?: string[];
+  pattern?: string;
+  numberFormat?: 'integer';
 }
 
 export interface BaseUrlParam {
@@ -43,7 +45,15 @@ export class ClientAPIBase {
       type: 'string' | 'number';
     } & BaseParameterInfo
   ): void {
-    const { name, required, type, paramType, enumValues } = meta;
+    const {
+      name,
+      required,
+      type,
+      paramType,
+      enumValues,
+      pattern,
+      numberFormat,
+    } = meta;
 
     switch (type) {
       case 'number': {
@@ -61,9 +71,15 @@ export class ClientAPIBase {
           }
         }
 
-        if (Number.isNaN(value)) {
+        if (Number.isFinite(value)) {
           throw new Error(
-            `Invalid value NaN for ${paramType} param '${name}'.`
+            `Invalid value '${value}' for ${paramType} param '${name}'.`
+          );
+        }
+
+        if (numberFormat === 'integer' && !Number.isInteger(value)) {
+          throw new Error(
+            `Value '${value}' for ${paramType} param '${name}' was not an integer.`
           );
         }
         break;
@@ -79,6 +95,12 @@ export class ClientAPIBase {
           if (!value) {
             throw new Error(
               `Required ${paramType} param '${name}' was not a truthy string value.`
+            );
+          }
+
+          if (pattern && value.match(pattern) === null) {
+            throw new Error(
+              `Required ${paramType} param '${name}' did not match the string pattern '${pattern}'.`
             );
           }
 
@@ -98,6 +120,12 @@ export class ClientAPIBase {
             if (!value) {
               throw new Error(
                 `Optional ${paramType} param '${name}' was not a truthy string value.`
+              );
+            }
+
+            if (pattern && value.match(pattern) === null) {
+              throw new Error(
+                `Required ${paramType} param '${name}' did not match the string pattern '${pattern}'.`
               );
             }
 

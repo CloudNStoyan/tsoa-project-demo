@@ -137,7 +137,9 @@ export class PetController extends BaseController {
   /**
    * Returns all pets with limit and offset functionality.
    * @param offset Offset to discard elements.
+   * @isInt offset
    * @param limit  How many records to return.
+   * @isInt limit
    * @summary      Returns all pets.
    * @returns      Successful retrieval of pets.
    */

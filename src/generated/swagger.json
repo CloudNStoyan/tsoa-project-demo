@@ -351,8 +351,8 @@
             "required": false,
             "schema": {
               "default": 0,
-              "format": "double",
-              "type": "number"
+              "format": "int32",
+              "type": "integer"
             }
           },
           {
@@ -362,8 +362,8 @@
             "required": false,
             "schema": {
               "default": 10,
-              "format": "double",
-              "type": "number"
+              "format": "int32",
+              "type": "integer"
             }
           }
         ]

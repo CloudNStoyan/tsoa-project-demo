@@ -670,6 +670,16 @@ class ModelRenderer {
           paramMeta.enumValues = param.paramType.valueType.enum;
         }
 
+        if (param.paramType.valueType.pattern) {
+          paramMeta.pattern = param.paramType.valueType.pattern;
+        }
+
+        const paramFormat = param.paramType.valueType.format;
+
+        if (paramFormat === 'int32' || paramFormat === 'int64') {
+          paramMeta.numberFormat = 'integer';
+        }
+
         output += this.renderJSON(paramMeta);
 
         output += ');\n\n';

@@ -295,16 +295,16 @@ paths:
           required: false
           schema:
             default: 0
-            format: double
-            type: number
+            format: int32
+            type: integer
         - description: How many records to return.
           in: query
           name: limit
           required: false
           schema:
             default: 10
-            format: double
-            type: number
+            format: int32
+            type: integer
   /pet/findByStatus:
     get:
       operationId: GetPetsByStatus
