@@ -1,6 +1,7 @@
 import {
   Body,
   Delete,
+  Example,
   Get,
   Path,
   Post,
@@ -22,7 +23,7 @@ import {
 /**
  * Adoption request information.
  */
-export interface AdoptionRequest {
+export class AdoptionRequest {
   /**
    * The adoption's ID.
    */
@@ -41,9 +42,21 @@ export interface AdoptionRequest {
 
   /**
    * The adoption request status.
-   * @example "Pending"
    */
+  @Example<AdoptionRequestStatus>(AdoptionRequestStatus.Pending)
   status: AdoptionRequestStatus;
+
+  constructor(
+    id: UUID,
+    petId: UUID,
+    dateOfSubmission: Date,
+    status: AdoptionRequestStatus
+  ) {
+    this.id = id;
+    this.petId = petId;
+    this.dateOfSubmission = dateOfSubmission;
+    this.status = status;
+  }
 }
 
 /**

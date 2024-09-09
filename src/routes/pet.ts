@@ -46,7 +46,7 @@ const PETS_EXAMPLE = [
 /**
  * Pet characteristics.
  */
-export interface Pet {
+export class Pet {
   /**
    * The pet's identifier.
    */
@@ -54,43 +54,43 @@ export interface Pet {
 
   /**
    * The name of the pet.
-   * @example "Max"
    * @minLength 3 Pet's name should be at least 3 characters long.
    * @maxLength 20 Pet's name should be no more than 20 characters long.
    */
+  @Example<string>('Max')
   name: string;
 
   /**
    * The kind of breed the pet is.
-   * @example "European Domestic Cat"
    */
+  @Example<string>('European Domestic Cat')
   breed: string;
 
   /**
    * Free form text associated with the pet.
-   * @example "Likes to scratch a lot."
    */
+  @Example<string>('Likes to scratch a lot.')
   notes: string;
 
   /**
    * What kind of pet it is.
-   * @example "Dog"
    */
+  @Example<AnimalKind>(AnimalKind.Dog)
   kind: AnimalKind;
 
   /**
    * The age of the pet.
-   * @example 2
    * @isInt   Pet's age should be a valid integer number.
    * @minimum 0 Pet's age should be a positive integer number.
    * @maximum 99 Pet's age should be a number that is no bigger than 99.
    */
+  @Example<number>(2)
   age: number;
 
   /**
    * Whether or not the pet has any health problems.
-   * @example false
    */
+  @Example<boolean>(false)
   healthProblems: boolean;
 
   /**
@@ -101,8 +101,8 @@ export interface Pet {
 
   /**
    * Pet's adoption status in the store.
-   * @example "Pending"
    */
+  @Example<AdoptionStatus>(AdoptionStatus.Pending)
   status: AdoptionStatus;
 
   /**
@@ -111,6 +111,30 @@ export interface Pet {
    * @maxItems 5 Pet's tags should contain no more than 5 tags.
    */
   tags: string[];
+
+  constructor(
+    id: UUID,
+    name: string,
+    breed: string,
+    notes: string,
+    kind: AnimalKind,
+    age: number,
+    healthProblems: boolean,
+    addedDate: Date,
+    status: AdoptionStatus,
+    tags: string[]
+  ) {
+    this.id = id;
+    this.name = name;
+    this.breed = breed;
+    this.notes = notes;
+    this.kind = kind;
+    this.age = age;
+    this.healthProblems = healthProblems;
+    this.addedDate = addedDate;
+    this.status = status;
+    this.tags = tags;
+  }
 }
 
 @Route('pet')

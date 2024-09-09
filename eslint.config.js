@@ -108,6 +108,7 @@ export default tseslint.config(
             'TSInterfaceDeclaration',
             'TSInterfaceDeclaration TSPropertySignature',
           ],
+          checkConstructors: false,
         },
       ],
       'jsdoc/no-restricted-syntax': [
