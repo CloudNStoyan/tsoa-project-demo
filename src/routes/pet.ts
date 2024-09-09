@@ -1,6 +1,7 @@
 import {
   Body,
   Delete,
+  Deprecated,
   Example,
   Get,
   Path,
@@ -207,6 +208,7 @@ export class PetController extends BaseController {
    * @summary          Finds Pets by added date.
    * @returns          Successful retrieval of pets.
    */
+  @Deprecated()
   @Example<Pet[]>(PETS_EXAMPLE)
   @Get('findByDate')
   async getPetsByDate(@Query() afterDate: Date): Promise<Pet[]> {

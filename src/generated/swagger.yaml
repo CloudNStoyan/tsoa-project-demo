@@ -509,6 +509,7 @@ paths:
       summary: Finds Pets by added date.
       tags:
         - Pet
+      deprecated: true
       security: []
       parameters:
         - description: The date to filter by.

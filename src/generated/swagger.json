@@ -621,6 +621,7 @@
         "description": "Returns pets that were added after the given date.",
         "summary": "Finds Pets by added date.",
         "tags": ["Pet"],
+        "deprecated": true,
         "security": [],
         "parameters": [
           {
