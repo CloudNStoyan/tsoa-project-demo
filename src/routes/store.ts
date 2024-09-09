@@ -96,7 +96,7 @@ export class StoreController extends BaseController {
 
     state.adoptionRequests.push(adoptionRequest);
 
-    return Promise.resolve(adoptionRequest);
+    return adoptionRequest;
   }
 
   /**
@@ -121,7 +121,7 @@ export class StoreController extends BaseController {
       });
     }
 
-    return Promise.resolve(adoptionRequest);
+    return adoptionRequest;
   }
 
   /**
