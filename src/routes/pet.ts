@@ -50,6 +50,7 @@ export class Pet {
   /**
    * The pet's identifier.
    */
+  @Example<UUID>('90dbbed9-bd3d-40ae-ad1c-86602844d4c1')
   id: UUID;
 
   /**
@@ -97,6 +98,7 @@ export class Pet {
    * When the pet was added to the system.
    * @isDate
    */
+  @Example<Date>(new Date('09-08-2024'))
   addedDate: Date;
 
   /**
@@ -110,6 +112,7 @@ export class Pet {
    * @minItems 1 Pet's tags should contain at least one tag.
    * @maxItems 5 Pet's tags should contain no more than 5 tags.
    */
+  @Example<string[]>(['cat', 'orange'])
   tags: string[];
 
   constructor(

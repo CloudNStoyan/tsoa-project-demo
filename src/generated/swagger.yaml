@@ -47,6 +47,7 @@ components:
       properties:
         id:
           description: The pet's identifier.
+          example: 90dbbed9-bd3d-40ae-ad1c-86602844d4c1
           allOf:
             - $ref: '#/components/schemas/UUID'
         name:
@@ -83,6 +84,7 @@ components:
           type: string
           format: date
           description: When the pet was added to the system.
+          example: 2024-09-07T21:00:00.000Z
         status:
           description: Pet's adoption status in the store.
           example: Pending
@@ -93,6 +95,9 @@ components:
             type: string
           type: array
           description: The pet's tags.
+          example:
+            - cat
+            - orange
           minItems: 1
           maxItems: 5
       required:
@@ -138,16 +143,19 @@ components:
       properties:
         id:
           description: The adoption's ID.
+          example: 67120cf3-1434-44be-b660-b02df64db677
           allOf:
             - $ref: '#/components/schemas/UUID'
         petId:
           description: The adoptee's ID.
+          example: 90dbbed9-bd3d-40ae-ad1c-86602844d4c1
           allOf:
             - $ref: '#/components/schemas/UUID'
         dateOfSubmission:
           type: string
           format: date-time
           description: The date of submission of the adoption request.
+          example: 2024-08-25T00:00:00.000Z
         status:
           description: The adoption request status.
           example: Pending
