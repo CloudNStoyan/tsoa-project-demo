@@ -392,6 +392,52 @@ export function RegisterRoutes(app: Router) {
   );
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
   app.get(
+    '/pet/findByDate',
+    ...fetchMiddlewares<RequestHandler>(PetController),
+    ...fetchMiddlewares<RequestHandler>(PetController.prototype.getPetsByDate),
+
+    async function PetController_getPetsByDate(
+      request: ExRequest,
+      response: ExResponse,
+      next: any
+    ) {
+      const args: Record<string, TsoaRoute.ParameterSchema> = {
+        afterDate: {
+          in: 'query',
+          name: 'afterDate',
+          required: true,
+          dataType: 'date',
+          validators: { isDate: { errorMsg: 'afterDate' } },
+        },
+      };
+
+      // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+      let validatedArgs: any[] = [];
+      try {
+        validatedArgs = templateService.getValidatedArgs({
+          args,
+          request,
+          response,
+        });
+
+        const controller = new PetController();
+
+        await templateService.apiHandler({
+          methodName: 'getPetsByDate',
+          controller,
+          response,
+          next,
+          validatedArgs,
+          successStatus: undefined,
+        });
+      } catch (err) {
+        return next(err);
+      }
+    }
+  );
+  // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+  app.get(
     '/pet/:petId',
     ...fetchMiddlewares<RequestHandler>(PetController),
     ...fetchMiddlewares<RequestHandler>(PetController.prototype.getPet),

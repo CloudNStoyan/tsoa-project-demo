@@ -201,6 +201,27 @@ export class PetController extends BaseController {
   }
 
   /**
+   * Returns pets that were added after the given date.
+   * @param  afterDate The date to filter by.
+   * @isDate afterDate
+   * @summary          Finds Pets by added date.
+   * @returns          Successful retrieval of pets.
+   */
+  @Example<Pet[]>(PETS_EXAMPLE)
+  @Get('findByDate')
+  async getPetsByDate(@Query() afterDate: Date): Promise<Pet[]> {
+    const filteredPets: Pet[] = [];
+
+    for (const pet of state.pets) {
+      if (Number(pet.addedDate) >= Number(afterDate)) {
+        filteredPets.push(pet);
+      }
+    }
+
+    return filteredPets;
+  }
+
+  /**
    * Returns a single pet.
    * @param petId The pet's id.
    * @summary     Find pet by ID.

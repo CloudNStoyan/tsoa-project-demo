@@ -465,6 +465,59 @@ paths:
             type: array
             items:
               type: string
+  /pet/findByDate:
+    get:
+      operationId: GetPetsByDate
+      responses:
+        '200':
+          description: Successful retrieval of pets.
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Pet'
+                type: array
+              examples:
+                Example 1:
+                  value:
+                    - id: 90dbbed9-bd3d-40ae-ad1c-86602844d4c1
+                      name: Kozunak
+                      breed: Orange Tabby
+                      notes: Likes to bite a lot.
+                      kind: Cat
+                      age: 4
+                      healthProblems: false
+                      addedDate: 2020-08-21T00:00:00.000Z
+                      status: Adopted
+                      tags:
+                        - cat
+                        - orange
+                    - id: d4c8d1c2-3928-468f-8e34-b3166a56f9ce
+                      name: Happy
+                      breed: European Domestic Cat
+                      notes: Very annoying.
+                      kind: Cat
+                      age: 1
+                      healthProblems: false
+                      addedDate: 2023-08-08T00:00:00.000Z
+                      status: Adopted
+                      tags:
+                        - cat
+                        - annoying
+                        - white
+      description: Returns pets that were added after the given date.
+      summary: Finds Pets by added date.
+      tags:
+        - Pet
+      security: []
+      parameters:
+        - description: The date to filter by.
+          in: query
+          name: afterDate
+          required: true
+          schema:
+            format: date
+            type: string
   /pet/{petId}:
     get:
       operationId: GetPet

@@ -328,6 +328,33 @@ export class PetClientAPI extends ClientAPIBase {
   }
 
   /**
+   * Returns pets that were added after the given date.
+   * @param afterDate The date to filter by.
+   * @summary Finds Pets by added date.
+   */
+  getPetsByDate(afterDate: string): Promise<Pet[]> {
+    super.validateParam(afterDate, {
+      name: 'afterDate',
+      required: true,
+      paramType: 'query',
+      type: 'string',
+    });
+
+    const urlParams = new URLSearchParams();
+
+    super.appendUrlParam(urlParams, afterDate, {
+      name: 'afterDate',
+      type: 'string',
+    });
+
+    const urlParamsString = urlParams.toString();
+
+    const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
+
+    return super.fetch<Pet[]>(`/pet/findByDate${queryString}`);
+  }
+
+  /**
    * Returns a single pet.
    * @param petId The pet's id.
    * @summary Find pet by ID.
