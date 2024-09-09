@@ -15,6 +15,5 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "pretty": true
-  },
-  "exclude": ["src/generated/client"]
+  }
 }

@@ -7,10 +7,10 @@
 ########################################################################
 
 ### Query Parameter: Offset to discard elements.
-@offset = str
+@offset = 0
 
 ### Query Parameter: How many records to return.
-@limit = str
+@limit = 0
 
 
 GET http://localhost:3000/pet/all

@@ -209,35 +209,31 @@ export class PetClientAPI extends ClientAPIBase {
    * @summary Returns all pets.
    */
   getAllPets(offset?: number, limit?: number): Promise<Pet[]> {
-    super.validateParam({
+    super.validateParam(offset, {
       name: 'offset',
       required: false,
-      value: offset,
       paramType: 'query',
       type: 'number',
+      numberFormat: 'integer',
     });
 
-    super.validateParam({
+    super.validateParam(limit, {
       name: 'limit',
       required: false,
-      value: limit,
       paramType: 'query',
       type: 'number',
+      numberFormat: 'integer',
     });
 
     const urlParams = new URLSearchParams();
 
-    super.appendUrlParam(urlParams, {
+    super.appendUrlParam(urlParams, offset, {
       name: 'offset',
-      required: false,
-      value: offset,
       type: 'number',
     });
 
-    super.appendUrlParam(urlParams, {
+    super.appendUrlParam(urlParams, limit, {
       name: 'limit',
-      required: false,
-      value: limit,
       type: 'number',
     });
 
@@ -254,10 +250,9 @@ export class PetClientAPI extends ClientAPIBase {
    * @summary Finds Pets by status.
    */
   getPetsByStatus(status: AdoptionStatus): Promise<Pet[]> {
-    super.validateParam({
+    super.validateParam(status, {
       name: 'status',
       required: true,
-      value: status,
       paramType: 'query',
       type: 'string',
       enumValues: ['Adopted', 'Available', 'Pending'],
@@ -265,10 +260,8 @@ export class PetClientAPI extends ClientAPIBase {
 
     const urlParams = new URLSearchParams();
 
-    super.appendUrlParam(urlParams, {
+    super.appendUrlParam(urlParams, status, {
       name: 'status',
-      required: true,
-      value: status,
       type: 'string',
     });
 
@@ -285,10 +278,9 @@ export class PetClientAPI extends ClientAPIBase {
    * @summary Finds Pets by set of kinds.
    */
   getPetsByKind(kinds: AnimalKind[]): Promise<Pet[]> {
-    super.validateParamArray({
+    super.validateParamArray(kinds, {
       name: 'kinds',
       required: true,
-      values: kinds,
       paramType: 'query',
       type: 'string',
       enumValues: ['Cat', 'Dog', 'Parrot'],
@@ -296,10 +288,8 @@ export class PetClientAPI extends ClientAPIBase {
 
     const urlParams = new URLSearchParams();
 
-    super.appendUrlParamArray(urlParams, {
+    super.appendUrlParamArray(urlParams, kinds, {
       name: 'kinds',
-      required: true,
-      values: kinds,
       type: 'string',
     });
 
@@ -316,20 +306,17 @@ export class PetClientAPI extends ClientAPIBase {
    * @summary Finds Pets by tags.
    */
   getPetsByTags(tags: string[]): Promise<Pet[]> {
-    super.validateParamArray({
+    super.validateParamArray(tags, {
       name: 'tags',
       required: true,
-      values: tags,
       paramType: 'query',
       type: 'string',
     });
 
     const urlParams = new URLSearchParams();
 
-    super.appendUrlParamArray(urlParams, {
+    super.appendUrlParamArray(urlParams, tags, {
       name: 'tags',
-      required: true,
-      values: tags,
       type: 'string',
     });
 
@@ -346,12 +333,13 @@ export class PetClientAPI extends ClientAPIBase {
    * @summary Find pet by ID.
    */
   getPet(petId: UUID): Promise<Pet> {
-    super.validateParam({
+    super.validateParam(petId, {
       name: 'petId',
       required: true,
-      value: petId,
       paramType: 'path',
       type: 'string',
+      pattern:
+        '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}',
     });
 
     return super.fetch<Pet>(`/pet/${encodeURIComponent(petId)}`);
@@ -363,12 +351,13 @@ export class PetClientAPI extends ClientAPIBase {
    * @summary Deletes a pet.
    */
   deletePet(petId: UUID): Promise<void> {
-    super.validateParam({
+    super.validateParam(petId, {
       name: 'petId',
       required: true,
-      value: petId,
       paramType: 'path',
       type: 'string',
+      pattern:
+        '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}',
     });
 
     return super.fetch(`/pet/${encodeURIComponent(petId)}`, {
@@ -410,12 +399,13 @@ export class StoreClientAPI extends ClientAPIBase {
    * @summary Find adoption request by ID.
    */
   getAdoptRequestById(requestId: UUID): Promise<AdoptionRequest> {
-    super.validateParam({
+    super.validateParam(requestId, {
       name: 'requestId',
       required: true,
-      value: requestId,
       paramType: 'path',
       type: 'string',
+      pattern:
+        '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}',
     });
 
     return super.fetch<AdoptionRequest>(
@@ -429,12 +419,13 @@ export class StoreClientAPI extends ClientAPIBase {
    * @summary Delete adoption request by ID.
    */
   deleteAdoptRequestById(requestId: UUID): Promise<void> {
-    super.validateParam({
+    super.validateParam(requestId, {
       name: 'requestId',
       required: true,
-      value: requestId,
       paramType: 'path',
       type: 'string',
+      pattern:
+        '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}',
     });
 
     return super.fetch(`/store/adopt/${encodeURIComponent(requestId)}`, {

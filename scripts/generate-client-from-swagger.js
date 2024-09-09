@@ -635,6 +635,10 @@ class ModelRenderer {
     }
   }
 
+  renderJSON(obj) {
+    return JSON.stringify(obj, null, 2);
+  }
+
   renderOperation(operation) {
     let output = '';
 
@@ -647,47 +651,38 @@ class ModelRenderer {
     if (operation.allParams) {
       for (const param of operation.allParams) {
         if (param.paramType.type !== 'array') {
-          output += 'super.validateParam({\n';
+          output += `super.validateParam(\n${param.name},\n`;
         } else {
-          output += 'super.validateParamArray({\n';
+          output += `super.validateParamArray(\n${param.name},\n`;
         }
 
-        output += `name: '${param.name}',\n`;
-        output += `required: ${param.required},\n`;
-
-        if (param.paramType.type !== 'array') {
-          output += `value: ${param.name},\n`;
-        } else {
-          output += `values: ${param.name},\n`;
-        }
-        output += `paramType: '${param.type}',\n`;
-
-        if (param.paramType.type === 'literal') {
-          output += `type: '${param.paramType.resolvedType}',\n`;
-        } else {
-          output += `type: '${param.paramType.valueType.type}',\n`;
-        }
+        const paramMeta = {
+          name: param.name,
+          required: param.required,
+          paramType: param.type,
+          type:
+            param.paramType.type === 'literal'
+              ? param.paramType.resolvedType
+              : param.paramType.valueType.type,
+        };
 
         if (Array.isArray(param.paramType.valueType.enum)) {
-          output += 'enumValues: ';
-          switch (param.paramType.valueType.type) {
-            case 'string': {
-              output += `[${param.paramType.valueType.enum.map((enumValue) => `'${enumValue}'`).join(', ')}]`;
-              break;
-            }
-            case 'number': {
-              output += `[${param.paramType.valueType.enum.join(', ')}]`;
-              break;
-            }
-            default: {
-              throw new Error(
-                `Received unexpected value type '${param.paramType.valueType.type}' for param name '${param.name}'.`
-              );
-            }
-          }
+          paramMeta.enumValues = param.paramType.valueType.enum;
         }
 
-        output += '});\n\n';
+        if (param.paramType.valueType.pattern) {
+          paramMeta.pattern = param.paramType.valueType.pattern;
+        }
+
+        const paramFormat = param.paramType.valueType.format;
+
+        if (paramFormat === 'int32' || paramFormat === 'int64') {
+          paramMeta.numberFormat = 'integer';
+        }
+
+        output += this.renderJSON(paramMeta);
+
+        output += ');\n\n';
       }
     }
 
@@ -698,27 +693,22 @@ class ModelRenderer {
 
       for (const queryParam of queryParams) {
         if (queryParam.paramType.type !== 'array') {
-          output += 'super.appendUrlParam(urlParams, {\n';
+          output += `super.appendUrlParam(urlParams, ${queryParam.name},\n`;
         } else {
-          output += 'super.appendUrlParamArray(urlParams, {\n';
+          output += `super.appendUrlParamArray(urlParams, ${queryParam.name},\n`;
         }
 
-        output += `name: '${queryParam.name}',\n`;
-        output += `required: ${queryParam.required},\n`;
+        const paramMeta = {
+          name: queryParam.name,
+          type:
+            queryParam.paramType.type === 'literal'
+              ? queryParam.paramType.resolvedType
+              : queryParam.paramType.valueType.type,
+        };
 
-        if (queryParam.paramType.type !== 'array') {
-          output += `value: ${queryParam.name},\n`;
-        } else {
-          output += `values: ${queryParam.name},\n`;
-        }
+        output += this.renderJSON(paramMeta);
 
-        if (queryParam.paramType.type === 'literal') {
-          output += `type: '${queryParam.paramType.resolvedType}',\n`;
-        } else {
-          output += `type: '${queryParam.paramType.valueType.type}',\n`;
-        }
-
-        output += '});\n\n';
+        output += ');\n\n';
       }
 
       output += '\nconst urlParamsString = urlParams.toString();\n\n';

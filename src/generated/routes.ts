@@ -239,8 +239,20 @@ export function RegisterRoutes(app: Router) {
       next: any
     ) {
       const args: Record<string, TsoaRoute.ParameterSchema> = {
-        offset: { default: 0, in: 'query', name: 'offset', dataType: 'double' },
-        limit: { default: 10, in: 'query', name: 'limit', dataType: 'double' },
+        offset: {
+          default: 0,
+          in: 'query',
+          name: 'offset',
+          dataType: 'integer',
+          validators: { isInt: { errorMsg: 'offset' } },
+        },
+        limit: {
+          default: 10,
+          in: 'query',
+          name: 'limit',
+          dataType: 'integer',
+          validators: { isInt: { errorMsg: 'limit' } },
+        },
       };
 
       // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

@@ -17,6 +17,7 @@ export default tseslint.config(
     },
     rules: {
       'no-unused-vars': 'off',
+      'no-dupe-class-members': 'off',
     },
   },
   prettier,
@@ -136,6 +137,13 @@ export default tseslint.config(
         },
       ],
       '@typescript-eslint/explicit-function-return-type': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'TSUnionType',
+          message: 'Unions are not allowed.',
+        },
+      ],
     },
   },
   { ignores: ['dist', 'src/generated/'] }

@@ -2,85 +2,14 @@ export interface BaseParameterInfo {
   name: string;
   paramType: 'query' | 'path';
   enumValues?: string[];
+  pattern?: string;
+  numberFormat?: 'integer';
 }
 
-export type ParameterInfo = (
-  | {
-      value: string;
-      type: 'string';
-      required: true;
-    }
-  | {
-      value: number;
-      type: 'number';
-      required: true;
-    }
-  | {
-      value: string | undefined;
-      type: 'string';
-      required: false;
-    }
-  | {
-      value: number | undefined;
-      type: 'number';
-      required: false;
-    }
-) &
-  BaseParameterInfo;
-
-export type ParameterInfoArray = (
-  | {
-      values: string[];
-      type: 'string';
-      required: true;
-    }
-  | {
-      values: number[];
-      type: 'number';
-      required: true;
-    }
-  | {
-      values: string[] | undefined;
-      type: 'string';
-      required: false;
-    }
-  | {
-      values: number[] | undefined;
-      type: 'number';
-      required: false;
-    }
-) &
-  BaseParameterInfo;
-
-export type UrlParam = (
-  | {
-      value: string;
-      type: 'string';
-      required: true;
-    }
-  | {
-      value: number;
-      type: 'number';
-      required: true;
-    }
-  | {
-      value: string | undefined;
-      type: 'string';
-      required: false;
-    }
-  | {
-      value: number | undefined;
-      type: 'number';
-      required: false;
-    }
-) & { name: string; method?: 'append' | 'set' };
-
-export type UrlParamArray = (
-  | { values: string[]; type: 'string'; required: true }
-  | { values: number[]; type: 'number'; required: true }
-  | { values: string[] | undefined; type: 'string'; required: false }
-  | { values: number[] | undefined; type: 'number'; required: false }
-) & { name: string };
+export interface BaseUrlParam {
+  name: string;
+  type: 'string' | 'number';
+}
 
 export class ClientAPIBase {
   constructor(..._options: unknown[]) {}
@@ -89,14 +18,43 @@ export class ClientAPIBase {
     return Promise.resolve() as Promise<T>;
   }
 
-  validateParam({
-    name,
-    value,
-    required,
-    type,
-    paramType,
-    enumValues,
-  }: ParameterInfo) {
+  validateParam(
+    value: string,
+    meta: { required: true; type: 'string' } & BaseParameterInfo
+  ): void;
+  validateParam(
+    value: string | undefined,
+    meta: { required: false; type: 'string' } & BaseParameterInfo
+  ): void;
+  validateParam(
+    value: number,
+    meta: { required: true; type: 'number' } & BaseParameterInfo
+  ): void;
+  validateParam(
+    value: number | undefined,
+    meta: { required: false; type: 'number' } & BaseParameterInfo
+  ): void;
+  validateParam(
+    value: string | number | undefined,
+    meta: { required: boolean; type: 'string' | 'number' } & BaseParameterInfo
+  ): void;
+  validateParam(
+    value: string | number | undefined,
+    meta: {
+      required: boolean;
+      type: 'string' | 'number';
+    } & BaseParameterInfo
+  ): void {
+    const {
+      name,
+      required,
+      type,
+      paramType,
+      enumValues,
+      pattern,
+      numberFormat,
+    } = meta;
+
     switch (type) {
       case 'number': {
         if (required) {
@@ -113,9 +71,15 @@ export class ClientAPIBase {
           }
         }
 
-        if (Number.isNaN(value)) {
+        if (Number.isFinite(value)) {
           throw new Error(
-            `Invalid value NaN for ${paramType} param '${name}'.`
+            `Invalid value '${value}' for ${paramType} param '${name}'.`
+          );
+        }
+
+        if (numberFormat === 'integer' && !Number.isInteger(value)) {
+          throw new Error(
+            `Value '${value}' for ${paramType} param '${name}' was not an integer.`
           );
         }
         break;
@@ -130,13 +94,19 @@ export class ClientAPIBase {
 
           if (!value) {
             throw new Error(
-              `Required ${paramType} param ${name} was not a truthy string value.`
+              `Required ${paramType} param '${name}' was not a truthy string value.`
+            );
+          }
+
+          if (pattern && value.match(pattern) === null) {
+            throw new Error(
+              `Required ${paramType} param '${name}' did not match the string pattern '${pattern}'.`
             );
           }
 
           if (Array.isArray(enumValues) && !enumValues.includes(value)) {
             throw new Error(
-              `Required ${paramType} param ${name} has invalid enum value '${value}'. Allowed values are '${enumValues.join(', ')}'`
+              `Required ${paramType} param '${name}' has invalid enum value '${value}'. Allowed values are '${enumValues.join(', ')}'`
             );
           }
         } else {
@@ -149,13 +119,19 @@ export class ClientAPIBase {
           if (typeof value === 'string') {
             if (!value) {
               throw new Error(
-                `Optional ${paramType} param ${name} was not a truthy string value.`
+                `Optional ${paramType} param '${name}' was not a truthy string value.`
+              );
+            }
+
+            if (pattern && value.match(pattern) === null) {
+              throw new Error(
+                `Required ${paramType} param '${name}' did not match the string pattern '${pattern}'.`
               );
             }
 
             if (Array.isArray(enumValues) && !enumValues.includes(value)) {
               throw new Error(
-                `Optional ${paramType} param ${name} has invalid enum value '${value}'. Allowed values are '${enumValues.join(', ')}'`
+                `Optional ${paramType} param '${name}' has invalid enum value '${value}'. Allowed values are '${enumValues.join(', ')}'`
               );
             }
           }
@@ -164,65 +140,108 @@ export class ClientAPIBase {
       }
       default: {
         throw new Error(
-          `Unexpected value type '${type}' for ${paramType} param ${name}.`
+          `Unexpected value type '${type}' for ${paramType} param '${name}'.`
         );
       }
     }
   }
 
-  validateParamArray({
-    name,
-    values,
-    required,
-    type,
-    paramType,
-  }: ParameterInfoArray) {
+  validateParamArray(
+    values: string[],
+    meta: { required: true; type: 'string' } & BaseParameterInfo
+  ): void;
+  validateParamArray(
+    values: string[] | undefined,
+    meta: { required: false; type: 'string' } & BaseParameterInfo
+  ): void;
+  validateParamArray(
+    values: number[],
+    meta: { required: true; type: 'number' } & BaseParameterInfo
+  ): void;
+  validateParamArray(
+    values: number[] | undefined,
+    meta: { required: false; type: 'number' } & BaseParameterInfo
+  ): void;
+  validateParamArray(
+    values: string[] | number[] | undefined,
+    meta: { required: boolean; type: 'string' | 'number' } & BaseParameterInfo
+  ): void {
+    const { name, required, type, paramType } = meta;
+
     if (!Array.isArray(values)) {
       throw new Error(
-        `Unexpected value type '${typeof values}' for ${paramType} param ${name}.`
+        `Unexpected value type '${typeof values}' for ${paramType} param '${name}'.`
       );
     }
 
     for (const value of values) {
-      this.validateParam({
+      this.validateParam(value, {
         name,
-        value,
         required,
         type,
         paramType,
-      } as ParameterInfo);
+      });
     }
   }
 
   appendUrlParam(
     urlParams: URLSearchParams,
-    { name, value, type, method = 'set' }: UrlParam
-  ) {
+    value: number | undefined,
+    meta: BaseUrlParam & { type: 'number' }
+  ): void;
+  appendUrlParam(
+    urlParams: URLSearchParams,
+    value: string | undefined,
+    meta: BaseUrlParam & { type: 'string' }
+  ): void;
+  appendUrlParam(
+    urlParams: URLSearchParams,
+    value: string | number | undefined,
+    meta: BaseUrlParam
+  ): void;
+  appendUrlParam(
+    urlParams: URLSearchParams,
+    value: string | number | undefined,
+    meta: BaseUrlParam
+  ): void {
+    const { name, type } = meta;
+
     if (type === 'number') {
       if (value !== undefined) {
-        urlParams[method](name, String(value));
+        urlParams.append(name, String(value));
       }
     }
 
     if (type === 'string') {
-      if (value) {
-        urlParams[method](name, value);
+      if (value && typeof value === 'string') {
+        urlParams.append(name, value);
       }
     }
   }
 
   appendUrlParamArray(
     urlParams: URLSearchParams,
-    { name, values, type }: UrlParamArray
-  ) {
+    values: number[] | undefined,
+    meta: BaseUrlParam & { type: 'number' }
+  ): void;
+  appendUrlParamArray(
+    urlParams: URLSearchParams,
+    values: string[] | undefined,
+    meta: BaseUrlParam & { type: 'string' }
+  ): void;
+  appendUrlParamArray(
+    urlParams: URLSearchParams,
+    values: string[] | number[] | undefined,
+    meta: BaseUrlParam
+  ): void {
+    const { name, type } = meta;
+
     if (Array.isArray(values)) {
       for (const value of values) {
-        this.appendUrlParam(urlParams, {
+        this.appendUrlParam(urlParams, value, {
           name,
-          value,
           type,
-          method: 'append',
-        } as UrlParam);
+        });
       }
     }
   }
