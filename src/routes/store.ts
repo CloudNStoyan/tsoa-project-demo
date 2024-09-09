@@ -36,7 +36,6 @@ export interface AdoptionRequest {
   /**
    * The date of submission of the adoption request.
    * @isDateTime
-   * @maxDate 2024-08-27
    */
   dateOfSubmission: Date;
 

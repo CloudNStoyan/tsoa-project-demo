@@ -77,7 +77,6 @@ const models: TsoaRoute.Models = {
             errorMsg: "Pet's name should be no more than 20 characters long.",
             value: 20,
           },
-          isString: { errorMsg: "Pet's name should be a string." },
         },
       },
       breed: { dataType: 'string', required: true },
@@ -98,29 +97,8 @@ const models: TsoaRoute.Models = {
           },
         },
       },
-      healthProblems: {
-        dataType: 'boolean',
-        required: true,
-        validators: {
-          isBoolean: {
-            errorMsg: "Pet's health problems flag should be a boolean.",
-          },
-        },
-      },
-      addedDate: {
-        dataType: 'date',
-        required: true,
-        validators: {
-          minDate: {
-            errorMsg: "Pet's added date should be no earlier than 2024-08-01.",
-            value: '2024-08-01',
-          },
-          maxDate: {
-            errorMsg: "Pet's added date should be no later than 2024-08-28.",
-            value: '2024-08-27',
-          },
-        },
-      },
+      healthProblems: { dataType: 'boolean', required: true },
+      addedDate: { dataType: 'date', required: true },
       status: { ref: 'AdoptionStatus', required: true },
       tags: {
         dataType: 'array',
@@ -134,9 +112,6 @@ const models: TsoaRoute.Models = {
           maxItems: {
             errorMsg: "Pet's tags should contain no more than 5 tags.",
             value: 5,
-          },
-          uniqueItems: {
-            errorMsg: "Pet's tags should contain only unique tags.",
           },
         },
       },
@@ -164,11 +139,7 @@ const models: TsoaRoute.Models = {
     properties: {
       id: { ref: 'UUID', required: true },
       petId: { ref: 'UUID', required: true },
-      dateOfSubmission: {
-        dataType: 'datetime',
-        required: true,
-        validators: { maxDate: { value: '2024-08-27' } },
-      },
+      dateOfSubmission: { dataType: 'datetime', required: true },
       status: { ref: 'AdoptionRequestStatus', required: true },
     },
     additionalProperties: false,
