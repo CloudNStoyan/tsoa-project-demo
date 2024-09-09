@@ -29,7 +29,9 @@ export class BaseController extends Controller {
  * @returns sliced array or empty if input is null or has length = 0 or even if the params (limit/offset) exceeds the array length
  */
 export function limitOffset<T>(array: T[], limit: number, offset: number): T[] {
-  if (!array) return [];
+  if (!array) {
+    return [];
+  }
 
   const length = array.length;
 
