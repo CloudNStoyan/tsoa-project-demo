@@ -1,0 +1,19 @@
+@contentType = application/json
+
+#################################################
+### Request: POST /store/adopt
+### Summary: Request an adoption of a pet.
+### Description: Request an adoption of a pet.
+#################################################
+
+
+
+POST http://localhost:3000/store/adopt
+Content-Type: {{contentType}}
+
+{
+  "id": "7312cc99-f99f-445e-a939-eb66c0c6724c",
+  "petId": "7312cc99-f99f-445e-a939-eb66c0c6724c",
+  "dateOfSubmission": "2024-01-01T00:00",
+  "status": "Pending"
+}

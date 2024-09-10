@@ -1,0 +1,13 @@
+@contentType = application/json
+
+#################################################
+### Request: GET /pet/findByTags
+### Summary: Finds Pets by tags.
+### Description: Finds Pets by tags.
+#################################################
+
+### Query Parameter: The tags to filter by.
+@tags = []
+
+GET http://localhost:3000/pet/findByTags?tags={{tags}}
+Content-Type: {{contentType}}

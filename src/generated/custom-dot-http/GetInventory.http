@@ -1,0 +1,12 @@
+@contentType = application/json
+
+#################################################
+### Request: GET /store/inventory
+### Summary: Returns pet inventories by adoption status.
+### Description: Returns pet inventories by adoption status.
+#################################################
+
+
+
+GET http://localhost:3000/store/inventory
+Content-Type: {{contentType}}

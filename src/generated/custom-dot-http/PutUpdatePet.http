@@ -1,0 +1,25 @@
+@contentType = application/json
+
+#################################################
+### Request: PUT /pet
+### Summary: Update an existing pet.
+### Description: Update an existing pet.
+#################################################
+
+
+
+PUT http://localhost:3000/pet
+Content-Type: {{contentType}}
+
+{
+  "id": "7312cc99-f99f-445e-a939-eb66c0c6724c",
+  "name": "Max",
+  "breed": "European Domestic Cat",
+  "notes": "Likes to scratch a lot.",
+  "kind": "Dog",
+  "age": 2,
+  "healthProblems": false,
+  "addedDate": "2024-01-01",
+  "status": "Pending",
+  "tags": []
+}
