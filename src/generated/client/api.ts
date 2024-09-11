@@ -53,6 +53,7 @@ export interface ApiError {
 export interface Pet {
   /**
    * The pet's identifier.
+   * @example "90dbbed9-bd3d-40ae-ad1c-86602844d4c1"
    */
   id: UUID;
 
@@ -96,6 +97,7 @@ export interface Pet {
   /**
    * When the pet was added to the system.
    * @format date
+   * @example "2024-09-07T21:00:00.000Z"
    */
   addedDate: string;
 
@@ -106,8 +108,12 @@ export interface Pet {
   status: AdoptionStatus;
 
   /**
-   * The pet's tags.
-   */
+* The pet's tags.
+* @example [
+  "cat",
+  "orange"
+]
+*/
   tags: string[];
 }
 
@@ -137,17 +143,20 @@ export interface InventoryMap {
 export interface AdoptionRequest {
   /**
    * The adoption's ID.
+   * @example "67120cf3-1434-44be-b660-b02df64db677"
    */
   id: UUID;
 
   /**
    * The adoptee's ID.
+   * @example "90dbbed9-bd3d-40ae-ad1c-86602844d4c1"
    */
   petId: UUID;
 
   /**
    * The date of submission of the adoption request.
    * @format date-time
+   * @example "2024-08-25T00:00:00.000Z"
    */
   dateOfSubmission: string;
 
