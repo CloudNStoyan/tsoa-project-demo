@@ -1,6 +1,7 @@
 import {
   Body,
   Delete,
+  Deprecated,
   Example,
   Get,
   Path,
@@ -45,77 +46,74 @@ const PETS_EXAMPLE = [
 /**
  * Pet characteristics.
  */
-export interface Pet {
+export class Pet {
   /**
    * The pet's identifier.
    */
-  id: UUID;
+  @Example<UUID>('90dbbed9-bd3d-40ae-ad1c-86602844d4c1')
+  id!: UUID;
 
   /**
    * The name of the pet.
-   * @example "Max"
    * @minLength 3 Pet's name should be at least 3 characters long.
    * @maxLength 20 Pet's name should be no more than 20 characters long.
-   * @isString Pet's name should be a string.
    */
-  name: string;
+  @Example<string>('Max')
+  name!: string;
 
   /**
    * The kind of breed the pet is.
-   * @example "European Domestic Cat"
    */
-  breed: string;
+  @Example<string>('European Domestic Cat')
+  breed!: string;
 
   /**
    * Free form text associated with the pet.
-   * @example "Likes to scratch a lot."
    */
-  notes: string;
+  @Example<string>('Likes to scratch a lot.')
+  notes!: string;
 
   /**
    * What kind of pet it is.
-   * @example "Dog"
    */
-  kind: AnimalKind;
+  @Example<AnimalKind>(AnimalKind.Dog)
+  kind!: AnimalKind;
 
   /**
    * The age of the pet.
-   * @example 2
    * @isInt   Pet's age should be a valid integer number.
    * @minimum 0 Pet's age should be a positive integer number.
    * @maximum 99 Pet's age should be a number that is no bigger than 99.
    */
-  age: number;
+  @Example<number>(2)
+  age!: number;
 
   /**
    * Whether or not the pet has any health problems.
-   * @example false
-   * @isBoolean Pet's health problems flag should be a boolean.
    */
-  healthProblems: boolean;
+  @Example<boolean>(false)
+  healthProblems!: boolean;
 
   /**
    * When the pet was added to the system.
    * @isDate
-   * @minDate 2024-08-01 Pet's added date should be no earlier than 2024-08-01.
-   * @maxDate 2024-08-27 Pet's added date should be no later than 2024-08-28.
    */
-  addedDate: Date;
+  @Example<Date>(new Date('09-08-2024'))
+  addedDate!: Date;
 
   /**
    * Pet's adoption status in the store.
-   * @example "Pending"
    */
-  status: AdoptionStatus;
+  @Example<AdoptionStatus>(AdoptionStatus.Pending)
+  status!: AdoptionStatus;
 
   /**
    * The pet's tags.
-   * @isArray Pet's tags should be an array.
    * @minItems 1 Pet's tags should contain at least one tag.
    * @maxItems 5 Pet's tags should contain no more than 5 tags.
-   * @uniqueItems Pet's tags should contain only unique tags.
    */
-  tags: string[];
+  @Example<string[]>(['cat', 'orange'])
+  tags!: string[];
 }
 
 @Route('pet')
@@ -200,6 +198,28 @@ export class PetController extends BaseController {
           filteredPets.push(pet);
           break;
         }
+      }
+    }
+
+    return filteredPets;
+  }
+
+  /**
+   * Returns pets that were added after the given date.
+   * @param  afterDate The date to filter by.
+   * @isDate afterDate
+   * @summary          Finds Pets by added date.
+   * @returns          Successful retrieval of pets.
+   */
+  @Deprecated()
+  @Example<Pet[]>(PETS_EXAMPLE)
+  @Get('findByDate')
+  async getPetsByDate(@Query() afterDate: Date): Promise<Pet[]> {
+    const filteredPets: Pet[] = [];
+
+    for (const pet of state.pets) {
+      if (Number(pet.addedDate) >= Number(afterDate)) {
+        filteredPets.push(pet);
       }
     }
 
