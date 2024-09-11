@@ -7,7 +7,7 @@ import express, {
 } from 'express';
 import swaggerUi from 'swagger-ui-express';
 
-import { ValidateError } from 'tsoa';
+import { ValidationService } from 'tsoa';
 import { RegisterRoutes } from './generated/routes.js';
 import { AuthError } from './auth.js';
 
@@ -34,23 +34,29 @@ app.use(
   }
 );
 
+// Disables TSOA's built-in validation (must be before RegisterRoutes)
+ValidationService.prototype.ValidateParam = (
+  _property,
+  rawValue,
+  _name = '',
+  _fieldErrors,
+  _isBodyParam,
+  _parent = ''
+) => rawValue;
+
+// Disables TSOA's built-in validation (must be before RegisterRoutes)
+RegisterRoutes.prototype.getValidatedArgs = (args: {}, _request: unknown) =>
+  Object.keys(args);
+
 RegisterRoutes(app);
 
 // This should be after RegisterRoutes(app)
 app.use(function ErrorHandler(
   err: unknown,
-  req: ExpressRequest,
+  _req: ExpressRequest,
   res: ExpressResponse,
   next: NextFunction
 ) {
-  if (err instanceof ValidateError) {
-    console.warn(`Caught Validation Error for ${req.path}:`, err.fields);
-    return res.status(422).json({
-      message: 'Validation Failed',
-      details: err?.fields,
-    });
-  }
-
   if (err instanceof AuthError) {
     return res.status(401).json({ status: 401, message: 'Access denied!' });
   }
