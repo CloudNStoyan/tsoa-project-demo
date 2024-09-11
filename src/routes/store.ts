@@ -28,38 +28,26 @@ export class AdoptionRequest {
    * The adoption's ID.
    */
   @Example<UUID>('67120cf3-1434-44be-b660-b02df64db677')
-  id: UUID;
+  id!: UUID;
 
   /**
    * The adoptee's ID.
    */
   @Example<UUID>('90dbbed9-bd3d-40ae-ad1c-86602844d4c1')
-  petId: UUID;
+  petId!: UUID;
 
   /**
    * The date of submission of the adoption request.
    * @isDateTime
    */
   @Example<Date>(new Date('2024-08-25'))
-  dateOfSubmission: Date;
+  dateOfSubmission!: Date;
 
   /**
    * The adoption request status.
    */
   @Example<AdoptionRequestStatus>(AdoptionRequestStatus.Pending)
-  status: AdoptionRequestStatus;
-
-  constructor(
-    id: UUID,
-    petId: UUID,
-    dateOfSubmission: Date,
-    status: AdoptionRequestStatus
-  ) {
-    this.id = id;
-    this.petId = petId;
-    this.dateOfSubmission = dateOfSubmission;
-    this.status = status;
-  }
+  status!: AdoptionRequestStatus;
 }
 
 /**
