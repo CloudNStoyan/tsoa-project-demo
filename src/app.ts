@@ -35,6 +35,7 @@ app.use(
 );
 
 // Disables TSOA's built-in validation (must be before RegisterRoutes)
+// https://github.com/lukeautry/tsoa/issues/181#issuecomment-1487811378
 ValidationService.prototype.ValidateParam = (
   _property,
   rawValue,
@@ -45,6 +46,7 @@ ValidationService.prototype.ValidateParam = (
 ) => rawValue;
 
 // Disables TSOA's built-in validation (must be before RegisterRoutes)
+// https://github.com/lukeautry/tsoa/issues/181#issuecomment-1487811378
 RegisterRoutes.prototype.getValidatedArgs = (args: {}, _request: unknown) =>
   Object.keys(args);
 
