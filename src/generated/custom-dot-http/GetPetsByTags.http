@@ -7,7 +7,7 @@
 #################################################
 
 ### Query Parameter: The tags to filter by.
-@tags = []
+@tags = str
 
 GET http://localhost:3000/pet/findByTags?tags={{tags}}
 Content-Type: {{contentType}}

@@ -7,7 +7,7 @@
 #################################################
 
 ### Query Parameter: The set of kinds of pet.
-@kinds = 'Cat'
+@kinds = Cat
 
 GET http://localhost:3000/pet/findByKinds?kinds={{kinds}}
 Content-Type: {{contentType}}

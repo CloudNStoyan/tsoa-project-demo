@@ -1,6 +1,12 @@
 @contentType = application/json
 
 #################################################
+### The TSOA Demo Pet Store API Key is:
+### `simple-pet-token`
+#################################################
+@apiToken = str
+
+#################################################
 ### Request: POST /store/adopt
 ### Summary: Request an adoption of a pet.
 ### Description: Request an adoption of a pet.
@@ -8,12 +14,12 @@
 
 
 
-POST http://localhost:3000/store/adopt
+POST http://localhost:3000/store/adopt?access_token={{apiToken}}
 Content-Type: {{contentType}}
 
 {
-  "id": "7312cc99-f99f-445e-a939-eb66c0c6724c",
-  "petId": "7312cc99-f99f-445e-a939-eb66c0c6724c",
-  "dateOfSubmission": "2024-01-01T00:00",
+  "id": "67120cf3-1434-44be-b660-b02df64db677",
+  "petId": "90dbbed9-bd3d-40ae-ad1c-86602844d4c1",
+  "dateOfSubmission": "2024-08-25T00:00:00.000Z",
   "status": "Pending"
 }

@@ -1,6 +1,12 @@
 @contentType = application/json
 
 #################################################
+### The TSOA Demo Pet Store API Key is:
+### `simple-pet-token`
+#################################################
+@apiToken = str
+
+#################################################
 ### Request: GET /store/adopt/{requestId}
 ### Summary: Find adoption request by ID.
 ### Description: Find adoption request by ID.
@@ -9,5 +15,5 @@
 ### Path Parameter: The adoption request's ID.
 @requestId = 7312cc99-f99f-445e-a939-eb66c0c6724c
 
-GET http://localhost:3000/store/adopt/{{requestId}}
+GET http://localhost:3000/store/adopt/{{requestId}}?access_token={{apiToken}}
 Content-Type: {{contentType}}

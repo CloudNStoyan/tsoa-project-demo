@@ -12,14 +12,17 @@ POST http://localhost:3000/pet
 Content-Type: {{contentType}}
 
 {
-  "id": "7312cc99-f99f-445e-a939-eb66c0c6724c",
+  "id": "90dbbed9-bd3d-40ae-ad1c-86602844d4c1",
   "name": "Max",
   "breed": "European Domestic Cat",
   "notes": "Likes to scratch a lot.",
   "kind": "Dog",
   "age": 2,
   "healthProblems": false,
-  "addedDate": "2024-01-01",
+  "addedDate": "2024-09-07T21:00:00.000Z",
   "status": "Pending",
-  "tags": []
+  "tags": [
+    "cat",
+    "orange"
+  ]
 }

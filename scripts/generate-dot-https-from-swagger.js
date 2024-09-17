@@ -63,11 +63,18 @@ class OperationsModel {
       return { ...refSchema, ...schema };
     }
 
+    if (schema.type === 'array') {
+      schema.items = this.resolveSchemaRef(schema.items);
+
+      return schema;
+    }
+
     return schema;
   }
 
   parse(swaggerDoc) {
     const paths = swaggerDoc.paths;
+    const securitySchemes = swaggerDoc.components.securitySchemes;
 
     const operations = [];
 
@@ -85,6 +92,26 @@ class OperationsModel {
           description: operationData.description,
           summary: operationData.summary,
         };
+
+        if (operationData.security.length > 0) {
+          const securityDefinitionName = Object.keys(
+            operationData.security[0]
+          )[0];
+
+          operation.security = securitySchemes[securityDefinitionName];
+
+          if (operation.security.in !== 'query') {
+            throw new Error(
+              `Unsupported security definition 'in' property, only 'query' is allowed instead got '${operation.security.in}'.`
+            );
+          }
+
+          if (operation.security.type !== 'apiKey') {
+            throw new Error(
+              `Unsupported security definition 'type' property, only 'apiKey' is allowed instead got '${operation.security.type}'.`
+            );
+          }
+        }
 
         if (operationData.requestBody) {
           const requestBody = operationData.requestBody;
@@ -160,7 +187,7 @@ class HttpFileRenderer {
         return false;
       }
       case 'array': {
-        return [];
+        return [this.getDefaultValue(schema.items)];
       }
       default: {
         throw new Error(`Invalid default value type: '${schema.type}'`);
@@ -168,7 +195,7 @@ class HttpFileRenderer {
     }
   }
 
-  renderDescriptionBlock(operation) {
+  renderMainDescriptionBlock(operation) {
     let output = '';
 
     output += '#################################################\n';
@@ -187,6 +214,26 @@ class HttpFileRenderer {
     return output;
   }
 
+  renderDescriptionBlock(description) {
+    let output = '';
+
+    const lines = description.split('\n');
+
+    output += '#################################################\n';
+
+    for (const line of lines) {
+      if (line.trim().length === 0) {
+        continue;
+      }
+
+      output += `### ${line}\n`;
+    }
+
+    output += '#################################################\n';
+
+    return output.trim();
+  }
+
   renderParams(params) {
     let output = '';
 
@@ -197,8 +244,6 @@ class HttpFileRenderer {
 
       let paramValue = this.getDefaultValue(param.schema);
 
-      console.log(param.name, paramValue);
-
       if (param.schema.example) {
         paramValue = param.schema.example;
       }
@@ -207,7 +252,9 @@ class HttpFileRenderer {
         paramValue = param.schema.default;
       }
 
-      console.log(param.name, paramValue, '2');
+      if (param.schema.type === 'array') {
+        paramValue = this.getDefaultValue(param.schema.items);
+      }
 
       output += `@${param.name} = ${!Array.isArray(paramValue) ? paramValue : JSON.stringify(paramValue)}\n\n`;
     }
@@ -238,6 +285,14 @@ class HttpFileRenderer {
       }
 
       output += queryParamsEntries.join('&');
+
+      if (operation.security) {
+        output += `&${operation.security.name}={{apiToken}}`;
+      }
+    } else {
+      if (operation.security) {
+        output += `?${operation.security.name}={{apiToken}}`;
+      }
     }
 
     return output;
@@ -266,8 +321,19 @@ class HttpFileRenderer {
   render() {
     let output = '';
 
+    output += '@contentType = application/json\n';
+
+    if (this.operation.security) {
+      if (this.operation.security.description) {
+        output += `\n${this.renderDescriptionBlock(this.operation.security.description)}\n`;
+      }
+
+      output += '@apiToken = str\n';
+    }
+
+    output += '\n';
     output +=
-      `@contentType = application/json\n\n${this.renderDescriptionBlock(this.operation)}\n\n${this.renderParams(this.operation.params)}\n\n${this.renderPath(this.operation)}\nContent-Type: {{contentType}}\n\n${this.renderBody(this.operation)}`.trim();
+      `${this.renderMainDescriptionBlock(this.operation)}\n\n${this.renderParams(this.operation.params)}\n\n${this.renderPath(this.operation)}\nContent-Type: {{contentType}}\n\n${this.renderBody(this.operation)}`.trim();
 
     return output;
   }

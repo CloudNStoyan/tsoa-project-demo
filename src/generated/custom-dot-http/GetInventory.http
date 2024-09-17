@@ -1,6 +1,12 @@
 @contentType = application/json
 
 #################################################
+### The TSOA Demo Pet Store API Key is:
+### `simple-pet-token`
+#################################################
+@apiToken = str
+
+#################################################
 ### Request: GET /store/inventory
 ### Summary: Returns pet inventories by adoption status.
 ### Description: Returns pet inventories by adoption status.
@@ -8,5 +14,5 @@
 
 
 
-GET http://localhost:3000/store/inventory
+GET http://localhost:3000/store/inventory?access_token={{apiToken}}
 Content-Type: {{contentType}}
