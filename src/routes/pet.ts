@@ -270,8 +270,6 @@ export class PetController extends BaseController {
     return pet;
   }
 
-  // FIXME: `@returns` JSDoc's declaration only transfers to the swagger.json if the method returns `200`.
-  // eslint-disable-next-line jsdoc/require-returns
   /**
    * Deletes a pet by ID.
    * @param petId Pet ID to delete.
