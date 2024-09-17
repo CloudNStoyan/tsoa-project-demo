@@ -137,6 +137,7 @@ export default tseslint.config(
           ],
         },
       ],
+      'jsdoc/require-returns': 'off',
       '@typescript-eslint/explicit-function-return-type': 'error',
       'no-restricted-syntax': [
         'error',
