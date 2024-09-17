@@ -1,3 +1,5 @@
+import { openapi } from '@apidevtools/openapi-schemas';
+import Ajv from 'ajv-draft-04';
 import fs from 'node:fs/promises';
 
 const SWAGGER_JSON_FILE_PATH = './src/generated/swagger.json';
@@ -12,6 +14,18 @@ if (!swaggerDocument.openapi.startsWith('3')) {
   throw new Error(
     `Unsupported OpenAPI version that is not '3.X.X' was found: '${swaggerDocument.openapi}'.`
   );
+}
+
+const ajv = new Ajv({
+  allErrors: true,
+  strict: false,
+  validateFormats: false,
+});
+
+const valid = ajv.validate(openapi.v3, swaggerDocument);
+
+if (!valid) {
+  throw new Error('OpenAPI Schema was not valid!');
 }
 
 function uppercaseFirstLetter(string) {
