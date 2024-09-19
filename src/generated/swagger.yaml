@@ -175,8 +175,8 @@ components:
 
         `simple-pet-token`
       type: apiKey
-      name: access_token
-      in: query
+      name: X-Access-Token
+      in: header
 info:
   title: TSOA Demo Pet Store - OpenAPI 3.0
   version: 1.0.0
