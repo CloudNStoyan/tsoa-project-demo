@@ -6,8 +6,6 @@
 ### Description: Update an existing pet.
 #################################################
 
-
-
 PUT http://localhost:3000/pet
 Content-Type: {{contentType}}
 

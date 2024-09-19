@@ -12,8 +12,6 @@
 ### Description: Request an adoption of a pet.
 #################################################
 
-
-
 POST http://localhost:3000/store/adopt
 Content-Type: {{contentType}}
 Authorization: Bearer {{apiToken}}

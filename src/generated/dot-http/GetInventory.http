@@ -12,8 +12,6 @@
 ### Description: Returns pet inventories by adoption status.
 #################################################
 
-
-
 GET http://localhost:3000/store/inventory
 Content-Type: {{contentType}}
 Authorization: Bearer {{apiToken}}

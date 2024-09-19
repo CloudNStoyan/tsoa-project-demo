@@ -288,7 +288,7 @@ class HttpFileRenderer {
     return output.trim();
   }
 
-  renderPath(operation) {
+  renderPathAndHeaders(operation) {
     let output = '';
 
     const method = operation.method.toUpperCase();
@@ -319,7 +319,18 @@ class HttpFileRenderer {
       output += `?${operation.security.name}={{apiToken}}`;
     }
 
-    return output;
+    output += '\nContent-Type: {{contentType}}\n';
+
+    if (
+      operation.security?.type === 'http' &&
+      operation.security.scheme === 'bearer'
+    ) {
+      output += `Authorization: Bearer {{apiToken}}`;
+    } else if (operation.security?.in === 'header') {
+      output += `${operation.security.name}: {{apiToken}}`;
+    }
+
+    return output.trim();
   }
 
   renderBody(operation) {
@@ -342,23 +353,6 @@ class HttpFileRenderer {
     return JSON.stringify(bodyJson, null, 2);
   }
 
-  renderHeaders(operation) {
-    let output = '';
-
-    output += 'Content-Type: {{contentType}}\n';
-
-    if (
-      operation.security?.type === 'http' &&
-      operation.security.scheme === 'bearer'
-    ) {
-      output += `Authorization: Bearer {{apiToken}}`;
-    } else if (operation.security?.in === 'header') {
-      output += `${operation.security.name}: {{apiToken}}`;
-    }
-
-    return output.trim();
-  }
-
   render() {
     let output = '';
 
@@ -373,8 +367,15 @@ class HttpFileRenderer {
     }
 
     output += '\n';
-    output +=
-      `${this.renderMainDescriptionBlock(this.operation)}\n\n${this.renderParams(this.operation.params)}\n\n${this.renderPath(this.operation)}\n${this.renderHeaders(this.operation)}\n\n${this.renderBody(this.operation)}`.trim();
+    output += [
+      this.renderMainDescriptionBlock(this.operation),
+      this.renderParams(this.operation.params),
+      this.renderPathAndHeaders(this.operation),
+      this.renderBody(this.operation),
+    ]
+      .filter((x) => x.trim().length > 0)
+      .join('\n\n')
+      .trim();
 
     return output;
   }
