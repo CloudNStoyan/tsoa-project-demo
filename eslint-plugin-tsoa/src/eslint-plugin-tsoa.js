@@ -7,6 +7,7 @@ import validResponseDecoratorTypeRule from './rules/valid-response-decorator-typ
 import requireJsdocExampleForEnumTypeRule from './rules/require-jsdoc-example-for-enum-type.js';
 import requireTagsMetadataRule from './rules/require-tags-metadata.js';
 import requireSecurityMetadataRule from './rules/require-security-metadata.js';
+import requireJsdocReturnsRule from './rules/require-jsdoc-returns.js';
 
 /** @type {import('eslint').ESLint.Plugin} */
 const plugin = {
@@ -17,6 +18,7 @@ const plugin = {
   configs: {},
   rules: {
     'require-example-decorator': requireExampleDecoratorRule,
+    'require-jsdoc-returns': requireJsdocReturnsRule,
     'valid-alternative-response': validAlternativeResponseRule,
     'valid-alternative-response-type': validAlternativeResponseTypeRule,
     'valid-security-decorator': validSecurityDecoratorRule,
@@ -31,6 +33,7 @@ const plugin = {
 
 const recommendedRules = {
   'tsoa/require-example-decorator': 'error',
+  'tsoa/require-jsdoc-returns': 'error',
   'tsoa/valid-alternative-response': 'error',
   'tsoa/valid-alternative-response-type': 'error',
   'tsoa/valid-security-decorator': 'error',
