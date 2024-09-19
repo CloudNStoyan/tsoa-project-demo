@@ -17,4 +17,4 @@
 
 GET http://localhost:3000/store/adopt/{{requestId}}
 Content-Type: {{contentType}}
-X-Access-Token: {{apiToken}}
+Authorization: Bearer {{apiToken}}

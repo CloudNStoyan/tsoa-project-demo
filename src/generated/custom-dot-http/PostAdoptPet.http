@@ -16,7 +16,7 @@
 
 POST http://localhost:3000/store/adopt
 Content-Type: {{contentType}}
-X-Access-Token: {{apiToken}}
+Authorization: Bearer {{apiToken}}
 
 {
   "id": "67120cf3-1434-44be-b660-b02df64db677",

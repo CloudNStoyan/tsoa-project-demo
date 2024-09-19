@@ -117,17 +117,21 @@ class OperationsModel {
           operation.security = securitySchemes[securityDefinitionName];
 
           if (
+            operation.security.type === 'apiKey' &&
             operation.security.in !== 'query' &&
             operation.security.in !== 'header'
           ) {
             throw new Error(
-              `Unsupported security definition 'in' property, only 'query' and 'header' are allowed instead got '${operation.security.in}'.`
+              `Unsupported security definition 'in' property, only 'query' and 'header' are supported instead got '${operation.security.in}'.`
             );
           }
 
-          if (operation.security.type !== 'apiKey') {
+          if (
+            operation.security.type !== 'apiKey' &&
+            operation.security.type !== 'http'
+          ) {
             throw new Error(
-              `Unsupported security definition 'type' property, only 'apiKey' is allowed instead got '${operation.security.type}'.`
+              `Unsupported security definition 'type' property, only 'apiKey' and 'http' is supported instead got '${operation.security.type}'.`
             );
           }
         }
@@ -340,7 +344,12 @@ class HttpFileRenderer {
 
     output += 'Content-Type: {{contentType}}\n';
 
-    if (operation.security?.in === 'header') {
+    if (
+      operation.security?.type === 'http' &&
+      operation.security.scheme === 'bearer'
+    ) {
+      output += `Authorization: Bearer {{apiToken}}`;
+    } else if (operation.security?.in === 'header') {
       output += `${operation.security.name}: {{apiToken}}`;
     }
 

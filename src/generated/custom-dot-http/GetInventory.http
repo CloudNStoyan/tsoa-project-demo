@@ -16,4 +16,4 @@
 
 GET http://localhost:3000/store/inventory
 Content-Type: {{contentType}}
-X-Access-Token: {{apiToken}}
+Authorization: Bearer {{apiToken}}
