@@ -1,16 +1,13 @@
 @contentType = application/json
 
-#####################################################################
+#################################################
 ### Request: GET /pet/findByDate
 ### Summary: Finds Pets by added date.
-### Description: Returns pets that were added after the given date.
-#####################################################################
+### Description: Finds Pets by added date.
+#################################################
 
 ### Query Parameter: The date to filter by.
-@afterDate = str
+@afterDate = 2024-01-01
 
-
-GET http://localhost:3000/pet/findByDate
+GET http://localhost:3000/pet/findByDate?afterDate={{afterDate}}
 Content-Type: {{contentType}}
-
-

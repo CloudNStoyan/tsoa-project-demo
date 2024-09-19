@@ -1,6 +1,9 @@
 import { openapi } from '@apidevtools/openapi-schemas';
 import Ajv from 'ajv-draft-04';
 import fs from 'node:fs/promises';
+import path from 'node:path';
+
+const OUT_DIST = './src/generated/dot-http';
 
 const SWAGGER_JSON_FILE_PATH = './src/generated/swagger.json';
 
@@ -379,7 +382,7 @@ class HttpFileRenderer {
 
 const model = new OperationsModel(swaggerDocument);
 
-await fs.mkdir('./src/generated/custom-dot-http');
+await fs.mkdir(OUT_DIST);
 
 for (const operation of model.operations) {
   const httpFileContent = new HttpFileRenderer(operation).render();
@@ -392,11 +395,7 @@ for (const operation of model.operations) {
     ? operation.id
     : `${operationMethodFormatted}${operation.id}`;
 
-  await fs.writeFile(
-    `./src/generated/custom-dot-http/${filename}.http`,
-    httpFileContent,
-    {
-      encoding: 'utf-8',
-    }
-  );
+  await fs.writeFile(path.join(OUT_DIST, `${filename}.http`), httpFileContent, {
+    encoding: 'utf-8',
+  });
 }

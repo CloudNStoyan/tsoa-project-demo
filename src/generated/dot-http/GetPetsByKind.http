@@ -1,16 +1,13 @@
 @contentType = application/json
 
-####################################################################
+#################################################
 ### Request: GET /pet/findByKinds
 ### Summary: Finds Pets by set of kinds.
-### Description: Returns pets that are of a specific set of kinds.
-####################################################################
+### Description: Finds Pets by set of kinds.
+#################################################
 
 ### Query Parameter: The set of kinds of pet.
-@kinds = str
+@kinds = Cat
 
-
-GET http://localhost:3000/pet/findByKinds
+GET http://localhost:3000/pet/findByKinds?kinds={{kinds}}
 Content-Type: {{contentType}}
-
-
