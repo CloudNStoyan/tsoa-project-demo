@@ -10,9 +10,12 @@ const swaggerJson = await fs.readFile(SWAGGER_JSON_FILE_PATH, {
 
 const swaggerDocument = JSON.parse(swaggerJson);
 
-if (!swaggerDocument.openapi.startsWith('3')) {
+// Currently validation only works for 'OpenAPI 3.0' and not
+// higher, as of writing TSOA doesn't support 'OpenAPI 3.1'.
+
+if (!swaggerDocument.openapi.startsWith('3.0')) {
   throw new Error(
-    `Unsupported OpenAPI version that is not '3.X.X' was found: '${swaggerDocument.openapi}'.`
+    `Unsupported OpenAPI version that is not '3.0.X' was found: '${swaggerDocument.openapi}'.`
   );
 }
 
