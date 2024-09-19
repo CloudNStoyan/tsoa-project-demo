@@ -13,9 +13,8 @@
     "securityDefinitions": {
       "api_key": {
         "description": "The TSOA Demo Pet Store API Key is:\n\n`simple-pet-token`",
-        "type": "apiKey",
-        "name": "X-Access-Token",
-        "in": "header"
+        "type": "http",
+        "scheme": "bearer"
       }
     },
     "tags": [

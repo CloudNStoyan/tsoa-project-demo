@@ -9,7 +9,12 @@ export function expressAuthentication(
   _scopes?: string[]
 ) {
   if (securityName === 'api_key') {
-    const token = request.get('x-access-token');
+    const authorization = request.get('authorization');
+
+    let token;
+    if (authorization && authorization.split(' ')[0] === 'Bearer') {
+      token = authorization.split(' ')[1];
+    }
 
     // This is where I'd put my scopes if I had any
 
