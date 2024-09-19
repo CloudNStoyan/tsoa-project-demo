@@ -21,7 +21,7 @@ export default {
   },
   create: (context) => {
     const services = ESLintUtils.getParserServices(context);
-    const sourceCode = context.getSourceCode();
+    const sourceCode = context.sourceCode || context.getSourceCode();
 
     function isTypeEnum(type) {
       return type.symbol?.flags & ts.SymbolFlags.Enum;
