@@ -174,9 +174,8 @@ components:
         The TSOA Demo Pet Store API Key is:
 
         `simple-pet-token`
-      type: apiKey
-      name: X-Access-Token
-      in: header
+      type: http
+      scheme: bearer
 info:
   title: TSOA Demo Pet Store - OpenAPI 3.0
   version: 1.0.0
