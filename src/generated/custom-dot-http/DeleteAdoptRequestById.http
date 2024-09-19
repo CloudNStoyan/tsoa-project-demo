@@ -15,5 +15,6 @@
 ### Path Parameter: The adoption request's ID.
 @requestId = 7312cc99-f99f-445e-a939-eb66c0c6724c
 
-DELETE http://localhost:3000/store/adopt/{{requestId}}?access_token={{apiToken}}
+DELETE http://localhost:3000/store/adopt/{{requestId}}
 Content-Type: {{contentType}}
+X-Access-Token: {{apiToken}}

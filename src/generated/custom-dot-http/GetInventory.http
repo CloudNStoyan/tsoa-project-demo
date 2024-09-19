@@ -14,5 +14,6 @@
 
 
 
-GET http://localhost:3000/store/inventory?access_token={{apiToken}}
+GET http://localhost:3000/store/inventory
 Content-Type: {{contentType}}
+X-Access-Token: {{apiToken}}

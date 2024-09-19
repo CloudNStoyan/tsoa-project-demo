@@ -100,9 +100,12 @@ class OperationsModel {
 
           operation.security = securitySchemes[securityDefinitionName];
 
-          if (operation.security.in !== 'query') {
+          if (
+            operation.security.in !== 'query' &&
+            operation.security.in !== 'header'
+          ) {
             throw new Error(
-              `Unsupported security definition 'in' property, only 'query' is allowed instead got '${operation.security.in}'.`
+              `Unsupported security definition 'in' property, only 'query' and 'header' are allowed instead got '${operation.security.in}'.`
             );
           }
 
@@ -286,13 +289,13 @@ class HttpFileRenderer {
 
       output += queryParamsEntries.join('&');
 
-      if (operation.security) {
+      console.log(operation.security);
+
+      if (operation.security?.in === 'query') {
         output += `&${operation.security.name}={{apiToken}}`;
       }
-    } else {
-      if (operation.security) {
-        output += `?${operation.security.name}={{apiToken}}`;
-      }
+    } else if (operation.security?.in === 'query') {
+      output += `?${operation.security.name}={{apiToken}}`;
     }
 
     return output;
@@ -318,6 +321,18 @@ class HttpFileRenderer {
     return JSON.stringify(bodyJson, null, 2);
   }
 
+  renderHeaders(operation) {
+    let output = '';
+
+    output += 'Content-Type: {{contentType}}\n';
+
+    if (operation.security?.in === 'header') {
+      output += `${operation.security.name}: {{apiToken}}`;
+    }
+
+    return output.trim();
+  }
+
   render() {
     let output = '';
 
@@ -333,7 +348,7 @@ class HttpFileRenderer {
 
     output += '\n';
     output +=
-      `${this.renderMainDescriptionBlock(this.operation)}\n\n${this.renderParams(this.operation.params)}\n\n${this.renderPath(this.operation)}\nContent-Type: {{contentType}}\n\n${this.renderBody(this.operation)}`.trim();
+      `${this.renderMainDescriptionBlock(this.operation)}\n\n${this.renderParams(this.operation.params)}\n\n${this.renderPath(this.operation)}\n${this.renderHeaders(this.operation)}\n\n${this.renderBody(this.operation)}`.trim();
 
     return output;
   }

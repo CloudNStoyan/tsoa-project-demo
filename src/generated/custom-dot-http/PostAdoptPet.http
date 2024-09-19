@@ -14,8 +14,9 @@
 
 
 
-POST http://localhost:3000/store/adopt?access_token={{apiToken}}
+POST http://localhost:3000/store/adopt
 Content-Type: {{contentType}}
+X-Access-Token: {{apiToken}}
 
 {
   "id": "67120cf3-1434-44be-b660-b02df64db677",
