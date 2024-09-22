@@ -132,7 +132,6 @@ export class StoreController extends BaseController {
    * Delete adoption request by ID.
    * @param requestId The adoption request's ID.
    * @summary         Delete adoption request by ID.
-   * @returns         Successful deletion of adoption request.
    */
   @Response(204, 'No Content')
   @Response<ApiError>(404, 'Not Found', {
