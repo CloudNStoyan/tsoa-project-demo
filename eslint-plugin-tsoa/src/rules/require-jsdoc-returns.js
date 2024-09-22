@@ -2,20 +2,35 @@ import { getTypeName, isPromiseLike } from '@typescript-eslint/type-utils';
 import { ESLintUtils } from '@typescript-eslint/utils';
 import { getJSDocComment, parseComment } from '@es-joy/jsdoccomment';
 
+const DEFAULT_DISALLOW_ON_VOID_OR_UNDEFINED = true;
+
 /** @type {import('eslint').Rule.RuleModule} */
 export default {
   meta: {
     messages: {
       returnsIsMissing: 'Missing JSDoc @returns declaration.',
+      returnsIsNotAllowed: "JSDoc @returns declaration is not allowed on methods that return 'null' or 'undefined'."
     },
     type: 'problem',
     docs: {
       description: 'Requires that return statements are documented.',
       recommended: true,
     },
-    schema: [],
+    schema: [
+      {
+        additionalProperties: false,
+        properties: {
+          disallowOnVoidOrUndefined: {
+            type: 'boolean',
+            default: DEFAULT_DISALLOW_ON_VOID_OR_UNDEFINED
+          }
+        }
+      }
+    ],
   },
   create(context) {
+    const { disallowOnVoidOrUndefined = DEFAULT_DISALLOW_ON_VOID_OR_UNDEFINED } = context.options[0] || {}
+
     const services = ESLintUtils.getParserServices(context);
     const checker = services.program.getTypeChecker();
     const sourceCode = context.sourceCode || context.getSourceCode();
@@ -45,10 +60,6 @@ export default {
       MethodDefinition(node) {
         const returnType = getFunctionReturnTypeName(node);
 
-        if (returnType === 'void' || returnType === 'undefined') {
-          return;
-        }
-
         const jsdocNode = getJSDocComment(sourceCode, node, {
           maxLines: 1,
           minLines: 0,
@@ -66,7 +77,20 @@ export default {
           return tag === targetTagName;
         });
 
-        if (propertyReturns.length === 0) {
+        const returnTypeIsUndefinedOrVoid = returnType === 'void' || returnType === 'undefined';
+        const hasReturnsJSDocDeclaration = propertyReturns.length > 0;
+
+        if (returnTypeIsUndefinedOrVoid) {
+          if (hasReturnsJSDocDeclaration && disallowOnVoidOrUndefined) {
+            context.report({
+              node,
+              messageId: 'returnsIsNotAllowed',
+            });
+          }
+          return;
+        }
+
+        if (!hasReturnsJSDocDeclaration) {
           context.report({
             node,
             messageId: 'returnsIsMissing',
