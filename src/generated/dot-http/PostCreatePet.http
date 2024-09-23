@@ -1,27 +1,26 @@
 @contentType = application/json
 
-##############################################
+#################################################
 ### Request: POST /pet
 ### Summary: Add a new pet to the store.
 ### Description: Add a new pet to the store.
-##############################################
-
+#################################################
 
 POST http://localhost:3000/pet
 Content-Type: {{contentType}}
 
 {
-  "id": "id",
-  "name": "name",
-  "breed": "breed",
-  "notes": "notes",
-  "kind": "Cat",
-  "age": 0,
+  "id": "90dbbed9-bd3d-40ae-ad1c-86602844d4c1",
+  "name": "Max",
+  "breed": "European Domestic Cat",
+  "notes": "Likes to scratch a lot.",
+  "kind": "Dog",
+  "age": 2,
   "healthProblems": false,
-  "addedDate": "2024-08-27",
-  "status": "Adopted",
+  "addedDate": "2024-09-07T21:00:00.000Z",
+  "status": "Pending",
   "tags": [
-    ""
+    "cat",
+    "orange"
   ]
 }
-
