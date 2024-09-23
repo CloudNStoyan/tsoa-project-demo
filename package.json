@@ -15,7 +15,7 @@
     "lint": "eslint ./ --max-warnings 0",
     "lint:fix": "npm run lint -- --fix",
     "generate-client-from-swagger": "rimraf ./src/generated/client && node ./scripts/generate-client-from-swagger.js",
-    "generate-http-files": "rimraf ./src/generated/dot-http && httpgenerator ./src/generated/swagger.json --base-url http://localhost:3000 --output ./src/generated/dot-http",
+    "generate-http-files": "rimraf ./src/generated/dot-http && node ./scripts/generate-dot-https-from-swagger.js",
     "post-process-swagger": "node ./scripts/post-process-swagger.js"
   },
   "dependencies": {
