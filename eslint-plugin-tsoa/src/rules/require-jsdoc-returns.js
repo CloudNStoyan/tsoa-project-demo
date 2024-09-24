@@ -9,7 +9,8 @@ export default {
   meta: {
     messages: {
       returnsIsMissing: 'Missing JSDoc @returns declaration.',
-      returnsIsNotAllowed: "JSDoc @returns declaration is not allowed on methods that return 'null' or 'undefined'."
+      returnsIsNotAllowed:
+        "JSDoc @returns declaration is not allowed on methods that return 'void' or 'undefined'.",
     },
     type: 'problem',
     docs: {
@@ -22,14 +23,16 @@ export default {
         properties: {
           disallowOnVoidOrUndefined: {
             type: 'boolean',
-            default: DEFAULT_DISALLOW_ON_VOID_OR_UNDEFINED
-          }
-        }
-      }
+            default: DEFAULT_DISALLOW_ON_VOID_OR_UNDEFINED,
+          },
+        },
+      },
     ],
   },
   create(context) {
-    const { disallowOnVoidOrUndefined = DEFAULT_DISALLOW_ON_VOID_OR_UNDEFINED } = context.options[0] || {}
+    const {
+      disallowOnVoidOrUndefined = DEFAULT_DISALLOW_ON_VOID_OR_UNDEFINED,
+    } = context.options[0] || {};
 
     const services = ESLintUtils.getParserServices(context);
     const checker = services.program.getTypeChecker();
@@ -77,13 +80,14 @@ export default {
           return tag === targetTagName;
         });
 
-        const returnTypeIsUndefinedOrVoid = returnType === 'void' || returnType === 'undefined';
+        const returnTypeIsUndefinedOrVoid =
+          returnType === 'void' || returnType === 'undefined';
         const hasReturnsJSDocDeclaration = propertyReturns.length > 0;
 
         if (returnTypeIsUndefinedOrVoid) {
           if (hasReturnsJSDocDeclaration && disallowOnVoidOrUndefined) {
             context.report({
-              node,
+              node: jsdocNode,
               messageId: 'returnsIsNotAllowed',
             });
           }
@@ -92,7 +96,7 @@ export default {
 
         if (!hasReturnsJSDocDeclaration) {
           context.report({
-            node,
+            node: jsdocNode,
             messageId: 'returnsIsMissing',
           });
         }
