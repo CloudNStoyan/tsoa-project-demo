@@ -12,8 +12,14 @@ export function expressAuthentication(
     const authorization = request.get('authorization');
 
     let token;
-    if (authorization && authorization.split(' ')[0] === 'Bearer') {
-      token = authorization.split(' ')[1];
+    if (authorization) {
+      const [tokenScheme, tokenValue] = authorization.split(' ');
+
+      if (tokenScheme === 'Bearer') {
+        token = tokenValue;
+      } else {
+        return Promise.reject(new AuthError("Token scheme must be 'Bearer'."));
+      }
     }
 
     // This is where I'd put my scopes if I had any
