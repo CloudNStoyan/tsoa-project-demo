@@ -1,3 +1,4 @@
+@baseUrl = http://localhost:3000
 @contentType = application/json
 
 #################################################
@@ -6,7 +7,7 @@
 ### Description: Add a new pet to the store.
 #################################################
 
-POST http://localhost:3000/pet
+POST {{baseUrl}}/pet
 Content-Type: {{contentType}}
 
 {

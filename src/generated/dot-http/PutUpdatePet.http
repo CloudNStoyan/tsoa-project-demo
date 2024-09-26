@@ -1,3 +1,4 @@
+@baseUrl = http://localhost:3000
 @contentType = application/json
 
 #################################################
@@ -6,7 +7,7 @@
 ### Description: Update an existing pet.
 #################################################
 
-PUT http://localhost:3000/pet
+PUT {{baseUrl}}/pet
 Content-Type: {{contentType}}
 
 {

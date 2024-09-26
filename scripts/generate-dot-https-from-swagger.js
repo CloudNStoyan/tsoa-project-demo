@@ -295,7 +295,7 @@ class HttpFileRenderer {
 
     const path = operation.path.replaceAll('{', '{{').replaceAll('}', '}}');
 
-    output += `${method} ${BASE_URL}${path}`;
+    output += `${method} {{baseUrl}}${path}`;
 
     const queryParams = operation.params.filter(
       (param) => param.in === 'query'
@@ -356,6 +356,7 @@ class HttpFileRenderer {
   render() {
     let output = '';
 
+    output += `@baseUrl = ${BASE_URL}\n`;
     output += '@contentType = application/json\n';
 
     if (this.operation.security) {

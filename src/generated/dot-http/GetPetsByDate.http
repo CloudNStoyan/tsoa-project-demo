@@ -1,3 +1,4 @@
+@baseUrl = http://localhost:3000
 @contentType = application/json
 
 #################################################
@@ -9,5 +10,5 @@
 ### Query Parameter: The date to filter by.
 @afterDate = 2024-01-01
 
-GET http://localhost:3000/pet/findByDate?afterDate={{afterDate}}
+GET {{baseUrl}}/pet/findByDate?afterDate={{afterDate}}
 Content-Type: {{contentType}}

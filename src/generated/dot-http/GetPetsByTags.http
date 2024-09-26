@@ -1,3 +1,4 @@
+@baseUrl = http://localhost:3000
 @contentType = application/json
 
 #################################################
@@ -9,5 +10,5 @@
 ### Query Parameter: The tags to filter by.
 @tags = str
 
-GET http://localhost:3000/pet/findByTags?tags={{tags}}
+GET {{baseUrl}}/pet/findByTags?tags={{tags}}
 Content-Type: {{contentType}}

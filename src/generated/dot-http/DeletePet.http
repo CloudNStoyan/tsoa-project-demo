@@ -1,3 +1,4 @@
+@baseUrl = http://localhost:3000
 @contentType = application/json
 
 #################################################
@@ -9,5 +10,5 @@
 ### Path Parameter: Pet ID to delete.
 @petId = 7312cc99-f99f-445e-a939-eb66c0c6724c
 
-DELETE http://localhost:3000/pet/{{petId}}
+DELETE {{baseUrl}}/pet/{{petId}}
 Content-Type: {{contentType}}
