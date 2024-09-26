@@ -1,3 +1,4 @@
+@baseUrl = http://localhost:3000
 @contentType = application/json
 
 #################################################
@@ -9,5 +10,5 @@
 ### Query Parameter: The adoption status.
 @status = Adopted
 
-GET http://localhost:3000/pet/findByStatus?status={{status}}
+GET {{baseUrl}}/pet/findByStatus?status={{status}}
 Content-Type: {{contentType}}

@@ -1,3 +1,4 @@
+@baseUrl = http://localhost:3000
 @contentType = application/json
 
 #################################################
@@ -12,5 +13,5 @@
 ### Query Parameter: How many records to return.
 @limit = 10
 
-GET http://localhost:3000/pet/all?offset={{offset}}&limit={{limit}}
+GET {{baseUrl}}/pet/all?offset={{offset}}&limit={{limit}}
 Content-Type: {{contentType}}
