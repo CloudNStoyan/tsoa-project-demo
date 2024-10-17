@@ -3,7 +3,7 @@ import prettier from 'eslint-config-prettier';
 import tseslint from 'typescript-eslint';
 import globals from 'globals';
 import jsdoc from 'eslint-plugin-jsdoc';
-import tsoa from './eslint-plugin-tsoa/src/eslint-plugin-tsoa.js';
+import apiDocumentation from '@arabasta/eslint-plugin-api-documentation';
 import enumNameAndValueMatch from './eslint-plugin-enum-name-and-value-match/src/eslint-plugin-enum-name-and-value-match.js';
 
 export default tseslint.config(
@@ -152,10 +152,10 @@ export default tseslint.config(
   },
   {
     files: ['src/routes/**'],
-    plugins: tsoa.configs.recommended.plugins,
+    plugins: apiDocumentation.configs.recommended.plugins,
     rules: {
-      ...tsoa.configs.recommended.rules,
-      'tsoa/valid-response-decorator-type': [
+      ...apiDocumentation.configs.recommended.rules,
+      '@arabasta/api-documentation/valid-response-decorator-type': [
         'error',
         { allowedTypes: ['ApiError'] },
       ],
