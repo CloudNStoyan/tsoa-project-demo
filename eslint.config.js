@@ -3,6 +3,8 @@ import prettier from 'eslint-config-prettier';
 import tseslint from 'typescript-eslint';
 import globals from 'globals';
 import jsdoc from 'eslint-plugin-jsdoc';
+import apiDocumentation from '@arabasta/eslint-plugin-api-documentation';
+import enumNameAndValueMatch from './eslint-plugin-enum-name-and-value-match/src/eslint-plugin-enum-name-and-value-match.js';
 
 export default tseslint.config(
   js.configs.recommended,
@@ -147,6 +149,22 @@ export default tseslint.config(
         },
       ],
     },
+  },
+  {
+    files: ['src/routes/**'],
+    plugins: apiDocumentation.configs.recommended.plugins,
+    rules: {
+      ...apiDocumentation.configs.recommended.rules,
+      '@arabasta/api-documentation/valid-response-decorator-type': [
+        'error',
+        { allowedTypes: ['ApiError'] },
+      ],
+    },
+  },
+  {
+    files: ['src/routes/**'],
+    plugins: enumNameAndValueMatch.configs.recommended.plugins,
+    rules: { ...enumNameAndValueMatch.configs.recommended.rules },
   },
   { ignores: ['dist', 'src/generated/'] }
 );
