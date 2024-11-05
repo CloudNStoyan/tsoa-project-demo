@@ -1,3 +1,7 @@
+export interface Options {
+  signal?: AbortSignal;
+}
+
 export interface BaseParameterInfo {
   name: string;
   paramType: 'query' | 'path';
