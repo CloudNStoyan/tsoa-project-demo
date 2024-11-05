@@ -484,7 +484,8 @@ class ModelRenderer {
   renderImports() {
     let output = '';
 
-    output += "import { ClientAPIBase } from '../../client-base.js';";
+    output +=
+      "import { type Options, ClientAPIBase } from '../../client-base.js';";
 
     return output;
   }
@@ -667,9 +668,9 @@ class ModelRenderer {
     if (operation.allParams) {
       for (const param of operation.allParams) {
         if (param.paramType.type !== 'array') {
-          output += `super.validateParam(\n${param.name},\n`;
+          output += `this.validateParam(\n${param.name},\n`;
         } else {
-          output += `super.validateParamArray(\n${param.name},\n`;
+          output += `this.validateParamArray(\n${param.name},\n`;
         }
 
         const paramMeta = {
@@ -709,9 +710,9 @@ class ModelRenderer {
 
       for (const queryParam of queryParams) {
         if (queryParam.paramType.type !== 'array') {
-          output += `super.appendUrlParam(urlParams, ${queryParam.name},\n`;
+          output += `this.appendUrlParam(urlParams, ${queryParam.name},\n`;
         } else {
-          output += `super.appendUrlParamArray(urlParams, ${queryParam.name},\n`;
+          output += `this.appendUrlParamArray(urlParams, ${queryParam.name},\n`;
         }
 
         const paramMeta = {
@@ -732,7 +733,7 @@ class ModelRenderer {
         "const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';\n\n";
     }
 
-    output += 'return super.fetch';
+    output += 'return this.fetch';
 
     if (operation.returnType !== 'void') {
       output += `<${operation.returnType}>`;
@@ -779,9 +780,11 @@ class ModelRenderer {
         output += `headers: {\n'Content-Type': 'application/json'\n},\n`;
       }
 
+      output += '...options,\n';
+
       output += '});';
     } else {
-      output += '`);';
+      output += '`, options);';
     }
 
     output += '}\n\n';
@@ -791,7 +794,7 @@ class ModelRenderer {
 
   renderParams(params, body) {
     if (!params && !body) {
-      return '';
+      return 'options?: Options';
     }
 
     let output = '';
@@ -821,6 +824,12 @@ class ModelRenderer {
 
       output += `${lowercaseFirstLetter(body.resolvedType)}: ${body.resolvedType}`;
     }
+
+    if (output.length > 0) {
+      output += ', ';
+    }
+
+    output += 'options?: Options';
 
     return output;
   }
