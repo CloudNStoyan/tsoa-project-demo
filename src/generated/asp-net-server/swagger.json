@@ -15,17 +15,32 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Pet"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Pet"
+                  }
+                ],
+                "description": "Pet characteristics."
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Pet"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Pet"
+                  }
+                ],
+                "description": "Pet characteristics."
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Pet"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Pet"
+                  }
+                ],
+                "description": "Pet characteristics."
               }
             }
           }
@@ -130,7 +145,7 @@
           "Parrot"
         ],
         "type": "string",
-        "description": "The pet's animal kind."
+        "description": "The pet's animal kind. 111"
       },
       "Pet": {
         "required": [
@@ -169,7 +184,12 @@
             "description": "Free form text associated with the pet."
           },
           "kind": {
-            "$ref": "#/components/schemas/AnimalKind"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnimalKind"
+              }
+            ],
+            "description": "What kind of pet it is."
           },
           "age": {
             "type": "integer",
@@ -186,7 +206,12 @@
             "format": "date"
           },
           "status": {
-            "$ref": "#/components/schemas/AdoptionStatus"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdoptionStatus"
+              }
+            ],
+            "description": "Pet's adoption status in the store."
           },
           "tags": {
             "type": "array",

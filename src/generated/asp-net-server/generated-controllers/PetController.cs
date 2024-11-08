@@ -1,9 +1,8 @@
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using SchemaFilters;
 
-namespace PetController;
-
+namespace GeneratedControllers;
 
 /// <summary>
 /// The pet's animal kind.
