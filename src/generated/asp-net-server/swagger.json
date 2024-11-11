@@ -17,31 +17,34 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Pet"
+                    "$ref": "#/components/schemas/PetModel"
                   }
                 ],
                 "description": "Pet characteristics."
-              }
+              },
+              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
             },
             "text/json": {
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Pet"
+                    "$ref": "#/components/schemas/PetModel"
                   }
                 ],
                 "description": "Pet characteristics."
-              }
+              },
+              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
             },
             "application/*+json": {
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Pet"
+                    "$ref": "#/components/schemas/PetModel"
                   }
                 ],
                 "description": "Pet characteristics."
-              }
+              },
+              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
             }
           }
         },
@@ -51,18 +54,21 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Pet"
-                }
+                  "$ref": "#/components/schemas/PetModel"
+                },
+                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Pet"
-                }
+                  "$ref": "#/components/schemas/PetModel"
+                },
+                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Pet"
-                }
+                  "$ref": "#/components/schemas/PetModel"
+                },
+                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
               }
             }
           },
@@ -108,17 +114,40 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Pet"
+                  "$ref": "#/components/schemas/PetModel"
+                },
+                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetModel"
+                },
+                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetModel"
+                },
+                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Pet"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Pet"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -145,9 +174,9 @@
           "Parrot"
         ],
         "type": "string",
-        "description": "The pet's animal kind. 111"
+        "description": "The pet's animal kind."
       },
-      "Pet": {
+      "PetModel": {
         "required": [
           "addedDate",
           "age",

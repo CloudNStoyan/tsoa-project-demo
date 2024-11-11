@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using AspNetServer.OpenApiExamples;
+using AspNetServer.SchemaFilters.Abstractions.Examples;
 using Microsoft.AspNetCore.Mvc;
-using SchemaFilters;
+using Swashbuckle.AspNetCore.Filters;
 
-namespace GeneratedControllers;
+namespace AspNetServer.GeneratedControllers;
 
 /// <summary>
 /// The pet's animal kind.
@@ -25,11 +27,12 @@ public enum AdoptionStatus {
 /// <summary>
 /// Pet characteristics.
 /// </summary>
-public class Pet {
+public class PetModel {
   /// <summary>
   /// The pet's identifier.
   /// </summary>
   [Required]
+  [SwaggerComplexExample]
   public Guid Id { get; set; }
 
   /// <summary>
@@ -84,7 +87,7 @@ public class Pet {
 [ApiController]
 [Route("[controller]")]
 public class PetController : ControllerBase {
-  private List<Pet> _pets =
+  private List<PetModel> _pets =
   [
    new() {
       Id = new Guid("90dbbed9-bd3d-40ae-ad1c-86602844d4c1"),
@@ -102,8 +105,9 @@ public class PetController : ControllerBase {
 
   [HttpPost]
   [ProducesResponseType(StatusCodes.Status201Created)]
+  [SwaggerRequestExample(typeof(PetModel), typeof(PetModelExample))]
   [ProducesResponseType(StatusCodes.Status400BadRequest)]
-  public ActionResult<Pet> Create(Pet pet)
+  public ActionResult<PetModel> Create(PetModel pet)
   {
     pet.Id = Guid.NewGuid();
 
@@ -113,7 +117,11 @@ public class PetController : ControllerBase {
   }
 
   [HttpGet]
-  public ActionResult<Pet> GetById(Guid petId) {
+  [ProducesResponseType(StatusCodes.Status200OK)]
+  [SwaggerResponseExample(200, typeof(PetModelExample))]
+  [ProducesResponseType(StatusCodes.Status404NotFound)]
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+  public async Task<ActionResult<PetModel>> GetById(Guid petId) {
     var pet = _pets.Find(x => x.Id == petId);
 
     if (pet is null) {
@@ -122,4 +130,5 @@ public class PetController : ControllerBase {
 
     return pet;
   }
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 }

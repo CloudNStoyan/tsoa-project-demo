@@ -3,7 +3,7 @@ using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace SchemaFilters;
+namespace AspNetServer.SchemaFilters;
 
 // [AttributeUsage(AttributeTargets.Property)]
 // public class ExampleAttribute : Attribute
@@ -16,7 +16,7 @@ namespace SchemaFilters;
 // }
 
 
-public class ExampleSchemaFilter : ISchemaFilter {
+public class ComplexExampleSchemaFilter : ISchemaFilter {
   public void Apply(OpenApiSchema schema, SchemaFilterContext context)
       {
         if (schema.Type != "object") {
