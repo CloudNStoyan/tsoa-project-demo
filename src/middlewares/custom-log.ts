@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 
 /**
  * Logger Middleware.
@@ -9,11 +9,13 @@ import { Request, Response, NextFunction } from 'express';
  * `@`Middlewares(customLog)
  * export class Foo {}
  */
+// eslint-disable-next-line @typescript-eslint/require-await
 export async function customLog(
   _req: Request,
   _res: Response,
   next: NextFunction
 ) {
+  // eslint-disable-next-line no-console
   console.log('IM MIDDLEWEARING RIGHT NOW!');
   next();
 }

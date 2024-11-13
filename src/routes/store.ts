@@ -1,3 +1,5 @@
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
+/* eslint-disable @typescript-eslint/require-await */
 import {
   Body,
   Delete,
@@ -11,13 +13,16 @@ import {
   Security,
   Tags,
 } from 'tsoa';
-import { ApiError, BaseController } from '../utils.js';
+
+// eslint-disable-next-line no-restricted-imports
 import { state } from '../state.js';
+// eslint-disable-next-line no-restricted-imports
+import { type ApiError, BaseController } from '../utils.js';
 import {
-  AdoptionStatus,
   AdoptionRequestStatus,
-  UUID,
-  ExpressRequestWithUser,
+  AdoptionStatus,
+  type ExpressRequestWithUser,
+  type UUID,
 } from './server-types.js';
 
 /**
@@ -53,6 +58,7 @@ export class AdoptionRequest {
 /**
  * Inventory map of adoption status to quantities.
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface InventoryMap extends Record<AdoptionStatus, number> {}
 
 @Route('store')
@@ -145,11 +151,14 @@ export class StoreController extends BaseController {
     );
 
     if (!adoptionRequest) {
-      return this.errorResult<void>(404, {
+      // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+      this.errorResult<void>(404, {
         message: 'Adoption request not found!',
       });
+      return;
     }
 
-    return this.noContentResult<void>();
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    this.noContentResult<void>();
   }
 }

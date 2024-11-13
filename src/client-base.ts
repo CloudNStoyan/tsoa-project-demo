@@ -16,6 +16,7 @@ export interface BaseUrlParam {
 }
 
 export class ClientAPIBase {
+  // eslint-disable-next-line @typescript-eslint/no-useless-constructor, no-empty-function
   constructor(..._options: unknown[]) {}
 
   fetch<T = void>(..._args: Parameters<typeof fetch>) {
@@ -67,12 +68,10 @@ export class ClientAPIBase {
               `Required ${paramType} param '${name}' did not have a value of type 'number'. Type: '${typeof value}', Value: '${value}'.`
             );
           }
-        } else {
-          if (typeof value !== 'number' && typeof value !== 'undefined') {
-            throw new Error(
-              `Optional ${paramType} param '${name}' did not have a value of type 'number' or 'undefined'. Type: '${typeof value}', Value: '${value}'.`
-            );
-          }
+        } else if (typeof value !== 'number' && typeof value !== 'undefined') {
+          throw new Error(
+            `Optional ${paramType} param '${name}' did not have a value of type 'number' or 'undefined'. Type: '${typeof value}', Value: '${value}'.`
+          );
         }
 
         if (Number.isFinite(value)) {
@@ -144,6 +143,7 @@ export class ClientAPIBase {
       }
       default: {
         throw new Error(
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           `Unexpected value type '${type}' for ${paramType} param '${name}'.`
         );
       }

@@ -1,3 +1,5 @@
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
+/* eslint-disable @typescript-eslint/require-await */
 import {
   Body,
   Delete,
@@ -12,9 +14,12 @@ import {
   Route,
   Tags,
 } from 'tsoa';
-import { ApiError, BaseController, limitOffset } from '../utils.js';
+
+// eslint-disable-next-line no-restricted-imports
 import { state } from '../state.js';
-import { AdoptionStatus, AnimalKind, UUID } from './server-types.js';
+// eslint-disable-next-line no-restricted-imports
+import { type ApiError, BaseController, limitOffset } from '../utils.js';
+import { AdoptionStatus, AnimalKind, type UUID } from './server-types.js';
 
 const PETS_EXAMPLE = [
   {
@@ -284,10 +289,13 @@ export class PetController extends BaseController {
   async deletePet(@Path() petId: UUID): Promise<void> {
     const pet = state.pets.find((p) => p.id === petId);
     if (!pet) {
-      return this.errorResult<void>(404, { message: 'Pet not found!' });
+      // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+      this.errorResult<void>(404, { message: 'Pet not found!' });
+      return;
     }
 
     state.pets = state.pets.filter((p) => p.id !== petId);
-    return this.noContentResult<void>();
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    this.noContentResult<void>();
   }
 }
