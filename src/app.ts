@@ -27,7 +27,6 @@ app.use(
   async (_req: ExpressRequest, res: ExpressResponse) =>
     res.send(
       swaggerUi.generateHTML(
-        // eslint-disable-next-line import/extensions
         (await import('./generated/swagger.json', { with: { type: 'json' } }))
           .default
       )

@@ -16,9 +16,6 @@ export interface BaseUrlParam {
 }
 
 export class ClientAPIBase {
-  // eslint-disable-next-line @typescript-eslint/no-useless-constructor, no-empty-function
-  constructor(..._options: unknown[]) {}
-
   fetch<T = void>(..._args: Parameters<typeof fetch>) {
     return Promise.resolve() as Promise<T>;
   }
@@ -143,7 +140,6 @@ export class ClientAPIBase {
       }
       default: {
         throw new Error(
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           `Unexpected value type '${type}' for ${paramType} param '${name}'.`
         );
       }

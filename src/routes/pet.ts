@@ -15,10 +15,9 @@ import {
   Tags,
 } from 'tsoa';
 
-// eslint-disable-next-line no-restricted-imports
-import { state } from '../state.js';
-// eslint-disable-next-line no-restricted-imports
-import { type ApiError, BaseController, limitOffset } from '../utils.js';
+import { state } from '~state.js';
+import { type ApiError, BaseController, limitOffset } from '~utils.js';
+
 import { AdoptionStatus, AnimalKind, type UUID } from './server-types.js';
 
 const PETS_EXAMPLE = [
@@ -289,13 +288,11 @@ export class PetController extends BaseController {
   async deletePet(@Path() petId: UUID): Promise<void> {
     const pet = state.pets.find((p) => p.id === petId);
     if (!pet) {
-      // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-      this.errorResult<void>(404, { message: 'Pet not found!' });
-      return;
+      return this.errorResult<void>(404, { message: 'Pet not found!' });
     }
 
     state.pets = state.pets.filter((p) => p.id !== petId);
-    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-    this.noContentResult<void>();
+
+    return this.noContentResult<void>();
   }
 }

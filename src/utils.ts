@@ -6,7 +6,6 @@ export interface ApiError {
 }
 
 export class BaseController extends Controller {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
   errorResult<TSuccess>(
     status: number,
     error: Omit<ApiError, 'status'>
@@ -16,7 +15,6 @@ export class BaseController extends Controller {
     return errorWithStatus as unknown as TSuccess;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
   noContentResult<TSuccess>(): TSuccess {
     this.setStatus(204);
     return undefined as unknown as TSuccess;
@@ -35,7 +33,7 @@ export function limitOffset<T>(array: T[], limit: number, offset: number): T[] {
     return [];
   }
 
-  // eslint-disable-next-line prefer-destructuring
+   
   const length = array.length;
 
   if (!length) {

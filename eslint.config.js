@@ -16,7 +16,14 @@ const typeScriptDefinitionExtensions = typeScriptExtensions
   .filter((x) => x !== 'tsx')
   .map((x) => `d.${x}`);
 
-const allExtensions = ['js', 'cjs', 'mjs', 'jsx', ...typeScriptExtensions];
+const allExtensions = [
+  'js',
+  'cjs',
+  'mjs',
+  'jsx',
+  'json',
+  ...typeScriptExtensions,
+];
 
 export default tseslint.config(
   // We use a tseslint helper function here so that we get easy "extends"
@@ -45,8 +52,7 @@ export default tseslint.config(
       parser: tseslint.parser,
     },
     rules: {
-      'no-unused-vars': 'off',
-      'no-dupe-class-members': 'off',
+      'prefer-destructuring': 'off',
       'import/no-restricted-paths': [
         'error',
         {
@@ -71,6 +77,13 @@ export default tseslint.config(
           ],
         },
       ],
+      'import/extensions': [
+        'error',
+        allExtensions.reduce((acc, val) => {
+          acc[val] = 'ignorePackages';
+          return acc;
+        }, {}),
+      ],
     },
   }),
 
@@ -79,7 +92,10 @@ export default tseslint.config(
     files: [`**/*.+(${typeScriptExtensions.join('|')})`],
     extends: [...typescriptConfig],
     rules: {
-      // Put your rules here.
+      '@typescript-eslint/no-confusing-void-expression': 'off',
+      '@typescript-eslint/no-invalid-void-type': 'off',
+      '@typescript-eslint/no-unnecessary-type-parameters': 'off',
+      '@typescript-eslint/restrict-template-expressions': 'off',
     },
   }),
 
@@ -102,6 +118,7 @@ export default tseslint.config(
         'error',
         { allowedTypes: ['ApiError'] },
       ],
+      '@typescript-eslint/no-empty-object-type': 'off',
     },
   }),
 
@@ -117,5 +134,5 @@ export default tseslint.config(
     },
   }),
 
-  { ignores: ['dist', 'src/generated/', 'scripts'] }
+  { ignores: ['dist', 'src/generated/', 'scripts', '**/*.json'] }
 );

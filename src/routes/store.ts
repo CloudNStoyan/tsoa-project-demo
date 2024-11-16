@@ -14,10 +14,9 @@ import {
   Tags,
 } from 'tsoa';
 
-// eslint-disable-next-line no-restricted-imports
-import { state } from '../state.js';
-// eslint-disable-next-line no-restricted-imports
-import { type ApiError, BaseController } from '../utils.js';
+import { state } from '~state.js';
+import { type ApiError, BaseController } from '~utils.js';
+
 import {
   AdoptionRequestStatus,
   AdoptionStatus,
@@ -58,7 +57,6 @@ export class AdoptionRequest {
 /**
  * Inventory map of adoption status to quantities.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface InventoryMap extends Record<AdoptionStatus, number> {}
 
 @Route('store')
@@ -151,14 +149,12 @@ export class StoreController extends BaseController {
     );
 
     if (!adoptionRequest) {
-      // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
       this.errorResult<void>(404, {
         message: 'Adoption request not found!',
       });
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
     this.noContentResult<void>();
   }
 }
