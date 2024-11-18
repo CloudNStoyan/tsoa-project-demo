@@ -22,15 +22,27 @@ app.use(
 app.use(json());
 
 app.use(
-  '/docs',
-  swaggerUi.serve,
+  '/docs/swagger.json',
   async (_req: ExpressRequest, res: ExpressResponse) =>
     res.send(
-      swaggerUi.generateHTML(
-        (await import('./generated/swagger.json', { with: { type: 'json' } }))
-          .default
-      )
+      (await import('./generated/swagger.json', { with: { type: 'json' } }))
+        .default
     )
+);
+
+app.use(
+  '/docs',
+  swaggerUi.serve,
+  swaggerUi.setup(
+    // we need to pass it something, preferably that would be `null` but the
+    // types of `swaggerUi.setup` don't allow `null` so we use an empty object.
+    {},
+    {
+      swaggerOptions: {
+        url: '/docs/swagger.json',
+      },
+    }
+  )
 );
 
 // Disables TSOA's built-in validation (must be before RegisterRoutes)
