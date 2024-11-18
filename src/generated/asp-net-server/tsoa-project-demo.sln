@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5FC4D385-5C08-48D8-BAA3-477121519A7B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "generated", "generated", "{0AB512BE-C26A-419F-B8DD-9A4CB981144F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "asp-net-server", "src\generated\asp-net-server\asp-net-server.csproj", "{8DF2928F-4A76-4E02-8815-2E4A1B390A28}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8DF2928F-4A76-4E02-8815-2E4A1B390A28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DF2928F-4A76-4E02-8815-2E4A1B390A28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DF2928F-4A76-4E02-8815-2E4A1B390A28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DF2928F-4A76-4E02-8815-2E4A1B390A28}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0AB512BE-C26A-419F-B8DD-9A4CB981144F} = {5FC4D385-5C08-48D8-BAA3-477121519A7B}
+		{8DF2928F-4A76-4E02-8815-2E4A1B390A28} = {0AB512BE-C26A-419F-B8DD-9A4CB981144F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FBCA88E9-61A8-4623-8DB3-13B5E36A0F17}
+	EndGlobalSection
+EndGlobal
