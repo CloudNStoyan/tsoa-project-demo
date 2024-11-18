@@ -1,4 +1,5 @@
 using AspNetServer.GeneratedControllers;
+using AspNetServer.SchemaFilters;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace AspNetServer.OpenApiExamples;

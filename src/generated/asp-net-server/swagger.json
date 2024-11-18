@@ -194,23 +194,27 @@
           "id": {
             "type": "string",
             "description": "The pet's identifier.",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "90dbbed9-bd3d-40ae-ad1c-86602844d4c1"
           },
           "name": {
             "maxLength": 20,
             "minLength": 3,
             "type": "string",
-            "description": "The name of the pet."
+            "description": "The name of the pet.",
+            "example": "Max"
           },
           "breed": {
             "minLength": 1,
             "type": "string",
-            "description": "The kind of breed the pet is."
+            "description": "The kind of breed the pet is.",
+            "example": "European Domestic Cat"
           },
           "notes": {
             "minLength": 1,
             "type": "string",
-            "description": "Free form text associated with the pet."
+            "description": "Free form text associated with the pet.",
+            "example": "Likes to scratch a lot."
           },
           "kind": {
             "allOf": [
@@ -218,21 +222,25 @@
                 "$ref": "#/components/schemas/AnimalKind"
               }
             ],
-            "description": "What kind of pet it is."
+            "description": "What kind of pet it is.",
+            "example": "0"
           },
           "age": {
             "type": "integer",
             "description": "The age of the pet.",
-            "format": "int32"
+            "format": "int32",
+            "example": "2"
           },
           "healthProblems": {
             "type": "boolean",
-            "description": "Whether or not the pet has any health problems."
+            "description": "Whether or not the pet has any health problems.",
+            "example": "false"
           },
           "addedDate": {
             "type": "string",
             "description": "When the pet was added to the system.",
-            "format": "date"
+            "format": "date",
+            "example": "2024-09-08"
           },
           "status": {
             "allOf": [
@@ -240,14 +248,16 @@
                 "$ref": "#/components/schemas/AdoptionStatus"
               }
             ],
-            "description": "Pet's adoption status in the store."
+            "description": "Pet's adoption status in the store.",
+            "example": "2"
           },
           "tags": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "description": "The pet's tags."
+            "description": "The pet's tags.",
+            "example": "[\n  \"cat\",\n  \"orange\"\n]"
           }
         },
         "additionalProperties": false,

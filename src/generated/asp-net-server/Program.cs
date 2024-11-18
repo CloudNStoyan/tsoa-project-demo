@@ -27,7 +27,7 @@ builder.Services.AddSwaggerGen(options => {
   options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
   options.UseAllOfToExtendReferenceSchemas();
 
-  // options.SchemaFilter<ComplexExampleSchemaFilter>();
+  options.SchemaFilter<PropertyExampleSchemaFilter>();
 });
 
 var app = builder.Build();

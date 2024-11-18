@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using AspNetServer.OpenApiExamples;
-using AspNetServer.SchemaFilters.Abstractions.Examples;
+using AspNetServer.SchemaFilters;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -27,12 +27,12 @@ public enum AdoptionStatus {
 /// <summary>
 /// Pet characteristics.
 /// </summary>
+[PropertiesExample(typeof(PetModelExample))]
 public class PetModel {
   /// <summary>
   /// The pet's identifier.
   /// </summary>
   [Required]
-  [SwaggerComplexExample]
   public Guid Id { get; set; }
 
   /// <summary>
