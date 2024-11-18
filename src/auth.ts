@@ -5,12 +5,11 @@ import { state } from './state.js';
 
 export class AuthError extends Error {}
 
-// eslint-disable-next-line consistent-return
 export function expressAuthentication(
   request: Request,
   securityName: string,
   _scopes?: string[]
-): Promise<AuthUser> | undefined {
+): Promise<AuthUser> {
   if (securityName === 'api_key') {
     const authorization = request.get('authorization');
 
@@ -32,4 +31,8 @@ export function expressAuthentication(
     }
     return Promise.reject(new AuthError('Invalid token.'));
   }
+
+  throw new Error(
+    `The '${securityName}' security definition was not expected.`
+  );
 }

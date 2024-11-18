@@ -16,6 +16,12 @@ export interface BaseUrlParam {
 }
 
 export class ClientAPIBase {
+  options: unknown[];
+
+  constructor(...options: unknown[]) {
+    this.options = options;
+  }
+
   fetch<T = void>(..._args: Parameters<typeof fetch>) {
     return Promise.resolve() as Promise<T>;
   }
