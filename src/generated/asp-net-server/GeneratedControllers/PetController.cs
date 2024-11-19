@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AspNetServer.GeneratedControllers;
 
-
 [ApiController]
 [Route("[controller]")]
 public class PetController : ControllerBase {

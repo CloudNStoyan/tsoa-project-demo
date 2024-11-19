@@ -176,7 +176,7 @@
         "type": "string",
         "description": "The pet's animal kind."
       },
-      "PetModel": {
+      "Pet": {
         "required": [
           "addedDate",
           "age",

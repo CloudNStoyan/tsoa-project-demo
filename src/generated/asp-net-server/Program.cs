@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
-using AspNetServer.SchemaFilters;
+using AspNetServer.SwashbuckleFilters;
 using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,7 +27,8 @@ builder.Services.AddSwaggerGen(options => {
   options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
   options.UseAllOfToExtendReferenceSchemas();
 
-  options.SchemaFilter<PropertyExampleSchemaFilter>();
+  options.SchemaFilter<PropertyExampleFilter>();
+  options.DocumentFilter<RemoveModelSuffixFilter>();
 });
 
 var app = builder.Build();

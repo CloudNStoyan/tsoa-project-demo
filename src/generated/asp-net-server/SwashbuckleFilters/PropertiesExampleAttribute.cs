@@ -1,4 +1,4 @@
-namespace AspNetServer.SchemaFilters;
+namespace AspNetServer.SwashbuckleFilters;
 
 [AttributeUsage(AttributeTargets.Class)]
 public class PropertiesExampleAttribute : Attribute {

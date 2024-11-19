@@ -7,12 +7,12 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace AspNetServer.SchemaFilters;
+namespace AspNetServer.SwashbuckleFilters;
 
-public class PropertyExampleSchemaFilter : ISchemaFilter {
+public class PropertyExampleFilter : ISchemaFilter {
   private readonly IServiceProvider serviceProvider;
   private readonly JsonSerializerOptions customJsonSerializerOptions;
-  public PropertyExampleSchemaFilter(IServiceProvider serviceProvider)
+  public PropertyExampleFilter(IServiceProvider serviceProvider)
   {
     this.serviceProvider = serviceProvider;
     this.customJsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using AspNetServer.OpenApiExamples;
-using AspNetServer.SchemaFilters;
+using AspNetServer.SwashbuckleFilters;
 
 namespace AspNetServer.GeneratedModels;
 
