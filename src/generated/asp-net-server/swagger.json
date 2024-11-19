@@ -229,12 +229,12 @@
             "type": "integer",
             "description": "The age of the pet.",
             "format": "int32",
-            "example": "2"
+            "example": 2
           },
           "healthProblems": {
             "type": "boolean",
             "description": "Whether or not the pet has any health problems.",
-            "example": "false"
+            "example": false
           },
           "addedDate": {
             "type": "string",
@@ -257,10 +257,7 @@
               "type": "string"
             },
             "description": "The pet's tags.",
-            "example": [
-              "cat",
-              "orange"
-            ]
+            "example": ["cat","orange"]
           }
         },
         "additionalProperties": false,

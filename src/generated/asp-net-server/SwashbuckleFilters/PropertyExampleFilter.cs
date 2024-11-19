@@ -49,17 +49,7 @@ public class PropertyExampleFilter : ISchemaFilter {
           string propertyName = property.Key;
           var propertySchema = property.Value;
 
-          if (propertySchema.Type == "array" && propertySchema.Items.Type == "string") {
-            OpenApiString[] arrayOfExamples = exampleJsonObject[propertyName]!.AsArray().Select(x => new OpenApiString(x!.ToString())).ToArray();
-
-            var exampleArray = new OpenApiArray();
-            exampleArray.AddRange(arrayOfExamples);
-
-            propertySchema.Example = exampleArray;
-            continue;
-          }
-
-          propertySchema.Example = new OpenApiString(exampleJsonObject[propertyName]!.ToString());
+          propertySchema.Example = new OpenApiString(exampleJsonObject[propertyName]!.ToJsonString(), false, true);
         }
       }
 }
