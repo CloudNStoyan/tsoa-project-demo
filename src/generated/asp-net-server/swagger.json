@@ -257,7 +257,10 @@
               "type": "string"
             },
             "description": "The pet's tags.",
-            "example": "[\n  \"cat\",\n  \"orange\"\n]"
+            "example": [
+              "cat",
+              "orange"
+            ]
           }
         },
         "additionalProperties": false,
