@@ -6,9 +6,6 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using Microsoft.OpenApi.Writers;
-using Microsoft.OpenApi.Extensions;
-using Microsoft.OpenApi;
 
 namespace AspNetServer.SchemaFilters;
 
