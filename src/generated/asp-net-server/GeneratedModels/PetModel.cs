@@ -41,6 +41,7 @@ public class PetModel {
   /// The age of the pet.
   /// </summary>
   [Required]
+  [Range(0, 99)]
   public int Age {get; set; }
   /// <summary>
   /// Whether or not the pet has any health problems.
@@ -61,5 +62,7 @@ public class PetModel {
   /// The pet's tags.
   /// </summary>
   [Required]
+  [MinLength(1)]
+  [MaxLength(5)]
   public required string[] Tags {get; set;}
 }

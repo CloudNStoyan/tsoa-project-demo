@@ -226,6 +226,8 @@
             "example": "Cat"
           },
           "age": {
+            "maximum": 99,
+            "minimum": 0,
             "type": "integer",
             "description": "The age of the pet.",
             "format": "int32",
@@ -252,6 +254,8 @@
             "example": "Pending"
           },
           "tags": {
+            "maxItems": 5,
+            "minItems": 1,
             "type": "array",
             "items": {
               "type": "string"
