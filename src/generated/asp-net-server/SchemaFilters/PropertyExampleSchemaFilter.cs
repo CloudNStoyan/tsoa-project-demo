@@ -1,55 +1,55 @@
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Microsoft.OpenApi.Any;
 using AspNetServer.SchemaFilters.Extensions;
-using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace AspNetServer.SchemaFilters;
 
-[AttributeUsage(AttributeTargets.Class)]
-public class PropertiesExampleAttribute : Attribute {
-  public PropertiesExampleAttribute(Type examplesProviderType)
-  {
-    ExamplesProviderType = examplesProviderType;
-  }
-
-  public Type ExamplesProviderType { get; }
-}
-
 public class PropertyExampleSchemaFilter : ISchemaFilter {
   private readonly IServiceProvider serviceProvider;
+  private readonly JsonSerializerOptions customJsonSerializerOptions;
   public PropertyExampleSchemaFilter(IServiceProvider serviceProvider)
   {
     this.serviceProvider = serviceProvider;
+    this.customJsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+    this.customJsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
   }
 
   public void Apply(OpenApiSchema schema, SchemaFilterContext context)
       {
-        if (context.MemberInfo?.ReflectedType == null) {
+        var schemaType = context.Type;
+
+        if (schema.Type != "object" || schema.Properties.Count == 0 || schemaType == null) {
           return;
         }
 
-        Type schemaType = context.MemberInfo.ReflectedType;
+        var propertiesExampleAttr = schemaType.GetCustomAttribute<PropertiesExampleAttribute>();
 
-        var attr = schemaType.GetCustomAttribute<PropertiesExampleAttribute>();
-
-        if (attr == null) {
+        if (propertiesExampleAttr == null) {
           return;
         }
 
-        var example = this.serviceProvider.GetCustomExampleWithExamplesProviderType(attr.ExamplesProviderType);
+        var example = this.serviceProvider.GetCustomExampleWithExamplesProviderType(propertiesExampleAttr.ExamplesProviderType);
 
         if (example == null) {
           return;
         }
 
-        var exampleJsonObject = JsonObject.Parse(System.Text.Json.JsonSerializer.Serialize(example));
+        var exampleJsonObject = JsonObject.Parse(JsonSerializer.Serialize(example, this.customJsonSerializerOptions));
 
-        schema.Example = new OpenApiString(exampleJsonObject[context.MemberInfo.Name].ToString());
+        if (exampleJsonObject == null) {
+          return;
+        }
 
-        Console.WriteLine(schema.SerializeAsJson(Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_0));
+        foreach(var property in schema.Properties) {
+          string propertyName = property.Key;
+          var propertySchema = property.Value;
+
+          propertySchema.Example = new OpenApiString(exampleJsonObject[propertyName]!.ToString());
+        }
       }
 }

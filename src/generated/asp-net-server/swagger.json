@@ -223,7 +223,7 @@
               }
             ],
             "description": "What kind of pet it is.",
-            "example": "0"
+            "example": "Cat"
           },
           "age": {
             "type": "integer",
@@ -249,7 +249,7 @@
               }
             ],
             "description": "Pet's adoption status in the store.",
-            "example": "2"
+            "example": "Pending"
           },
           "tags": {
             "type": "array",
