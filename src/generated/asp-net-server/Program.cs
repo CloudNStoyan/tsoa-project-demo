@@ -3,17 +3,24 @@ using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
 using AspNetServer.SwashbuckleFilters;
 using Swashbuckle.AspNetCore.Filters;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers().AddJsonOptions(options => {
-  options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-});
+builder.Services
+  .AddControllers(options => {
+    options.OutputFormatters.RemoveType<StringOutputFormatter>();
+  })
+  .AddJsonOptions(options => {
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+  });
 
 builder.Services.AddSwaggerExamplesFromAssemblies(Assembly.GetExecutingAssembly());
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => {
+  options.CustomOperationIds(x => x.ActionDescriptor.RouteValues["action"]);
+
   options.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "1.0.0",
@@ -29,6 +36,7 @@ builder.Services.AddSwaggerGen(options => {
 
   options.SchemaFilter<PropertyExampleFilter>();
   options.DocumentFilter<RemoveModelSuffixFilter>();
+  options.OperationFilter<RemoveTextJsonResponseFilter>();
 });
 
 var app = builder.Build();

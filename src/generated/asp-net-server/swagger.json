@@ -11,7 +11,11 @@
         "tags": [
           "Pet"
         ],
+        "summary": "Add a new pet to the store.",
+        "description": "Add a new pet to the store.",
+        "operationId": "CreatePet",
         "requestBody": {
+          "description": "Create a new pet in the store.",
           "content": {
             "application/json": {
               "schema": {
@@ -52,19 +56,7 @@
           "201": {
             "description": "Created",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/PetModel"
-                },
-                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PetModel"
-                },
-                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PetModel"
                 },
@@ -75,17 +67,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -94,17 +76,91 @@
           }
         }
       },
+      "put": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Update an existing pet.",
+        "description": "Update an existing pet by ID.",
+        "operationId": "UpdatePet",
+        "requestBody": {
+          "description": "The pet's information that should be used in the update.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PetModel"
+                  }
+                ],
+                "description": "Pet characteristics."
+              },
+              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PetModel"
+                  }
+                ],
+                "description": "Pet characteristics."
+              },
+              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PetModel"
+                  }
+                ],
+                "description": "Pet characteristics."
+              },
+              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Pet/all": {
       "get": {
         "tags": [
           "Pet"
         ],
+        "summary": "Returns all pets.",
+        "description": "Returns all pets with limit and offset functionality.",
+        "operationId": "GetAllPets",
         "parameters": [
           {
-            "name": "petId",
+            "name": "offset",
             "in": "query",
+            "description": "Offset to discard elements.",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "How many records to return.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
             }
           }
         ],
@@ -112,40 +168,254 @@
           "200": {
             "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/PetModel"
-                },
-                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
-              },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PetModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PetModel"
+                  }
                 },
-                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PetModel"
-                },
-                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
+                "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
               }
             }
+          }
+        }
+      }
+    },
+    "/Pet/findByStatus": {
+      "get": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Finds Pets by status.",
+        "description": "Returns pets that have the selected adoption status.",
+        "operationId": "GetPetsByStatus",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "The adoption status.",
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/AdoptionStatus"
+                }
+              ],
+              "description": "The pet's adoption status."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PetModel"
+                  }
+                },
+                "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Pet/findByKinds": {
+      "get": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Finds Pets by set of kinds.",
+        "description": "Returns pets that are of a specific set of kinds.",
+        "operationId": "GetPetsByKind",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "query",
+            "description": "The set of kinds of pet.",
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/AnimalKind"
+                }
+              ],
+              "description": "The pet's animal kind."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PetModel"
+                  }
+                },
+                "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Pet/findByTags": {
+      "get": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Finds Pets by tags.",
+        "description": "Returns pets that include the filter tags.",
+        "operationId": "GetPetsByTags",
+        "requestBody": {
+          "description": "The tags to filter by.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PetModel"
+                  }
+                },
+                "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Pet/findByDate": {
+      "get": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Finds Pets by added date.",
+        "description": "Returns pets that were added after the given date.",
+        "operationId": "GetPetsByDate",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "description": "The date to filter by.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PetModel"
+                  }
+                },
+                "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Pet/{petId}": {
+      "get": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Find pet by ID.",
+        "description": "Returns a single pet.",
+        "operationId": "GetPet",
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "description": "The pet's id.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Deletes a pet.",
+        "description": "Deletes a pet by ID.",
+        "operationId": "DeletePet",
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "description": "Pet ID to delete.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
           },
           "404": {
             "description": "Not Found",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
