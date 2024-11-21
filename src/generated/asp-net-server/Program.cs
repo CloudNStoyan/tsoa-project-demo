@@ -45,6 +45,7 @@ builder.Services.AddSwaggerGen(options => {
   options.SchemaFilter<PropertyExampleFilter>();
   options.OperationFilter<RemoveTextJsonResponseFilter>();
   options.OperationFilter<ErrorExampleFilter>();
+  options.OperationFilter<NoInlineSchemaFilter>();
 });
 
 var app = builder.Build();

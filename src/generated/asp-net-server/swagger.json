@@ -469,23 +469,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "Adopted": {
-                      "type": "integer",
-                      "format": "int32"
-                    },
-                    "Available": {
-                      "type": "integer",
-                      "format": "int32"
-                    },
-                    "Pending": {
-                      "type": "integer",
-                      "format": "int32"
-                    }
-                  },
-                  "additionalProperties": false,
-                  "description": "Inventory map of adoption status to quantities."
+                  "$ref": "#/components/schemas/InventoryMap"
                 }
               }
             }
@@ -505,23 +489,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "Adopted": {
-                      "type": "integer",
-                      "format": "int32"
-                    },
-                    "Available": {
-                      "type": "integer",
-                      "format": "int32"
-                    },
-                    "Pending": {
-                      "type": "integer",
-                      "format": "int32"
-                    }
-                  },
-                  "additionalProperties": false,
-                  "description": "Inventory map of adoption status to quantities."
+                  "$ref": "#/components/schemas/InventoryMap"
                 }
               }
             }
@@ -549,6 +517,25 @@
         ],
         "type": "string",
         "description": "The pet's animal kind."
+      },
+      "InventoryMap": {
+        "type": "object",
+        "properties": {
+          "Adopted": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Available": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Pending": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Inventory map of adoption status to quantities."
       },
       "Pet": {
         "required": [

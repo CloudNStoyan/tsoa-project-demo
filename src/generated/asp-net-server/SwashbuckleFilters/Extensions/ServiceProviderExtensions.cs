@@ -1,7 +1,7 @@
 using System.Reflection;
 using Swashbuckle.AspNetCore.Filters;
 
-namespace AspNetServer.SchemaFilters.Extensions;
+namespace AspNetServer.SwashbuckleFilters.Extensions;
 
 public static class ServiceProviderExtensions {
   /// <summary>

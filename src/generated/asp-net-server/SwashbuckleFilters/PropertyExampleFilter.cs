@@ -1,6 +1,6 @@
 using System.Reflection;
 using Microsoft.OpenApi.Any;
-using AspNetServer.SchemaFilters.Extensions;
+using AspNetServer.SwashbuckleFilters.Extensions;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text.Json;
