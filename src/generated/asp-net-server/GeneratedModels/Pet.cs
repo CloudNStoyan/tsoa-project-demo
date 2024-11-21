@@ -7,8 +7,8 @@ namespace AspNetServer.GeneratedModels;
 /// <summary>
 /// Pet characteristics.
 /// </summary>
-[PropertiesExample(typeof(PetModelExample))]
-public class PetModel {
+[PropertiesExample(typeof(PetExample))]
+public class Pet {
   /// <summary>
   /// The pet's identifier.
   /// </summary>

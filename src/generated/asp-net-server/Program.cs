@@ -35,7 +35,6 @@ builder.Services.AddSwaggerGen(options => {
   options.UseAllOfToExtendReferenceSchemas();
 
   options.SchemaFilter<PropertyExampleFilter>();
-  options.DocumentFilter<RemoveModelSuffixFilter>();
   options.OperationFilter<RemoveTextJsonResponseFilter>();
 });
 

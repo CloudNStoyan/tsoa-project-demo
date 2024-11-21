@@ -6,7 +6,7 @@ namespace AspNetServer.GeneratedControllers;
 [ApiController]
 [Route("[controller]")]
 public class PetController : ControllerBase {
-  private List<PetModel> _pets =
+  private List<Pet> _pets =
   [
    new() {
       Id = new Guid("90dbbed9-bd3d-40ae-ad1c-86602844d4c1"),
@@ -31,7 +31,7 @@ public class PetController : ControllerBase {
   [HttpPost]
   [ProducesResponseType(StatusCodes.Status201Created)]
   [ProducesResponseType(StatusCodes.Status400BadRequest)]
-  public ActionResult<PetModel> CreatePet(PetModel pet)
+  public ActionResult<Pet> CreatePet(Pet pet)
   {
     pet.Id = Guid.NewGuid();
 
@@ -48,7 +48,7 @@ public class PetController : ControllerBase {
   /// <param name="limit">How many records to return.</param>
   /// <returns>Successful retrieval of pets.</returns>
   [HttpGet("all")]
-  public ActionResult<PetModel[]> GetAllPets(int offset, int limit = 10) {
+  public ActionResult<Pet[]> GetAllPets(int offset, int limit = 10) {
     throw new NotImplementedException();
   }
 
@@ -59,7 +59,7 @@ public class PetController : ControllerBase {
   /// <param name="status">The adoption status.</param>
   /// <returns>Successful retrieval of pets.</returns>
   [HttpGet("findByStatus")]
-  public ActionResult<PetModel[]> GetPetsByStatus(AdoptionStatus status) {
+  public ActionResult<Pet[]> GetPetsByStatus(AdoptionStatus status) {
     throw new NotImplementedException();
   }
 
@@ -70,7 +70,7 @@ public class PetController : ControllerBase {
   /// <param name="kind">The set of kinds of pet.</param>
   /// <returns>Successful retrieval of pets.</returns>
   [HttpGet("findByKinds")]
-  public ActionResult<PetModel[]> GetPetsByKind(AnimalKind kind) {
+  public ActionResult<Pet[]> GetPetsByKind(AnimalKind kind) {
     throw new NotImplementedException();
   }
 
@@ -81,7 +81,7 @@ public class PetController : ControllerBase {
   /// <param name="tags">The tags to filter by.</param>
   /// <returns>Successful retrieval of pets.</returns>
   [HttpGet("findByTags")]
-  public ActionResult<PetModel[]> GetPetsByTags(string[] tags) {
+  public ActionResult<Pet[]> GetPetsByTags(string[] tags) {
     throw new NotImplementedException();
   }
 
@@ -92,7 +92,7 @@ public class PetController : ControllerBase {
   /// <param name="date">The date to filter by.</param>
   /// <returns>Successful retrieval of pets.</returns>
   [HttpGet("findByDate")]
-  public ActionResult<PetModel[]> GetPetsByDate(DateOnly date) {
+  public ActionResult<Pet[]> GetPetsByDate(DateOnly date) {
     throw new NotImplementedException();
   }
 
@@ -104,7 +104,7 @@ public class PetController : ControllerBase {
   /// <returns>Successful retrieval of a pet.</returns>
   [HttpGet("{petId}")]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
-  public ActionResult<PetModel> GetPet(Guid petId) {
+  public ActionResult<Pet> GetPet(Guid petId) {
     var pet = _pets.Find(x => x.Id == petId);
 
     if (pet is null) {
@@ -122,7 +122,7 @@ public class PetController : ControllerBase {
   /// <returns>Successful update of a pet.</returns>
   [HttpPut]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
-  public ActionResult<PetModel> UpdatePet(PetModel petToUpdate) {
+  public ActionResult<Pet> UpdatePet(Pet petToUpdate) {
     throw new NotImplementedException();
   }
 

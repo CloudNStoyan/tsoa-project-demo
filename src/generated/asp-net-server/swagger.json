@@ -21,7 +21,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/PetModel"
+                    "$ref": "#/components/schemas/Pet"
                   }
                 ],
                 "description": "Pet characteristics."
@@ -32,7 +32,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/PetModel"
+                    "$ref": "#/components/schemas/Pet"
                   }
                 ],
                 "description": "Pet characteristics."
@@ -43,7 +43,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/PetModel"
+                    "$ref": "#/components/schemas/Pet"
                   }
                 ],
                 "description": "Pet characteristics."
@@ -58,7 +58,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PetModel"
+                  "$ref": "#/components/schemas/Pet"
                 },
                 "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
               }
@@ -90,7 +90,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/PetModel"
+                    "$ref": "#/components/schemas/Pet"
                   }
                 ],
                 "description": "Pet characteristics."
@@ -101,7 +101,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/PetModel"
+                    "$ref": "#/components/schemas/Pet"
                   }
                 ],
                 "description": "Pet characteristics."
@@ -112,7 +112,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/PetModel"
+                    "$ref": "#/components/schemas/Pet"
                   }
                 ],
                 "description": "Pet characteristics."
@@ -172,7 +172,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PetModel"
+                    "$ref": "#/components/schemas/Pet"
                   }
                 },
                 "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
@@ -213,7 +213,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PetModel"
+                    "$ref": "#/components/schemas/Pet"
                   }
                 },
                 "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
@@ -254,7 +254,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PetModel"
+                    "$ref": "#/components/schemas/Pet"
                   }
                 },
                 "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
@@ -309,7 +309,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PetModel"
+                    "$ref": "#/components/schemas/Pet"
                   }
                 },
                 "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
@@ -346,7 +346,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PetModel"
+                    "$ref": "#/components/schemas/Pet"
                   }
                 },
                 "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]

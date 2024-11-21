@@ -3,11 +3,11 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace AspNetServer.OpenApiExamples;
 
-public class MultiplePetModelExample : IExamplesProvider<PetModel[]>
+public class MultiplePetExample : IExamplesProvider<Pet[]>
 {
-  public PetModel[] GetExamples()
+  public Pet[] GetExamples()
   {
-    PetModel[] petExamples = [
+    Pet[] petExamples = [
       new()
     {
       Id = Guid.Parse("90dbbed9-bd3d-40ae-ad1c-86602844d4c1"),
