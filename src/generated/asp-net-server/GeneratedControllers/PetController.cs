@@ -40,7 +40,7 @@ public class PetController : ControllerBase {
   /// <param name="status">The adoption status.</param>
   /// <response code="200">Successful retrieval of pets.</response>
   [HttpGet("findByStatus")]
-  public ActionResult<Pet[]> GetPetsByStatus([Required] AdoptionStatus status) {
+  public ActionResult<Pet[]> GetPetsByStatus([Required][FromQuery] AdoptionStatus status) {
     throw new NotImplementedException();
   }
 
@@ -48,10 +48,10 @@ public class PetController : ControllerBase {
   /// Finds Pets by set of kinds.
   /// </summary>
   /// <remarks>Returns pets that are of a specific set of kinds.</remarks>
-  /// <param name="kind">The set of kinds of pet.</param>
+  /// <param name="kinds">The set of kinds of pet.</param>
   /// <response code="200">Successful retrieval of pets.</response>
   [HttpGet("findByKinds")]
-  public ActionResult<Pet[]> GetPetsByKind([Required] AnimalKind kind) {
+  public ActionResult<Pet[]> GetPetsByKind([Required][FromQuery]AnimalKind[] kinds) {
     throw new NotImplementedException();
   }
 
@@ -62,7 +62,7 @@ public class PetController : ControllerBase {
   /// <param name="tags">The tags to filter by.</param>
   /// <response code="200">Successful retrieval of pets.</response>
   [HttpGet("findByTags")]
-  public ActionResult<Pet[]> GetPetsByTags([Required] string[] tags) {
+  public ActionResult<Pet[]> GetPetsByTags([Required][FromQuery] string[] tags) {
     throw new NotImplementedException();
   }
 
@@ -70,10 +70,11 @@ public class PetController : ControllerBase {
   /// Finds Pets by added date.
   /// </summary>
   /// <remarks>Returns pets that were added after the given date.</remarks>
-  /// <param name="date">The date to filter by.</param>
+  /// <param name="afterDate">The date to filter by.</param>
   /// <response code="200">Successful retrieval of pets.</response>
   [HttpGet("findByDate")]
-  public ActionResult<Pet[]> GetPetsByDate([Required] DateOnly date) {
+  [Obsolete]
+  public ActionResult<Pet[]> GetPetsByDate([Required][FromQuery] DateOnly afterDate) {
     throw new NotImplementedException();
   }
 
@@ -103,7 +104,7 @@ public class PetController : ControllerBase {
   [ProducesResponseType(StatusCodes.Status200OK)]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
   [SwaggerErrorExample(StatusCodes.Status404NotFound, "Not Found", "Pet not found!")]
-  public ActionResult<Pet> UpdatePet([Required] Pet petToUpdate) {
+  public ActionResult<Pet> UpdatePet([Required][FromBody] Pet petToUpdate) {
     throw new NotImplementedException();
   }
 

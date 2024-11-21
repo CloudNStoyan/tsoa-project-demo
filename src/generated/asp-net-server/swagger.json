@@ -198,17 +198,15 @@
         "operationId": "GetPetsByKind",
         "parameters": [
           {
-            "name": "kind",
+            "name": "kinds",
             "in": "query",
             "description": "The set of kinds of pet.",
             "required": true,
             "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/AnimalKind"
-                }
-              ],
-              "description": "The pet's animal kind."
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/AnimalKind"
+              }
             }
           }
         ],
@@ -238,20 +236,20 @@
         "summary": "Finds Pets by tags.",
         "description": "Returns pets that include the filter tags.",
         "operationId": "GetPetsByTags",
-        "requestBody": {
-          "description": "The tags to filter by.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
+        "parameters": [
+          {
+            "name": "tags",
+            "in": "query",
+            "description": "The tags to filter by.",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
               }
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful retrieval of pets.",
@@ -280,7 +278,7 @@
         "operationId": "GetPetsByDate",
         "parameters": [
           {
-            "name": "date",
+            "name": "afterDate",
             "in": "query",
             "description": "The date to filter by.",
             "required": true,
@@ -305,7 +303,8 @@
               }
             }
           }
-        }
+        },
+        "deprecated": true
       }
     },
     "/Pet/{petId}": {
