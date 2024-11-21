@@ -27,28 +27,6 @@
                 "description": "Pet characteristics."
               },
               "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
-            },
-            "text/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Pet"
-                  }
-                ],
-                "description": "Pet characteristics."
-              },
-              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
-            },
-            "application/*+json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Pet"
-                  }
-                ],
-                "description": "Pet characteristics."
-              },
-              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
             }
           }
         },
@@ -77,28 +55,6 @@
           "description": "The pet's information that should be used in the update.",
           "content": {
             "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Pet"
-                  }
-                ],
-                "description": "Pet characteristics."
-              },
-              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
-            },
-            "text/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Pet"
-                  }
-                ],
-                "description": "Pet characteristics."
-              },
-              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
-            },
-            "application/*+json": {
               "schema": {
                 "allOf": [
                   {
@@ -277,22 +233,6 @@
           "description": "The tags to filter by.",
           "content": {
             "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/*+json": {
               "schema": {
                 "type": "array",
                 "items": {
