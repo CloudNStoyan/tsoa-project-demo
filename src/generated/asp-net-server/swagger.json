@@ -53,24 +53,14 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "Created",
+          "200": {
+            "description": "Successful creation of a pet.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Pet"
                 },
                 "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
               }
             }
           }
@@ -122,6 +112,17 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "Successful update of a pet.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pet"
+                },
+                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -166,7 +167,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Successful retrieval of pets.",
             "content": {
               "application/json": {
                 "schema": {
@@ -207,7 +208,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Successful retrieval of pets.",
             "content": {
               "application/json": {
                 "schema": {
@@ -248,7 +249,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Successful retrieval of pets.",
             "content": {
               "application/json": {
                 "schema": {
@@ -303,7 +304,7 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Successful retrieval of pets.",
             "content": {
               "application/json": {
                 "schema": {
@@ -340,7 +341,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Successful retrieval of pets.",
             "content": {
               "application/json": {
                 "schema": {
@@ -377,12 +378,43 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Successful retrieval of a pet.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pet"
+                },
+                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Not Found","status":404,"detail":"Pet not found!"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Unauthorized","status":401,"detail":"Access denied!"}
+                  }
                 }
               }
             }
@@ -410,7 +442,7 @@
         ],
         "responses": {
           "204": {
-            "description": "No Content"
+            "description": "No content"
           },
           "404": {
             "description": "Not Found",
@@ -418,6 +450,78 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Store": {
+      "get": {
+        "tags": [
+          "Store"
+        ],
+        "operationId": "GetInventory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Adopted": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "Available": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "Pending": {
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Inventory map of adoption status to quantities."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Store/v2/inventory": {
+      "get": {
+        "tags": [
+          "Store"
+        ],
+        "operationId": "GetInventoryV2",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Adopted": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "Available": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "Pending": {
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Inventory map of adoption status to quantities."
                 }
               }
             }

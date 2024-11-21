@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using AspNetServer.SwashbuckleFilters;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,13 @@ builder.Services
     options.OutputFormatters.RemoveType<StringOutputFormatter>();
   })
   .AddJsonOptions(options => {
+    // These are the JsonSerializerDefaults.Web settings
+    // https://learn.microsoft.com/en-us/dotnet/api/system.text.json.jsonserializerdefaults?view=net-9.0
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
+
+    // This makes our enums string literal instead of numbers
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
   });
 
@@ -36,6 +44,7 @@ builder.Services.AddSwaggerGen(options => {
 
   options.SchemaFilter<PropertyExampleFilter>();
   options.OperationFilter<RemoveTextJsonResponseFilter>();
+  options.OperationFilter<ErrorExampleFilter>();
 });
 
 var app = builder.Build();
