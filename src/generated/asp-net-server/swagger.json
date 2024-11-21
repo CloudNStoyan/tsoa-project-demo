@@ -28,7 +28,8 @@
               },
               "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -65,7 +66,8 @@
               },
               "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -85,6 +87,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Not Found","status":404,"detail":"Pet not found!"}
+                  }
                 }
               }
             }
@@ -152,6 +159,7 @@
             "name": "status",
             "in": "query",
             "description": "The adoption status.",
+            "required": true,
             "schema": {
               "allOf": [
                 {
@@ -193,6 +201,7 @@
             "name": "kind",
             "in": "query",
             "description": "The set of kinds of pet.",
+            "required": true,
             "schema": {
               "allOf": [
                 {
@@ -240,7 +249,8 @@
                 }
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -273,6 +283,7 @@
             "name": "date",
             "in": "query",
             "description": "The date to filter by.",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "date"
@@ -390,6 +401,11 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Not Found","status":404,"detail":"Pet not found!"}
+                  }
                 }
               }
             }
@@ -462,16 +478,16 @@
         "type": "object",
         "properties": {
           "Adopted": {
-            "type": "integer",
-            "format": "int32"
+            "type": "number",
+            "format": "double"
           },
           "Available": {
-            "type": "integer",
-            "format": "int32"
+            "type": "number",
+            "format": "double"
           },
           "Pending": {
-            "type": "integer",
-            "format": "int32"
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false,

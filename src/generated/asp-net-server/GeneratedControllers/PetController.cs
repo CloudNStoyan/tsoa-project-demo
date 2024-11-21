@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using AspNetServer.GeneratedModels;
 using AspNetServer.SwashbuckleFilters;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,7 @@ public class PetController : ControllerBase {
   /// <response code="200">Successful creation of a pet.</response>
   [HttpPost]
   [ProducesResponseType(StatusCodes.Status200OK)]
-  public ActionResult<Pet> CreatePet(Pet pet)
+  public ActionResult<Pet> CreatePet([Required] Pet pet)
   {
     throw new NotImplementedException();
   }
@@ -39,7 +40,7 @@ public class PetController : ControllerBase {
   /// <param name="status">The adoption status.</param>
   /// <response code="200">Successful retrieval of pets.</response>
   [HttpGet("findByStatus")]
-  public ActionResult<Pet[]> GetPetsByStatus(AdoptionStatus status) {
+  public ActionResult<Pet[]> GetPetsByStatus([Required] AdoptionStatus status) {
     throw new NotImplementedException();
   }
 
@@ -50,7 +51,7 @@ public class PetController : ControllerBase {
   /// <param name="kind">The set of kinds of pet.</param>
   /// <response code="200">Successful retrieval of pets.</response>
   [HttpGet("findByKinds")]
-  public ActionResult<Pet[]> GetPetsByKind(AnimalKind kind) {
+  public ActionResult<Pet[]> GetPetsByKind([Required] AnimalKind kind) {
     throw new NotImplementedException();
   }
 
@@ -61,7 +62,7 @@ public class PetController : ControllerBase {
   /// <param name="tags">The tags to filter by.</param>
   /// <response code="200">Successful retrieval of pets.</response>
   [HttpGet("findByTags")]
-  public ActionResult<Pet[]> GetPetsByTags(string[] tags) {
+  public ActionResult<Pet[]> GetPetsByTags([Required] string[] tags) {
     throw new NotImplementedException();
   }
 
@@ -72,7 +73,7 @@ public class PetController : ControllerBase {
   /// <param name="date">The date to filter by.</param>
   /// <response code="200">Successful retrieval of pets.</response>
   [HttpGet("findByDate")]
-  public ActionResult<Pet[]> GetPetsByDate(DateOnly date) {
+  public ActionResult<Pet[]> GetPetsByDate([Required] DateOnly date) {
     throw new NotImplementedException();
   }
 
@@ -88,7 +89,7 @@ public class PetController : ControllerBase {
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   [SwaggerErrorExample(StatusCodes.Status404NotFound, "Not Found", "Pet not found!")]
   [SwaggerErrorExample(StatusCodes.Status401Unauthorized, "Unauthorized", "Access denied!")]
-  public ActionResult<Pet> GetPet(Guid petId) {
+  public ActionResult<Pet> GetPet([Required] Guid petId) {
     throw new NotImplementedException();
   }
 
@@ -101,7 +102,8 @@ public class PetController : ControllerBase {
   [HttpPut]
   [ProducesResponseType(StatusCodes.Status200OK)]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
-  public ActionResult<Pet> UpdatePet(Pet petToUpdate) {
+  [SwaggerErrorExample(StatusCodes.Status404NotFound, "Not Found", "Pet not found!")]
+  public ActionResult<Pet> UpdatePet([Required] Pet petToUpdate) {
     throw new NotImplementedException();
   }
 
@@ -114,7 +116,8 @@ public class PetController : ControllerBase {
   [HttpDelete("{petId}")]
   [ProducesResponseType(StatusCodes.Status204NoContent)]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
-  public ActionResult DeletePet(Guid petId) {
+  [SwaggerErrorExample(StatusCodes.Status404NotFound, "Not Found", "Pet not found!")]
+  public ActionResult DeletePet([Required] Guid petId) {
     throw new NotImplementedException();
   }
 }
