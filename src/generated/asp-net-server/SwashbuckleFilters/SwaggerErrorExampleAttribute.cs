@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AspNetServer.SwashbuckleFilters;
 
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
 public class SwaggerErrorExampleAttribute : Attribute {
   public int StatusCode { get; set; }
   public string Title { get; set; }

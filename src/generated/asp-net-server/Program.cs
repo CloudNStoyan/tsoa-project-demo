@@ -46,6 +46,14 @@ builder.Services.AddSwaggerGen(options => {
   options.OperationFilter<RemoveUndesiredContentTypesFilter>();
   options.OperationFilter<ErrorExampleFilter>();
   options.OperationFilter<NoInlineSchemaFilter>();
+  options.OperationFilter<SecurityRequirementsOperationFilter>(false, "api_key");
+
+  options.AddSecurityDefinition("api_key", new OpenApiSecurityScheme
+    {
+        Description = "The TSOA Demo Pet Store API Key is:\n\n`simple-pet-token`",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
 });
 
 var app = builder.Build();

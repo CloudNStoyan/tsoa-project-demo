@@ -1,19 +1,24 @@
 using System.ComponentModel.DataAnnotations;
 using AspNetServer.GeneratedModels;
 using AspNetServer.SwashbuckleFilters;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AspNetServer.GeneratedControllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
+[SwaggerErrorExample(StatusCodes.Status401Unauthorized, "Unauthorized", "Access denied!")]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public class StoreController : ControllerBase {
 
   /// <summary>
-  /// Returns a map of adoption status to quantities.
+  /// Returns pet inventories by adoption status.
   /// </summary>
-  /// <remarks>Returns pet inventories by adoption status.</remarks>
+  /// <remarks>Returns a map of adoption status to quantities.</remarks>
   /// <response code="200">Successful retrieval of inventory.</response>
+  [ProducesResponseType(StatusCodes.Status200OK)]
   [HttpGet("inventory")]
   public ActionResult<InventoryMap> GetInventory() {
     throw new NotImplementedException();
@@ -25,6 +30,7 @@ public class StoreController : ControllerBase {
   /// <remarks>Place an adoption request for a pet.</remarks>
   /// <response code="200">Successful creation of adoption request.</response>
   /// <param name="adoptionRequest">The adoption request.</param>
+  [ProducesResponseType(StatusCodes.Status200OK)]
   [HttpPost("adopt")]
   public ActionResult<AdoptionRequest> AdoptPet([Required][FromBody] AdoptionRequest adoptionRequest) {
     throw new NotImplementedException();

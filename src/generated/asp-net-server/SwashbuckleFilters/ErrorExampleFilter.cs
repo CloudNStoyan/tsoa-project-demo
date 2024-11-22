@@ -1,6 +1,6 @@
-using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AspNetServer.SwashbuckleFilters.Extensions;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -17,7 +17,7 @@ public class ErrorExampleFilter : IOperationFilter
   }
   public void Apply(OpenApiOperation operation, OperationFilterContext context)
   {
-    var errorExamples = context.MethodInfo.GetCustomAttributes<SwaggerErrorExampleAttribute>();
+    var errorExamples = context.GetControllerAndActionAttributes<SwaggerErrorExampleAttribute>();
 
     if (!errorExamples.Any()) {
       return;
