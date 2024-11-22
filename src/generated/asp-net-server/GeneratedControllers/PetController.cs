@@ -29,7 +29,7 @@ public class PetController : ControllerBase {
   /// <param name="limit">How many records to return.</param>
   /// <response code="200">Successful retrieval of pets.</response>
   [HttpGet("all")]
-  public ActionResult<Pet[]> GetAllPets(int offset, int limit = 10) {
+  public ActionResult<Pet[]> GetAllPets(int offset = 0, int limit = 10) {
     throw new NotImplementedException();
   }
 
@@ -87,9 +87,7 @@ public class PetController : ControllerBase {
   [HttpGet("{petId}")]
   [ProducesResponseType(StatusCodes.Status200OK)]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
-  [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   [SwaggerErrorExample(StatusCodes.Status404NotFound, "Not Found", "Pet not found!")]
-  [SwaggerErrorExample(StatusCodes.Status401Unauthorized, "Unauthorized", "Access denied!")]
   public ActionResult<Pet> GetPet([Required] Guid petId) {
     throw new NotImplementedException();
   }

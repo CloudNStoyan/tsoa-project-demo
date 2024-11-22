@@ -114,7 +114,8 @@
             "description": "Offset to discard elements.",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 0
             }
           },
           {
@@ -353,21 +354,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                },
-                "examples": {
-                  "Example 1": {
-                    "value": {"title":"Unauthorized","status":401,"detail":"Access denied!"}
-                  }
-                }
-              }
-            }
           }
         }
       },
@@ -412,15 +398,17 @@
         }
       }
     },
-    "/Store": {
+    "/Store/inventory": {
       "get": {
         "tags": [
           "Store"
         ],
+        "summary": "Returns a map of adoption status to quantities.",
+        "description": "Returns pet inventories by adoption status.",
         "operationId": "GetInventory",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Successful retrieval of inventory.",
             "content": {
               "application/json": {
                 "schema": {
@@ -432,19 +420,129 @@
         }
       }
     },
-    "/Store/v2/inventory": {
+    "/Store/adopt": {
+      "post": {
+        "tags": [
+          "Store"
+        ],
+        "summary": "Request an adoption of a pet.",
+        "description": "Place an adoption request for a pet.",
+        "operationId": "AdoptPet",
+        "requestBody": {
+          "description": "The adoption request.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AdoptionRequest"
+                  }
+                ],
+                "description": "Adoption request information."
+              },
+              "example": {"id":"67120cf3-1434-44be-b660-b02df64db677","petId":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","dateOfSubmission":"2024-08-25T00:00:00","status":"Pending"}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful creation of adoption request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdoptionRequest"
+                },
+                "example": {"id":"67120cf3-1434-44be-b660-b02df64db677","petId":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","dateOfSubmission":"2024-08-25T00:00:00","status":"Pending"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Store/adopt/{requestId}": {
       "get": {
         "tags": [
           "Store"
         ],
-        "operationId": "GetInventoryV2",
+        "summary": "Find adoption request by ID.",
+        "description": "Find adoption request by ID.",
+        "operationId": "GetAdoptRequestById",
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "description": "The adoption request's ID.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Successful retrieval of adoption request.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InventoryMap"
+                  "$ref": "#/components/schemas/AdoptionRequest"
+                },
+                "example": {"id":"67120cf3-1434-44be-b660-b02df64db677","petId":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","dateOfSubmission":"2024-08-25T00:00:00","status":"Pending"}
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Not Found","status":404,"detail":"Adoption request not found!"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Store"
+        ],
+        "summary": "Delete adoption request by ID.",
+        "description": "Delete adoption request by ID.",
+        "operationId": "DeleteAdoptRequestById",
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "description": "The adoption request's ID.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Not Found","status":404,"detail":"Adoption request not found!"}
+                  }
                 }
               }
             }
@@ -455,6 +553,55 @@
   },
   "components": {
     "schemas": {
+      "AdoptionRequest": {
+        "required": [
+          "dateOfSubmission",
+          "id",
+          "petId",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The adoption's ID.",
+            "format": "uuid",
+            "example": "67120cf3-1434-44be-b660-b02df64db677"
+          },
+          "petId": {
+            "type": "string",
+            "description": "The adoptee's ID.",
+            "format": "uuid",
+            "example": "90dbbed9-bd3d-40ae-ad1c-86602844d4c1"
+          },
+          "dateOfSubmission": {
+            "type": "string",
+            "description": "The date of submission of the adoption request.",
+            "format": "date-time",
+            "example": "2024-08-25T00:00:00"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdoptionRequestStatus"
+              }
+            ],
+            "description": "The adoption request status.",
+            "example": "Pending"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Adoption request information."
+      },
+      "AdoptionRequestStatus": {
+        "enum": [
+          "Approved",
+          "Pending",
+          "Denied"
+        ],
+        "type": "string",
+        "description": "The adoption request's status."
+      },
       "AdoptionStatus": {
         "enum": [
           "Adopted",
