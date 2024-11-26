@@ -1,10 +1,10 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
-using AspNetServer.SwashbuckleFilters;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using System.Text.Json;
+using AspNetServer.SwashbuckleFilters.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,10 +42,8 @@ builder.Services.AddSwaggerGen(options => {
   options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
   options.UseAllOfToExtendReferenceSchemas();
 
-  options.SchemaFilter<PropertyExampleFilter>();
-  options.OperationFilter<RemoveUndesiredContentTypesFilter>();
-  options.OperationFilter<ErrorExampleFilter>();
-  options.OperationFilter<NoInlineSchemaFilter>();
+  options.AddCustomFilters();
+
   options.OperationFilter<SecurityRequirementsOperationFilter>(false, "api_key");
 
   options.AddSecurityDefinition("api_key", new OpenApiSecurityScheme
