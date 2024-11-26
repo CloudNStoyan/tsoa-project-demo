@@ -434,7 +434,7 @@ class TypescriptModel {
     for (const [propertyName, propertyData] of openapiProperties) {
       const tsProperty = {
         name: propertyName,
-        required: requiredProperties.includes(propertyName),
+        required: requiredProperties?.includes(propertyName) || false,
         jsdoc: this.resolveJsdoc(propertyData),
         resolvedType: this.resolveType(propertyData),
       };

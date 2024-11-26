@@ -1,5 +1,14 @@
 import { Controller } from 'tsoa';
 
+export interface ProblemDetails {
+  type?: string | null;
+  title?: string | null;
+  /** @isInt */
+  status?: number | null;
+  detail?: string | null;
+  instance?: string | null;
+}
+
 export interface ApiError {
   status: number;
   message: string;
@@ -33,7 +42,6 @@ export function limitOffset<T>(array: T[], limit: number, offset: number): T[] {
     return [];
   }
 
-   
   const length = array.length;
 
   if (!length) {

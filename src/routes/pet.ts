@@ -15,7 +15,7 @@ import {
 } from 'tsoa';
 
 import { state } from '~state.js';
-import { type ApiError, BaseController, limitOffset } from '~utils.js';
+import { BaseController, type ProblemDetails, limitOffset } from '~utils.js';
 
 import { AdoptionStatus, AnimalKind, type UUID } from './server-types.js';
 
@@ -232,9 +232,10 @@ export class PetController extends BaseController {
    * @summary     Find pet by ID.
    * @returns     Successful retrieval of a pet.
    */
-  @Response<ApiError>(404, 'Not Found', {
+  @Response<ProblemDetails>(404, 'Not Found', {
     status: 404,
-    message: 'Pet not found!',
+    title: 'Not Found',
+    detail: 'Pet not found!',
   })
   @Get('{petId}')
   getPet(@Path() petId: UUID): Pet {
@@ -253,9 +254,10 @@ export class PetController extends BaseController {
    * @summary           Update an existing pet.
    * @returns           Successful update of a pet.
    */
-  @Response<ApiError>(404, 'Not Found', {
+  @Response<ProblemDetails>(404, 'Not Found', {
     status: 404,
-    message: 'Pet not found!',
+    title: 'Not Found',
+    detail: 'Pet not found!',
   })
   @Put()
   updatePet(@Body() petToUpdate: Pet): Pet {
@@ -278,9 +280,10 @@ export class PetController extends BaseController {
   // eslint-disable-next-line @arabasta/tsoa/valid-alternative-response
   @SuccessResponse(204, 'No Content')
   @Delete('{petId}')
-  @Response<ApiError>(404, 'Not Found', {
+  @Response<ProblemDetails>(404, 'Not Found', {
     status: 404,
-    message: 'Pet not found!',
+    title: 'Not Found',
+    detail: 'Pet not found!',
   })
   deletePet(@Path() petId: UUID): void {
     const pet = state.pets.find((p) => p.id === petId);

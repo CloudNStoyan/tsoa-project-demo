@@ -38,13 +38,19 @@ export enum AdoptionRequestStatus {
  */
 export type UUID = string;
 
-export interface ApiError {
-  /**
-   * @format double
-   */
-  status: number;
+export interface ProblemDetails {
+  type?: string;
 
-  message: string;
+  title?: string;
+
+  /**
+   * @format int32
+   */
+  status?: number;
+
+  detail?: string;
+
+  instance?: string;
 }
 
 /**
