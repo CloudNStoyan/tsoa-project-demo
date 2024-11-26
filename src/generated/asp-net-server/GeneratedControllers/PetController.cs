@@ -111,7 +111,7 @@ public class PetController : ControllerBase {
   /// </summary>
   /// <remarks>Deletes a pet by ID.</remarks>
   /// <param name="petId">Pet ID to delete.</param>
-  /// <response code="204">No content</response>
+  /// <response code="204">No Content</response>
   [HttpDelete("{petId}")]
   [ProducesResponseType(StatusCodes.Status204NoContent)]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
