@@ -14,7 +14,7 @@ import {
 } from 'tsoa';
 
 import { state } from '~state.js';
-import { type ApiError, BaseController } from '~utils.js';
+import { BaseController, type ProblemDetails } from '~utils.js';
 
 import {
   AdoptionRequestStatus,
@@ -61,9 +61,10 @@ export interface InventoryMap extends Record<AdoptionStatus, number> {}
 @Route('store')
 @Tags('Store')
 @Security('api_key')
-@Response<ApiError>(401, 'Unauthorized', {
+@Response<ProblemDetails>(401, 'Unauthorized', {
   status: 401,
-  message: 'Access denied!',
+  title: 'Unauthorized',
+  detail: 'Access denied!',
 })
 export class StoreController extends BaseController {
   /**
@@ -108,9 +109,10 @@ export class StoreController extends BaseController {
    * @summary         Find adoption request by ID.
    * @returns         Successful retrieval of adoption request.
    */
-  @Response<ApiError>(404, 'Not Found', {
+  @Response<ProblemDetails>(404, 'Not Found', {
     status: 404,
-    message: 'Adoption request not found!',
+    title: 'Not Found',
+    detail: 'Adoption request not found!',
   })
   @Get('adopt/{requestId}')
   getAdoptRequestById(@Path() requestId: UUID): AdoptionRequest {
@@ -134,9 +136,10 @@ export class StoreController extends BaseController {
    */
   // eslint-disable-next-line @arabasta/tsoa/valid-alternative-response
   @SuccessResponse(204, 'No Content')
-  @Response<ApiError>(404, 'Not Found', {
+  @Response<ProblemDetails>(404, 'Not Found', {
     status: 404,
-    message: 'Adoption request not found!',
+    title: 'Not Found',
+    detail: 'Adoption request not found!',
   })
   @Delete('adopt/{requestId}')
   deleteAdoptRequestById(@Path() requestId: UUID): void {

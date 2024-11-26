@@ -7,17 +7,30 @@
     "requestBodies": {},
     "responses": {},
     "schemas": {
-      "ApiError": {
+      "ProblemDetails": {
         "properties": {
-          "status": {
-            "type": "number",
-            "format": "double"
+          "type": {
+            "type": "string",
+            "nullable": true
           },
-          "message": {
-            "type": "string"
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
           }
         },
-        "required": ["status", "message"],
         "type": "object",
         "additionalProperties": false
       },
@@ -263,13 +276,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 },
                 "examples": {
                   "Example 1": {
                     "value": {
                       "status": 404,
-                      "message": "Pet not found!"
+                      "title": "Not Found",
+                      "detail": "Pet not found!"
                     }
                   }
                 }
@@ -661,13 +675,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 },
                 "examples": {
                   "Example 1": {
                     "value": {
                       "status": 404,
-                      "message": "Pet not found!"
+                      "title": "Not Found",
+                      "detail": "Pet not found!"
                     }
                   }
                 }
@@ -702,13 +717,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 },
                 "examples": {
                   "Example 1": {
                     "value": {
                       "status": 404,
-                      "message": "Pet not found!"
+                      "title": "Not Found",
+                      "detail": "Pet not found!"
                     }
                   }
                 }
@@ -752,13 +768,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 },
                 "examples": {
                   "Example 1": {
                     "value": {
                       "status": 401,
-                      "message": "Access denied!"
+                      "title": "Unauthorized",
+                      "detail": "Access denied!"
                     }
                   }
                 }
@@ -796,13 +813,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 },
                 "examples": {
                   "Example 1": {
                     "value": {
                       "status": 401,
-                      "message": "Access denied!"
+                      "title": "Unauthorized",
+                      "detail": "Access denied!"
                     }
                   }
                 }
@@ -852,13 +870,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 },
                 "examples": {
                   "Example 1": {
                     "value": {
                       "status": 401,
-                      "message": "Access denied!"
+                      "title": "Unauthorized",
+                      "detail": "Access denied!"
                     }
                   }
                 }
@@ -870,13 +889,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 },
                 "examples": {
                   "Example 1": {
                     "value": {
                       "status": 404,
-                      "message": "Adoption request not found!"
+                      "title": "Not Found",
+                      "detail": "Adoption request not found!"
                     }
                   }
                 }
@@ -915,13 +935,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 },
                 "examples": {
                   "Example 1": {
                     "value": {
                       "status": 401,
-                      "message": "Access denied!"
+                      "title": "Unauthorized",
+                      "detail": "Access denied!"
                     }
                   }
                 }
@@ -933,13 +954,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiError"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 },
                 "examples": {
                   "Example 1": {
                     "value": {
                       "status": 404,
-                      "message": "Adoption request not found!"
+                      "title": "Not Found",
+                      "detail": "Adoption request not found!"
                     }
                   }
                 }

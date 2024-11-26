@@ -6,16 +6,24 @@ components:
   requestBodies: {}
   responses: {}
   schemas:
-    ApiError:
+    ProblemDetails:
       properties:
-        status:
-          type: number
-          format: double
-        message:
+        type:
           type: string
-      required:
-        - status
-        - message
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        status:
+          type: integer
+          format: int32
+          nullable: true
+        detail:
+          type: string
+          nullable: true
+        instance:
+          type: string
+          nullable: true
       type: object
       additionalProperties: false
     UUID:
@@ -230,12 +238,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'
+                $ref: '#/components/schemas/ProblemDetails'
               examples:
                 Example 1:
                   value:
                     status: 404
-                    message: Pet not found!
+                    title: Not Found
+                    detail: Pet not found!
       description: Update an existing pet by ID.
       summary: Update an existing pet.
       tags:
@@ -541,12 +550,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'
+                $ref: '#/components/schemas/ProblemDetails'
               examples:
                 Example 1:
                   value:
                     status: 404
-                    message: Pet not found!
+                    title: Not Found
+                    detail: Pet not found!
       description: Returns a single pet.
       summary: Find pet by ID.
       tags:
@@ -569,12 +579,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'
+                $ref: '#/components/schemas/ProblemDetails'
               examples:
                 Example 1:
                   value:
                     status: 404
-                    message: Pet not found!
+                    title: Not Found
+                    detail: Pet not found!
       description: Deletes a pet by ID.
       summary: Deletes a pet.
       tags:
@@ -602,12 +613,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'
+                $ref: '#/components/schemas/ProblemDetails'
               examples:
                 Example 1:
                   value:
                     status: 401
-                    message: Access denied!
+                    title: Unauthorized
+                    detail: Access denied!
       description: Returns a map of adoption status to quantities.
       summary: Returns pet inventories by adoption status.
       tags:
@@ -630,12 +642,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'
+                $ref: '#/components/schemas/ProblemDetails'
               examples:
                 Example 1:
                   value:
                     status: 401
-                    message: Access denied!
+                    title: Unauthorized
+                    detail: Access denied!
       description: Place an adoption request for a pet.
       summary: Request an adoption of a pet.
       tags:
@@ -666,23 +679,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'
+                $ref: '#/components/schemas/ProblemDetails'
               examples:
                 Example 1:
                   value:
                     status: 401
-                    message: Access denied!
+                    title: Unauthorized
+                    detail: Access denied!
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'
+                $ref: '#/components/schemas/ProblemDetails'
               examples:
                 Example 1:
                   value:
                     status: 404
-                    message: Adoption request not found!
+                    title: Not Found
+                    detail: Adoption request not found!
       description: Find adoption request by ID.
       summary: Find adoption request by ID.
       tags:
@@ -706,23 +721,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'
+                $ref: '#/components/schemas/ProblemDetails'
               examples:
                 Example 1:
                   value:
                     status: 401
-                    message: Access denied!
+                    title: Unauthorized
+                    detail: Access denied!
         '404':
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'
+                $ref: '#/components/schemas/ProblemDetails'
               examples:
                 Example 1:
                   value:
                     status: 404
-                    message: Adoption request not found!
+                    title: Not Found
+                    detail: Adoption request not found!
       description: Delete adoption request by ID.
       summary: Delete adoption request by ID.
       tags:

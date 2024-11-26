@@ -116,7 +116,7 @@ export default tseslint.config(
       // Put your rules here.
       '@arabasta/tsoa/valid-response-decorator-type': [
         'error',
-        { allowedTypes: ['ApiError'] },
+        { allowedTypes: ['ProblemDetails'] },
       ],
       '@typescript-eslint/no-empty-object-type': 'off',
     },
