@@ -16,7 +16,11 @@ export interface BaseUrlParam {
 }
 
 export class ClientAPIBase {
-  constructor(..._options: unknown[]) {}
+  options: unknown[];
+
+  constructor(...options: unknown[]) {
+    this.options = options;
+  }
 
   fetch<T = void>(..._args: Parameters<typeof fetch>) {
     return Promise.resolve() as Promise<T>;
@@ -67,12 +71,10 @@ export class ClientAPIBase {
               `Required ${paramType} param '${name}' did not have a value of type 'number'. Type: '${typeof value}', Value: '${value}'.`
             );
           }
-        } else {
-          if (typeof value !== 'number' && typeof value !== 'undefined') {
-            throw new Error(
-              `Optional ${paramType} param '${name}' did not have a value of type 'number' or 'undefined'. Type: '${typeof value}', Value: '${value}'.`
-            );
-          }
+        } else if (typeof value !== 'number' && typeof value !== 'undefined') {
+          throw new Error(
+            `Optional ${paramType} param '${name}' did not have a value of type 'number' or 'undefined'. Type: '${typeof value}', Value: '${value}'.`
+          );
         }
 
         if (Number.isFinite(value)) {

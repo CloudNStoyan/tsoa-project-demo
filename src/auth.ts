@@ -1,4 +1,6 @@
 import type { Request } from 'express';
+
+import type { AuthUser } from './routes/server-types.js';
 import { state } from './state.js';
 
 export class AuthError extends Error {}
@@ -7,7 +9,7 @@ export function expressAuthentication(
   request: Request,
   securityName: string,
   _scopes?: string[]
-) {
+): Promise<AuthUser> {
   if (securityName === 'api_key') {
     const authorization = request.get('authorization');
 
@@ -26,8 +28,11 @@ export function expressAuthentication(
 
     if (token === 'simple-pet-token') {
       return Promise.resolve(state.users[0]);
-    } else {
-      return Promise.reject(new AuthError('Invalid token.'));
     }
+    return Promise.reject(new AuthError('Invalid token.'));
   }
+
+  throw new Error(
+    `The '${securityName}' security definition was not expected.`
+  );
 }

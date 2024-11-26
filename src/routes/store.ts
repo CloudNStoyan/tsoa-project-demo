@@ -11,13 +11,15 @@ import {
   Security,
   Tags,
 } from 'tsoa';
-import { ApiError, BaseController } from '../utils.js';
-import { state } from '../state.js';
+
+import { state } from '~state.js';
+import { type ApiError, BaseController } from '~utils.js';
+
 import {
-  AdoptionStatus,
   AdoptionRequestStatus,
-  UUID,
-  ExpressRequestWithUser,
+  AdoptionStatus,
+  type ExpressRequestWithUser,
+  type UUID,
 } from './server-types.js';
 
 /**
@@ -70,9 +72,7 @@ export class StoreController extends BaseController {
    * @returns        Successful retrieval of inventory.
    */
   @Get('inventory')
-  async getInventory(
-    @Request() _request: ExpressRequestWithUser
-  ): Promise<InventoryMap> {
+  getInventory(@Request() _request: ExpressRequestWithUser): InventoryMap {
     const inventoryMap: InventoryMap = {
       [AdoptionStatus.Adopted]: 0,
       [AdoptionStatus.Available]: 0,
@@ -93,9 +93,7 @@ export class StoreController extends BaseController {
    * @returns               Successful creation of adoption request.
    */
   @Post('adopt')
-  async adoptPet(
-    @Body() adoptionRequest: AdoptionRequest
-  ): Promise<AdoptionRequest> {
+  adoptPet(@Body() adoptionRequest: AdoptionRequest): AdoptionRequest {
     adoptionRequest.id = crypto.randomUUID();
 
     state.adoptionRequests.push(adoptionRequest);
@@ -114,7 +112,7 @@ export class StoreController extends BaseController {
     message: 'Adoption request not found!',
   })
   @Get('adopt/{requestId}')
-  async getAdoptRequestById(@Path() requestId: UUID): Promise<AdoptionRequest> {
+  getAdoptRequestById(@Path() requestId: UUID): AdoptionRequest {
     const adoptionRequest = state.adoptionRequests.find(
       (r) => r.id === requestId
     );
@@ -139,7 +137,7 @@ export class StoreController extends BaseController {
     message: 'Adoption request not found!',
   })
   @Delete('adopt/{requestId}')
-  async deleteAdoptRequestById(@Path() requestId: UUID): Promise<void> {
+  deleteAdoptRequestById(@Path() requestId: UUID): void {
     const adoptionRequest = state.adoptionRequests.find(
       (r) => r.id === requestId
     );

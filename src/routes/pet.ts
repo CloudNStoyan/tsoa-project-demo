@@ -12,9 +12,11 @@ import {
   Route,
   Tags,
 } from 'tsoa';
-import { ApiError, BaseController, limitOffset } from '../utils.js';
-import { state } from '../state.js';
-import { AdoptionStatus, AnimalKind, UUID } from './server-types.js';
+
+import { state } from '~state.js';
+import { type ApiError, BaseController, limitOffset } from '~utils.js';
+
+import { AdoptionStatus, AnimalKind, type UUID } from './server-types.js';
 
 const PETS_EXAMPLE = [
   {
@@ -126,7 +128,7 @@ export class PetController extends BaseController {
    * @returns   Successful creation of a pet.
    */
   @Post()
-  async createPet(@Body() pet: Pet): Promise<Pet> {
+  createPet(@Body() pet: Pet): Pet {
     state.pets.push(pet);
 
     return pet;
@@ -143,10 +145,7 @@ export class PetController extends BaseController {
    */
   @Example<Pet[]>(PETS_EXAMPLE)
   @Get('all')
-  async getAllPets(
-    @Query() offset: number = 0,
-    @Query() limit: number = 10
-  ): Promise<Pet[]> {
+  getAllPets(@Query() offset: number = 0, @Query() limit: number = 10): Pet[] {
     return limitOffset(state.pets, limit, offset);
   }
 
@@ -158,7 +157,7 @@ export class PetController extends BaseController {
    */
   @Example<Pet[]>(PETS_EXAMPLE)
   @Get('findByStatus')
-  async getPetsByStatus(@Query() status: AdoptionStatus): Promise<Pet[]> {
+  getPetsByStatus(@Query() status: AdoptionStatus): Pet[] {
     const filteredPets = state.pets.filter((p) => p.status === status);
 
     return filteredPets;
@@ -172,7 +171,7 @@ export class PetController extends BaseController {
    */
   @Example<Pet[]>(PETS_EXAMPLE)
   @Get('findByKinds')
-  async getPetsByKind(@Query() kinds: AnimalKind[]): Promise<Pet[]> {
+  getPetsByKind(@Query() kinds: AnimalKind[]): Pet[] {
     const filteredPets = state.pets.filter((p) => kinds.includes(p.kind));
 
     return filteredPets;
@@ -186,10 +185,10 @@ export class PetController extends BaseController {
    */
   @Example<Pet[]>(PETS_EXAMPLE)
   @Get('findByTags')
-  async getPetsByTags(
+  getPetsByTags(
     @Query()
     tags: string[]
-  ): Promise<Pet[]> {
+  ): Pet[] {
     const filteredPets: Pet[] = [];
 
     for (const pet of state.pets) {
@@ -214,7 +213,7 @@ export class PetController extends BaseController {
   @Deprecated()
   @Example<Pet[]>(PETS_EXAMPLE)
   @Get('findByDate')
-  async getPetsByDate(@Query() afterDate: Date): Promise<Pet[]> {
+  getPetsByDate(@Query() afterDate: Date): Pet[] {
     const filteredPets: Pet[] = [];
 
     for (const pet of state.pets) {
@@ -237,7 +236,7 @@ export class PetController extends BaseController {
     message: 'Pet not found!',
   })
   @Get('{petId}')
-  async getPet(@Path() petId: UUID): Promise<Pet> {
+  getPet(@Path() petId: UUID): Pet {
     const pet = state.pets.find((p) => p.id === petId);
 
     if (!pet) {
@@ -258,7 +257,7 @@ export class PetController extends BaseController {
     message: 'Pet not found!',
   })
   @Put()
-  async updatePet(@Body() petToUpdate: Pet): Promise<Pet> {
+  updatePet(@Body() petToUpdate: Pet): Pet {
     const pet = state.pets.find((p) => p.id === petToUpdate.id);
 
     if (!pet) {
@@ -281,13 +280,14 @@ export class PetController extends BaseController {
     status: 404,
     message: 'Pet not found!',
   })
-  async deletePet(@Path() petId: UUID): Promise<void> {
+  deletePet(@Path() petId: UUID): void {
     const pet = state.pets.find((p) => p.id === petId);
     if (!pet) {
       return this.errorResult<void>(404, { message: 'Pet not found!' });
     }
 
     state.pets = state.pets.filter((p) => p.id !== petId);
+
     return this.noContentResult<void>();
   }
 }

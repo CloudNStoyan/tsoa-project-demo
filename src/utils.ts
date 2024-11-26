@@ -9,15 +9,15 @@ export class BaseController extends Controller {
   errorResult<TSuccess>(
     status: number,
     error: Omit<ApiError, 'status'>
-  ): Promise<TSuccess> {
+  ): TSuccess {
     this.setStatus(status);
     const errorWithStatus: ApiError = { ...error, status };
-    return errorWithStatus as unknown as Promise<TSuccess>;
+    return errorWithStatus as unknown as TSuccess;
   }
 
-  noContentResult<TSuccess>(): Promise<TSuccess> {
+  noContentResult<TSuccess>(): TSuccess {
     this.setStatus(204);
-    return undefined as unknown as Promise<TSuccess>;
+    return undefined as unknown as TSuccess;
   }
 }
 
@@ -29,10 +29,11 @@ export class BaseController extends Controller {
  * @returns sliced array or empty if input is null or has length = 0 or even if the params (limit/offset) exceeds the array length
  */
 export function limitOffset<T>(array: T[], limit: number, offset: number): T[] {
-  if (!array) {
+  if (!Array.isArray(array)) {
     return [];
   }
 
+   
   const length = array.length;
 
   if (!length) {

@@ -1,5 +1,5 @@
 {
-  "exec": "node --loader ts-node/esm src/server.ts",
+  "exec": "npm run build && node dist/server.cjs",
   "watch": ["src"],
   "ext": "ts",
   "ignore": ["src/generated/routes.ts", "src/generated/client"]

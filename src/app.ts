@@ -1,15 +1,15 @@
 import express, {
+  type Request as ExpressRequest,
+  type Response as ExpressResponse,
+  type NextFunction,
   json,
   urlencoded,
-  Request as ExpressRequest,
-  Response as ExpressResponse,
-  NextFunction,
 } from 'express';
 import swaggerUi from 'swagger-ui-express';
-
 import { ValidationService } from 'tsoa';
-import { RegisterRoutes } from './generated/routes.js';
+
 import { AuthError } from './auth.js';
+import { RegisterRoutes } from './generated/routes.js';
 
 export const app = express();
 
@@ -23,12 +23,11 @@ app.use(json());
 
 app.use(
   '/docs/swagger.json',
-  async (_req: ExpressRequest, res: ExpressResponse) => {
-    return res.send(
+  async (_req: ExpressRequest, res: ExpressResponse) =>
+    res.send(
       (await import('./generated/swagger.json', { with: { type: 'json' } }))
         .default
-    );
-  }
+    )
 );
 
 app.use(
@@ -51,36 +50,42 @@ app.use(
 ValidationService.prototype.ValidateParam = (
   _property,
   rawValue,
-  _name = '',
   _fieldErrors,
   _isBodyParam,
-  _parent = ''
+  _parent = false,
+  _name = ''
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 ) => rawValue;
 
 // Disables TSOA's built-in validation (must be before RegisterRoutes)
 // https://github.com/lukeautry/tsoa/issues/181#issuecomment-1487811378
-RegisterRoutes.prototype.getValidatedArgs = (args: {}, _request: unknown) =>
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+RegisterRoutes.prototype.getValidatedArgs = (args: object, _request: unknown) =>
   Object.keys(args);
 
 RegisterRoutes(app);
 
 // This should be after RegisterRoutes(app)
-app.use(function ErrorHandler(
-  err: unknown,
-  _req: ExpressRequest,
-  res: ExpressResponse,
-  next: NextFunction
-) {
-  if (err instanceof AuthError) {
-    return res.status(401).json({ status: 401, message: 'Access denied!' });
-  }
+app.use(
+  (
+    err: unknown,
+    _req: ExpressRequest,
+    res: ExpressResponse,
+    next: NextFunction
+    // eslint-disable-next-line consistent-return
+  ) => {
+    if (err instanceof AuthError) {
+      return res.status(401).json({ status: 401, message: 'Access denied!' });
+    }
 
-  if (err instanceof Error) {
-    console.error(err);
-    return res.status(500).json({
-      message: 'Internal Server Error',
-    });
-  }
+    if (err instanceof Error) {
+      // eslint-disable-next-line no-console
+      console.error(err);
+      return res.status(500).json({
+        message: 'Internal Server Error',
+      });
+    }
 
-  next();
-});
+    next();
+  }
+);

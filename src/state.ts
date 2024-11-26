@@ -1,11 +1,11 @@
 import type { Pet } from './routes/pet.js';
-import { AdoptionRequest } from './routes/store.js';
 import {
   AdoptionRequestStatus,
   AdoptionStatus,
   AnimalKind,
-  AuthUser,
+  type AuthUser,
 } from './routes/server-types.js';
+import type { AdoptionRequest } from './routes/store.js';
 
 export interface PetStoreState {
   pets: Pet[];
