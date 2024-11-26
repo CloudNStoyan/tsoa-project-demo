@@ -69,7 +69,7 @@
           },
           "kind": {
             "description": "What kind of pet it is.",
-            "example": "Dog",
+            "example": "Cat",
             "allOf": [
               {
                 "$ref": "#/components/schemas/AnimalKind"
@@ -695,7 +695,7 @@
         "operationId": "DeletePet",
         "responses": {
           "204": {
-            "description": "No content"
+            "description": "No Content"
           },
           "404": {
             "description": "Not Found",
@@ -908,7 +908,7 @@
         "operationId": "DeleteAdoptRequestById",
         "responses": {
           "204": {
-            "description": "No content"
+            "description": "No Content"
           },
           "401": {
             "description": "Unauthorized",

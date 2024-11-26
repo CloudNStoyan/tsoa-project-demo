@@ -77,7 +77,7 @@ export interface Pet {
 
   /**
    * What kind of pet it is.
-   * @example "Dog"
+   * @example "Cat"
    */
   kind: AnimalKind;
 

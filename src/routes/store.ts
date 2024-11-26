@@ -9,6 +9,7 @@ import {
   Response,
   Route,
   Security,
+  SuccessResponse,
   Tags,
 } from 'tsoa';
 
@@ -131,7 +132,8 @@ export class StoreController extends BaseController {
    * @param requestId The adoption request's ID.
    * @summary         Delete adoption request by ID.
    */
-  @Response(204, 'No Content')
+  // eslint-disable-next-line @arabasta/tsoa/valid-alternative-response
+  @SuccessResponse(204, 'No Content')
   @Response<ApiError>(404, 'Not Found', {
     status: 404,
     message: 'Adoption request not found!',

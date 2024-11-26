@@ -10,6 +10,7 @@ import {
   Query,
   Response,
   Route,
+  SuccessResponse,
   Tags,
 } from 'tsoa';
 
@@ -274,7 +275,8 @@ export class PetController extends BaseController {
    * @param petId Pet ID to delete.
    * @summary     Deletes a pet.
    */
-  @Response(204, 'No Content')
+  // eslint-disable-next-line @arabasta/tsoa/valid-alternative-response
+  @SuccessResponse(204, 'No Content')
   @Delete('{petId}')
   @Response<ApiError>(404, 'Not Found', {
     status: 404,
