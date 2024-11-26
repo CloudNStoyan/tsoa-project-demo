@@ -40,5 +40,12 @@
     "routesDir": "src/generated/",
     "authenticationModule": "src/auth.ts",
     "esm": true
+  },
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "~*": ["src/*"],
+      "src/*": ["src/*"]
+    }
   }
 }

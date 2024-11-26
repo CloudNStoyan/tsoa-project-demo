@@ -1,12 +1,48 @@
-import js from '@eslint/js';
-import prettier from 'eslint-config-prettier';
-import tseslint from 'typescript-eslint';
+import {
+  baseConfig,
+  configFilesConfig,
+  tsoaConfig,
+  typescriptConfig,
+  typescriptDefinitionsConfig,
+} from '@arabasta/eslint-config';
 import globals from 'globals';
-import jsdoc from 'eslint-plugin-jsdoc';
+// import/no-unresolved doesn't support node "exports" field. https://github.com/import-js/eslint-plugin-import/issues/1810
+// eslint-disable-next-line import/no-unresolved
+import tseslint from 'typescript-eslint';
+
+const typeScriptExtensions = ['ts', 'cts', 'mts', 'tsx'];
+
+const typeScriptDefinitionExtensions = typeScriptExtensions
+  .filter((x) => x !== 'tsx')
+  .map((x) => `d.${x}`);
+
+const allExtensions = [
+  'js',
+  'cjs',
+  'mjs',
+  'jsx',
+  'json',
+  ...typeScriptExtensions,
+];
 
 export default tseslint.config(
-  js.configs.recommended,
-  {
+  // We use a tseslint helper function here so that we get easy "extends"
+  // functionality that eslint flat config makes hard to achieve.
+  // You can use this for the convenience, without using TypeScript.
+  // Ideally this helper function should be provided by eslint.
+  // For more information: https://typescript-eslint.io/packages/typescript-eslint/#flat-config-extends
+  ...tseslint.config({
+    name: 'All files',
+    files: [`**/*.+(${allExtensions.join('|')})`],
+    extends: [...baseConfig],
+    settings: {
+      'import/extensions': allExtensions.map((ext) => `.${ext}`),
+      'import/resolver': {
+        node: {
+          extensions: allExtensions.map((ext) => `.${ext}`),
+        },
+      },
+    },
     languageOptions: {
       globals: {
         ...globals.node,
@@ -16,137 +52,87 @@ export default tseslint.config(
       parser: tseslint.parser,
     },
     rules: {
-      'no-unused-vars': 'off',
-      'no-dupe-class-members': 'off',
-    },
-  },
-  prettier,
-  {
-    files: ['**/*.ts'],
-    languageOptions: {
-      parserOptions: {
-        project: ['tsconfig.json'],
-      },
-    },
-  },
-  {
-    files: ['src/routes/**'],
-    extends: [jsdoc.configs['flat/recommended-typescript-error'], prettier],
-    plugins: {
-      '@typescript-eslint': tseslint.plugin,
-    },
-    rules: {
-      'jsdoc/check-tag-names': [
+      'prefer-destructuring': 'off',
+      'import/no-restricted-paths': [
         'error',
         {
-          definedTags: [
-            'format',
-            'isDateTime',
-            'isDate',
-            'minDate',
-            'maxDate',
-            'isInt',
-            'isFloat',
-            'isLong',
-            'isDouble',
-            'minimum',
-            'maximum',
-            'isString',
-            'minLength',
-            'maxLength',
-            'pattern',
-            'isArray',
-            'minItems',
-            'maxItems',
-            'uniqueItems',
-            'isBoolean',
-          ],
-        },
-      ],
-      'jsdoc/check-indentation': 'error',
-      'jsdoc/check-line-alignment': [
-        'error',
-        'always',
-        {
-          tags: [
-            'param',
-            'arg',
-            'argument',
-            'property',
-            'prop',
-            'returns',
-            'return',
-            'summary',
-            'isInt',
-            'pattern',
-            'format',
-          ],
-        },
-      ],
-      'jsdoc/no-blank-block-descriptions': 'error',
-      'jsdoc/no-blank-blocks': ['error', { enableFixer: true }],
-      'jsdoc/require-asterisk-prefix': 'error',
-      'jsdoc/require-description': 'error',
-      'jsdoc/require-description-complete-sentence': 'error',
-      'jsdoc/require-example': [
-        'error',
-        {
-          contexts: [
-            'TSInterfaceDeclaration TSPropertySignature:not([typeAnnotation.typeAnnotation.type="TSArrayType"], [typeAnnotation.typeAnnotation.type="TSTypeReference"])',
-          ],
-        },
-      ],
-      'jsdoc/require-throws': 'error',
-      'jsdoc/require-jsdoc': [
-        'error',
-        {
-          require: {
-            MethodDefinition: true,
-          },
-          contexts: [
-            'TSTypeAliasDeclaration',
-            'TSInterfaceDeclaration',
-            'TSInterfaceDeclaration TSPropertySignature',
-          ],
-          checkConstructors: false,
-        },
-      ],
-      'jsdoc/no-restricted-syntax': [
-        'error',
-        {
-          contexts: [
+          zones: [
             {
-              comment: 'JsdocBlock:not(*:has(JsdocTag[tag=summary]))',
-              context: 'MethodDefinition',
-              message: 'Missing JSDoc @summary declaration.',
+              target: './',
+              from: `./src/**/*.+(spec|test).+(${allExtensions.join('|')})`,
+              message: 'Importing test files in non-test files is not allowed.',
             },
             {
-              comment: 'JsdocBlock:has(JsdocTag[tag=example])',
-              context:
-                'TSPropertySignature[typeAnnotation.typeAnnotation.type="TSArrayType"]',
-              message: 'Using JSDoc @example on arrays is forbidden.',
-            },
-            {
-              comment:
-                'JsdocBlock:not(*:has(JsdocTag[tag=isInt], JsdocTag[tag=isFloat], JsdocTag[tag=isLong], JsdocTag[tag=isDouble]))',
-              context:
-                'TSPropertySignature[typeAnnotation.typeAnnotation.type="TSNumberKeyword"],TSTypeAliasDeclaration[typeAnnotation.type="TSNumberKeyword"]',
+              target: './',
+              from: `./__mocks__`,
               message:
-                'Missing JSDoc number type declaration (@isInt, @isFloat, @isLong, @isDouble).',
+                'Importing mock modules in non-test files is not allowed.',
+            },
+            {
+              target: './',
+              from: './src/testing',
+              message:
+                'Importing testing utilities in non-test files is not allowed.',
             },
           ],
         },
       ],
-      'jsdoc/require-returns': 'off',
-      '@typescript-eslint/explicit-function-return-type': 'error',
-      'no-restricted-syntax': [
+      'import/extensions': [
         'error',
-        {
-          selector: 'TSUnionType',
-          message: 'Unions are not allowed.',
-        },
+        allExtensions.reduce((acc, val) => {
+          acc[val] = 'ignorePackages';
+          return acc;
+        }, {}),
       ],
     },
-  },
-  { ignores: ['dist', 'src/generated/'] }
+  }),
+
+  ...tseslint.config({
+    name: 'TypeScript files',
+    files: [`**/*.+(${typeScriptExtensions.join('|')})`],
+    extends: [...typescriptConfig],
+    rules: {
+      '@typescript-eslint/no-confusing-void-expression': 'off',
+      '@typescript-eslint/no-invalid-void-type': 'off',
+      '@typescript-eslint/no-unnecessary-type-parameters': 'off',
+      '@typescript-eslint/restrict-template-expressions': 'off',
+    },
+  }),
+
+  ...tseslint.config({
+    name: 'TypeScript definition files',
+    files: [`**/*.+(${typeScriptDefinitionExtensions.join('|')})`],
+    extends: [...typescriptDefinitionsConfig],
+    rules: {
+      // Put your rules here.
+    },
+  }),
+
+  ...tseslint.config({
+    name: 'TSOA files',
+    files: ['src/routes/**'],
+    extends: [...tsoaConfig],
+    rules: {
+      // Put your rules here.
+      '@arabasta/tsoa/valid-response-decorator-type': [
+        'error',
+        { allowedTypes: ['ApiError'] },
+      ],
+      '@typescript-eslint/no-empty-object-type': 'off',
+    },
+  }),
+
+  ...tseslint.config({
+    name: 'Root level configuration files',
+    files: [
+      `*.+(${allExtensions.join('|')})`,
+      `__mocks__/**/*.+(${allExtensions.join('|')})`,
+    ],
+    extends: [...configFilesConfig],
+    rules: {
+      // Put your rules here.
+    },
+  }),
+
+  { ignores: ['dist', 'src/generated/', 'scripts', '**/*.json'] }
 );
