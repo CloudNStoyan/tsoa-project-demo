@@ -43,6 +43,24 @@ builder.Services.AddSwaggerGen(options => {
   options.UseAllOfToExtendReferenceSchemas();
 
   options.AddCustomFilters();
+  options.AddCustomTagsMetadata([
+    new() {
+      Name = "Pet",
+      Description = "Everything about your Pets",
+      ExternalDocs = new () {
+        Description = "Find out more",
+        Url = new ("http://swagger.io"),
+      }
+    },
+    new() {
+      Name = "Store",
+      Description = "Access to Petstore orders",
+      ExternalDocs = new () {
+        Description = "Find out more about our store",
+        Url = new ("http://swagger.io"),
+      }
+    }
+  ]);
 
   options.OperationFilter<SecurityRequirementsOperationFilter>(false, "api_key");
 
