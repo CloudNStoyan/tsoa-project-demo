@@ -26,6 +26,22 @@ for (const schemaName in schemas) {
   }
 }
 
+for (const path in swaggerDocument.paths) {
+  const httpMethods = swaggerDocument.paths[path];
+
+  for (const httpMethod in httpMethods) {
+    const operation = httpMethods[httpMethod];
+
+    const parameters = operation.parameters;
+
+    for (const parameter of parameters) {
+      if ('required' in parameter && parameter.required === false) {
+        delete parameter.required;
+      }
+    }
+  }
+}
+
 fs.writeFile(SWAGGER_JSON_FILE_PATH, JSON.stringify(swaggerDocument, null, 2), {
   encoding: 'utf-8',
 });

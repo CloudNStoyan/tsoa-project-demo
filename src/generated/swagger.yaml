@@ -308,7 +308,6 @@ paths:
         - description: Offset to discard elements.
           in: query
           name: offset
-          required: false
           schema:
             default: 0
             format: int32
@@ -316,7 +315,6 @@ paths:
         - description: How many records to return.
           in: query
           name: limit
-          required: false
           schema:
             default: 10
             format: int32
