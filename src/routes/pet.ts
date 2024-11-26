@@ -78,7 +78,7 @@ export class Pet {
   /**
    * What kind of pet it is.
    */
-  @Example<AnimalKind>(AnimalKind.Dog)
+  @Example<AnimalKind>(AnimalKind.Cat)
   kind!: AnimalKind;
 
   /**
