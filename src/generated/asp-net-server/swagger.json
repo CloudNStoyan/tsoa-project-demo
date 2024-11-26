@@ -748,13 +748,11 @@
             "example": "Max"
           },
           "breed": {
-            "minLength": 1,
             "type": "string",
             "description": "The kind of breed the pet is.",
             "example": "European Domestic Cat"
           },
           "notes": {
-            "minLength": 1,
             "type": "string",
             "description": "Free form text associated with the pet.",
             "example": "Likes to scratch a lot."

@@ -10,6 +10,7 @@ public static class SwaggerGenOptionsExtensions {
     options.OperationFilter<RemoveUndesiredContentTypesFilter>();
     options.OperationFilter<ErrorExampleFilter>();
     options.OperationFilter<NoInlineSchemaFilter>();
+    options.SchemaFilter<RemoveUndesiredMinLengthFilter>();
   }
 
   public static void AddCustomTagsMetadata(this SwaggerGenOptions options, OpenApiTag[] tags) {
