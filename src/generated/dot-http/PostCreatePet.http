@@ -15,7 +15,7 @@ Content-Type: {{contentType}}
   "name": "Max",
   "breed": "European Domestic Cat",
   "notes": "Likes to scratch a lot.",
-  "kind": "Dog",
+  "kind": "Cat",
   "age": 2,
   "healthProblems": false,
   "addedDate": "2024-09-07T21:00:00.000Z",

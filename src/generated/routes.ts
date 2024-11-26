@@ -554,7 +554,7 @@ export function RegisterRoutes(app: Router) {
           response,
           next,
           validatedArgs,
-          successStatus: undefined,
+          successStatus: 204,
         });
       } catch (err) {
         return next(err);
@@ -742,7 +742,7 @@ export function RegisterRoutes(app: Router) {
           response,
           next,
           validatedArgs,
-          successStatus: undefined,
+          successStatus: 204,
         });
       } catch (err) {
         return next(err);
