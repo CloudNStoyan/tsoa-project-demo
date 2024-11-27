@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using AspNetServer.SwashbuckleFilters;
+using AspNetServer.Generated.Examples;
 
 namespace AspNetServer.Generated.Models;
 
 /// <summary>
 /// Pet characteristics.
 /// </summary>
+[PropertiesExample(typeof(PetExample))]
 public class Pet {
   /// <summary>
   /// The pet's identifier.

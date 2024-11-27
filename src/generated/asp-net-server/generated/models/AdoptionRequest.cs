@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using AspNetServer.SwashbuckleFilters;
+using AspNetServer.Generated.Examples;
 
 namespace AspNetServer.Generated.Models;
 
 /// <summary>
 /// Adoption request information.
 /// </summary>
+[PropertiesExample(typeof(AdoptionRequestExample))]
 public class AdoptionRequest {
   /// <summary>
   /// The adoption's ID.

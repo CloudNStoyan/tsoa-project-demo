@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using AspNetServer.SwashbuckleFilters;
 
 namespace AspNetServer.Generated.Models;
 

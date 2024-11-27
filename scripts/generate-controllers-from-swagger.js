@@ -38,9 +38,11 @@ function uppercaseFirstLetter(string) {
 
 class DotNetModel {
   #swaggerDocument;
+  #rootNamespace;
 
-  constructor(swaggerDocument) {
+  constructor(swaggerDocument, rootNamespace) {
     this.#swaggerDocument = swaggerDocument;
+    this.#rootNamespace = rootNamespace;
 
     this.models = this.GenerateModels();
   }
@@ -170,6 +172,7 @@ class DotNetModel {
       dotnetType: this.ResolveDotnetType(schema),
       nullable: schema.nullable || false,
       attributes: this.GenerateAttributes(schema, required),
+      example: schema.example,
     };
   }
 
@@ -186,11 +189,46 @@ class DotNetModel {
       );
     }
 
+    const imports = new Set();
+
+    const hasAttributes =
+      properties.findIndex((prop) => prop.attributes.length > 0) !== -1;
+
+    if (hasAttributes) {
+      const dataAnnotationsImport =
+        'using System.ComponentModel.DataAnnotations;';
+
+      if (!imports.has(dataAnnotationsImport)) {
+        imports.add(dataAnnotationsImport);
+      }
+    }
+
+    const hasExamples =
+      schema.example !== undefined ||
+      properties.findIndex((prop) => prop.example === undefined) === -1;
+
+    if (hasExamples) {
+      const filtersImport = `using ${this.#rootNamespace}.SwashbuckleFilters;`;
+
+      if (!imports.has(filtersImport)) {
+        imports.add(filtersImport);
+      }
+
+      const examplesImport = `using ${this.#rootNamespace}.Generated.Examples;`;
+
+      if (!imports.has(examplesImport)) {
+        imports.add(examplesImport);
+      }
+    }
+
     return {
       name,
       type: 'class',
       xmlObject: this.GenerateXmlObject(schema),
       properties,
+      hasExamples,
+      example: schema.example,
+      imports,
     };
   }
 
@@ -322,7 +360,9 @@ class RenderModel {
     let output = '';
 
     output += this.renderXml(classModel.xmlObject);
-    //output += `[PropertiesExample(typeof(${classModel.name}Example))]\n`;
+    if (classModel.hasExamples) {
+      output += `[PropertiesExample(typeof(${classModel.name}Example))]\n`;
+    }
     output += `public class ${classModel.name} {\n`;
 
     for (const property of classModel.properties) {
@@ -340,8 +380,10 @@ class RenderModel {
 
     let output = '';
 
-    output += 'using System.ComponentModel.DataAnnotations;\n';
-    output += 'using AspNetServer.SwashbuckleFilters;\n\n';
+    if (model.imports?.size > 0) {
+      output += Array.from(model.imports).join('\n');
+      output += '\n\n';
+    }
 
     output += `namespace ${rootNamespace}.Generated.Models;\n\n`;
 
@@ -353,19 +395,141 @@ class RenderModel {
       output += this.renderClass(model);
     }
 
+    return output.trim();
+  }
+}
+
+class RenderExample {
+  #model;
+  #rootNamespace;
+
+  constructor(model, rootNamespace) {
+    this.#model = model;
+    this.#rootNamespace = rootNamespace;
+  }
+
+  getIndentationString(indentation = 0) {
+    return new Array(indentation).fill(' ').join('');
+  }
+
+  renderPropertyValue(dotnetType, example) {
+    let output = '';
+
+    if (dotnetType.type === 'literal') {
+      if (dotnetType.resolved === 'string') {
+        output += `"${example}"`;
+      } else {
+        output += example;
+      }
+    } else if (dotnetType.type === 'object') {
+      output += `${dotnetType.resolved}.Parse("${example}")`;
+    } else if (dotnetType.type === 'enum') {
+      output += `${dotnetType.resolved}.${example}`;
+    } else if (dotnetType.type === 'array') {
+      if (!Array.isArray(example)) {
+        throw new Error(
+          `Expected array example, but got '${typeof example}' example.`
+        );
+      }
+
+      output += '[';
+      output += example
+        .map((exampleElement) =>
+          this.renderPropertyValue(dotnetType.itemType, exampleElement)
+        )
+        .join(', ');
+      output += ']';
+    } else {
+      throw new Error(`Unexpected type '${dotnetType.type}' found.`);
+    }
+
+    return output;
+  }
+
+  renderProperty(property, schemaExample, indentation = 0) {
+    const indentationString = this.getIndentationString(indentation);
+
+    let output = '';
+
+    const name = uppercaseFirstLetter(property.name);
+
+    const example = schemaExample
+      ? schemaExample[property.name]
+      : property.example;
+
+    output += `${indentationString}${name} = ${this.renderPropertyValue(property.dotnetType, example)},\n`;
+
+    return output;
+  }
+
+  renderExample(indentation = 0) {
+    const model = this.#model;
+
+    const indentationString = this.getIndentationString(indentation);
+
+    let output = '';
+
+    output += `${indentationString}return new()\n`;
+    output += `${indentationString}{\n`;
+
+    for (const property of model.properties) {
+      output += this.renderProperty(property, model.example, indentation + 2);
+    }
+
+    output += `${indentationString}};\n`;
+
+    return output;
+  }
+
+  render() {
+    const model = this.#model;
+    const rootNamespace = this.#rootNamespace;
+
+    let output = '';
+
+    output += `using ${rootNamespace}.Generated.Models;\n`;
+    output += 'using Swashbuckle.AspNetCore.Filters;\n\n';
+
+    output += `namespace ${rootNamespace}.Generated.Examples;\n\n`;
+
+    output += `public class ${model.name}Example : IExamplesProvider<${model.name}>\n`;
+    output += '{\n';
+    output += `  public ${model.name} GetExamples()\n`;
+    output += '  {\n';
+    output += this.renderExample(4);
+    output += '  }\n';
+    output += '}';
+
     return output;
   }
 }
 
-const dotNetModel = new DotNetModel(swaggerDocument);
+const ROOT_NAMESPACE = 'AspNetServer';
+
+const IGNORED_MODELS = new Set(['ProblemDetails']);
+
+const dotNetModel = new DotNetModel(swaggerDocument, ROOT_NAMESPACE);
 
 await fs.mkdir(path.join(GENERATED_FOLDER, 'models'), { recursive: true });
+await fs.mkdir(path.join(GENERATED_FOLDER, 'examples'), { recursive: true });
 for (const model of dotNetModel.models) {
-  await fs.writeFile(
-    path.join(GENERATED_FOLDER, 'models', `${model.name}.cs`),
-    new RenderModel(model, 'AspNetServer').render(),
-    {
-      encoding: 'utf-8',
-    }
-  );
+  if (model.type === 'class' && model.hasExamples) {
+    await fs.writeFile(
+      path.join(GENERATED_FOLDER, 'examples', `${model.name}Example.cs`),
+      new RenderExample(model, ROOT_NAMESPACE).render(),
+      {
+        encoding: 'utf-8',
+      }
+    );
+  }
+
+  if (!IGNORED_MODELS.has(model.name)) {
+    await fs.writeFile(
+      path.join(GENERATED_FOLDER, 'models', `${model.name}.cs`),
+      new RenderModel(model, ROOT_NAMESPACE).render(),
+      {
+        encoding: 'utf-8',
+      }
+    );
+  }
 }
