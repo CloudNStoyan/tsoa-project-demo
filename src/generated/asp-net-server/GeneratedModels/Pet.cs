@@ -36,33 +36,33 @@ public class Pet {
   /// What kind of pet it is.
   /// </summary>
   [Required]
-  public AnimalKind Kind {get; set;}
+  public AnimalKind Kind { get; set; }
   /// <summary>
   /// The age of the pet.
   /// </summary>
   [Required]
   [Range(0, 99)]
-  public int Age {get; set; }
+  public int Age { get; set; }
   /// <summary>
   /// Whether or not the pet has any health problems.
   /// </summary>
   [Required]
-  public bool HealthProblems {get; set;}
+  public bool HealthProblems { get; set; }
   /// <summary>
   /// When the pet was added to the system.
   /// </summary>
   [Required]
-  public DateOnly AddedDate {get; set;}
+  public DateOnly AddedDate { get; set; }
   /// <summary>
   /// Pet's adoption status in the store.
   /// </summary>
   [Required]
-  public AdoptionStatus Status {get; set;}
+  public AdoptionStatus Status { get; set; }
   /// <summary>
   /// The pet's tags.
   /// </summary>
   [Required]
   [MinLength(1)]
   [MaxLength(5)]
-  public required string[] Tags {get; set;}
+  public required string[] Tags { get; set; }
 }
