@@ -45,6 +45,7 @@ class DotNetModel {
     this.#rootNamespace = rootNamespace;
 
     this.models = this.GenerateModels();
+    this.controllers = this.GenerateControllers();
   }
 
   SchemaIsEnum(schema) {
@@ -259,6 +260,130 @@ class DotNetModel {
     }
 
     return generatedModels;
+  }
+
+  GenerateTags(operations) {
+    const tagSchemas = this.#swaggerDocument.tags;
+
+    const tagsMap = new Map();
+
+    for (const operation of operations) {
+      for (const operationTag of operation.schema.tags) {
+        if (!tagsMap.has(operationTag)) {
+          tagsMap.set(operationTag, { name: operationTag });
+        }
+      }
+    }
+
+    const tags = Array.from(tagsMap.values()).map((tag) => {
+      const tagSchema = tagSchemas.find((t) => t.name === tag.name);
+      if (tagSchema) {
+        return { ...tag, xmlObject: this.GenerateXmlObject(tagSchema) };
+      }
+
+      return tag;
+    });
+
+    return tags;
+  }
+
+  ResponseSchemaIsInlineObject(schema) {
+    if (schema.type === 'array') {
+      if (schema.items.$ref) {
+        return false;
+      }
+    }
+
+    if (schema.$ref) {
+      return false;
+    }
+
+    if (schema.type === 'object') {
+      return true;
+    }
+
+    return false;
+  }
+
+  ThrowIfResponseContentIsInvalid(content) {
+    if (!content) {
+      throw new Error(
+        `Response '200' did not have 'application/json' content:\n${JSON.stringify(content, null, 2)}`
+      );
+    }
+
+    if (this.ResponseSchemaIsInlineObject(content.schema)) {
+      throw new Error(
+        `Operation responses should have a reference to a schema instead of a inline object: \n${JSON.stringify(content.schema, null, 2)}`
+      );
+    }
+  }
+
+  GenerateReturnType(responses) {
+    if (responses['204'] && !responses['200']) {
+      return { resolved: 'void', type: 'literal' };
+    }
+
+    if (responses['200']) {
+      const content = responses['200'].content['application/json'];
+
+      this.ThrowIfResponseContentIsInvalid(content);
+
+      // TODO: How to solve this in DotNet?
+      // if (responses['204']) {
+      //   return `${this.resolveType(content.schema)} | void`;
+      // }
+
+      return this.ResolveDotnetType(content.schema);
+    }
+
+    throw new Error(
+      `Unexpected response object:\n${JSON.stringify(responses, null, 2)}`
+    );
+  }
+
+  GenerateOperations() {
+    const paths = this.#swaggerDocument.paths;
+
+    const operations = [];
+
+    for (const path in paths) {
+      for (const method in paths[path]) {
+        const operationSchema = paths[path][method];
+
+        const operation = {
+          schema: operationSchema,
+          path,
+          method,
+          returnType: this.GenerateReturnType(operationSchema.responses),
+        };
+
+        operations.push(operation);
+      }
+    }
+
+    return operations;
+  }
+
+  GenerateControllers() {
+    const operations = this.GenerateOperations();
+    const tags = this.GenerateTags(operations);
+
+    const controllers = [];
+
+    for (const tag of tags) {
+      const tagOperations = operations.filter((op) =>
+        op.schema.tags.includes(tag.name)
+      );
+
+      controllers.push({
+        name: tag.name,
+        xmlObject: tag.xmlObject,
+        operations: tagOperations,
+      });
+    }
+
+    return controllers;
   }
 }
 
@@ -504,6 +629,71 @@ class RenderExample {
   }
 }
 
+class RenderController {
+  #controller;
+  #rootNamespace;
+
+  constructor(controller, rootNamespace) {
+    this.#controller = controller;
+    this.#rootNamespace = rootNamespace;
+  }
+
+  getIndentationString(indentation) {
+    return new Array(indentation).fill(' ').join('');
+  }
+
+  renderOperation(operation, indentation = 0) {
+    const indentationString = this.getIndentationString(indentation);
+
+    let output = '';
+
+    //public ActionResult<Pet> CreatePet([Required] Pet pet)
+
+    output += indentationString;
+    output += 'public ActionResult';
+
+    if (operation.returnType.resolved !== 'void') {
+      output += `<${operation.returnType.resolved}>`;
+    }
+
+    output += ` ${operation.schema.operationId}()\n`;
+    output += `${indentationString}{\n`;
+    output += `${indentationString}}\n\n`;
+
+    return output;
+  }
+
+  render() {
+    const controller = this.#controller;
+
+    const imports = [
+      'using Microsoft.AspNetCore.Mvc;',
+      `using ${this.#rootNamespace}.Generated.Models;`,
+    ];
+    const attributes = ['[ApiController]', '[Route("[controller]")]'];
+
+    let output = '';
+
+    output += imports.join('\n');
+    output += '\n\n';
+
+    output += `namespace ${this.#rootNamespace}.Generated.Controllers;\n\n`;
+
+    output += attributes.join('\n');
+    output += '\n';
+    output += `public class ${controller.name}Controller : ControllerBase\n`;
+    output += '{\n';
+
+    for (const operation of controller.operations) {
+      output += this.renderOperation(operation, 2);
+    }
+
+    output += '}';
+
+    return output;
+  }
+}
+
 const ROOT_NAMESPACE = 'AspNetServer';
 
 const IGNORED_MODELS = new Set(['ProblemDetails']);
@@ -532,4 +722,18 @@ for (const model of dotNetModel.models) {
       }
     );
   }
+}
+await fs.mkdir(path.join(GENERATED_FOLDER, 'controllers'), { recursive: true });
+for (const controller of dotNetModel.controllers) {
+  await fs.writeFile(
+    path.join(
+      GENERATED_FOLDER,
+      'controllers',
+      `${controller.name}Controller.cs`
+    ),
+    new RenderController(controller, ROOT_NAMESPACE).render(),
+    {
+      encoding: 'utf-8',
+    }
+  );
 }
