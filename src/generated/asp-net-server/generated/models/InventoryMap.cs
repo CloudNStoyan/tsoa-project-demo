@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using AspNetServer.SwashbuckleFilters;
 
 namespace AspNetServer.Generated.Models;
@@ -6,19 +7,10 @@ namespace AspNetServer.Generated.Models;
 /// Inventory map of adoption status to quantities.
 /// </summary>
 public class InventoryMap {
-  /// <summary>
-  /// undefined
-  /// </summary>
+  [Required]
   public double Adopted { get; set; }
-
-  /// <summary>
-  /// undefined
-  /// </summary>
+  [Required]
   public double Available { get; set; }
-
-  /// <summary>
-  /// undefined
-  /// </summary>
+  [Required]
   public double Pending { get; set; }
-
 }

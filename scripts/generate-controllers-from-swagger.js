@@ -45,9 +45,13 @@ class DotNetModel {
     this.models = this.GenerateModels();
   }
 
-  GetDotnetType(schema) {
+  SchemaIsEnum(schema) {
+    return schema.type === 'string' && Array.isArray(schema.enum);
+  }
+
+  ResolveDotnetType(schema) {
     if (Array.isArray(schema.allOf) && schema.allOf.length === 1) {
-      return this.GetDotnetType(schema.allOf[0]);
+      return this.ResolveDotnetType(schema.allOf[0]);
     }
 
     if (schema.$ref) {
@@ -59,54 +63,102 @@ class DotNetModel {
 
       const typeName = schema.$ref.split('#/components/schemas/')[1];
 
-      return typeName;
+      const schemaType = this.#swaggerDocument.components.schemas[typeName];
+
+      const isEnum = this.SchemaIsEnum(schemaType);
+
+      if (schemaType.type != 'object' && !isEnum) {
+        return this.ResolveDotnetType(schemaType);
+      }
+
+      return { resolved: typeName, type: isEnum ? 'enum' : 'object' };
     }
 
     switch (schema.type) {
       case 'array': {
-        return `${this.GetDotnetType(schema.items)}[]`;
+        const itemType = this.ResolveDotnetType(schema.items);
+
+        return {
+          resolved: `${itemType.resolved}[]`,
+          itemType,
+          type: 'array',
+        };
       }
       case 'string': {
         if (schema.format === 'uuid') {
-          return 'Guid';
+          return { resolved: 'Guid', type: 'object', builtin: true };
         } else if (schema.format === 'date') {
-          return 'DateOnly';
+          return { resolved: 'DateOnly', type: 'object', builtin: true };
         } else if (schema.format === 'date-time') {
-          return 'DateTime';
+          return { resolved: 'DateTime', type: 'object', builtin: true };
         } else {
-          return 'string';
+          return { resolved: 'string', type: 'literal' };
         }
       }
       case 'boolean': {
-        return 'bool';
+        return { resolved: 'bool', type: 'literal' };
       }
       case 'integer': {
-        return 'int';
+        return { resolved: 'int', type: 'literal' };
       }
       case 'number': {
         if (schema.format === 'float') {
-          return 'float';
+          return { resolved: 'float', type: 'literal' };
         } else if (schema.format === 'double') {
-          return 'double';
+          return { resolved: 'double', type: 'literal' };
         } else if (schema.format === 'int32') {
-          return 'int';
+          return { resolved: 'int', type: 'literal' };
         } else if (schema.format === 'int64') {
-          return 'long';
+          return { resolved: 'long', type: 'literal' };
         } else {
           throw new Error(`Unexpected number format '${schema.format}'.`);
         }
       }
       default: {
-        console.log(schema);
         throw new Error(`Unexpected schema type '${schema.type}'.`);
       }
     }
   }
 
   GenerateXmlObject(schema) {
-    return {
+    const output = {
       summary: schema.description,
     };
+
+    for (const key in output) {
+      if (output[key] !== undefined) {
+        return output;
+      }
+    }
+
+    return '';
+  }
+
+  GenerateAttributes(schema, required) {
+    const attributes = [];
+
+    if (schema.minLength !== undefined || schema.minItems !== undefined) {
+      attributes.push(`[MinLength(${schema.minLength || schema.minItems})]`);
+    }
+
+    if (schema.maxLength !== undefined || schema.maxItems !== undefined) {
+      attributes.push(`[MaxLength(${schema.maxLength || schema.maxItems})]`);
+    }
+
+    if (schema.maximum !== undefined || schema.minimum !== undefined) {
+      const numberType = this.ResolveDotnetType(schema);
+
+      const maximum = schema.maximum || `${numberType}.MaxValue`;
+      const minimum = schema.minimum || '0';
+
+      attributes.push(`[Range(${minimum}, ${maximum})]`);
+    }
+
+    if (required === true) {
+      attributes.push('[Required]');
+    }
+
+    return attributes;
   }
 
   GenerateProperty(schema, name, required) {
@@ -115,7 +167,9 @@ class DotNetModel {
       type: schema.type,
       required,
       xmlObject: this.GenerateXmlObject(schema),
-      dotnetType: this.GetDotnetType(schema),
+      dotnetType: this.ResolveDotnetType(schema),
+      nullable: schema.nullable || false,
+      attributes: this.GenerateAttributes(schema, required),
     };
   }
 
@@ -189,12 +243,16 @@ class RenderModel {
     return true;
   }
 
+  getIndentationString(indentation) {
+    return new Array(indentation).fill(' ').join('');
+  }
+
   renderXml(xmlObject, indentation = 0) {
     if (this.isEmpty(xmlObject)) {
       return '';
     }
 
-    let indentationString = new Array(indentation).fill(' ').join('');
+    let indentationString = this.getIndentationString(indentation);
 
     let output = '';
 
@@ -202,6 +260,22 @@ class RenderModel {
       output += `${indentationString}/// <summary>\n`;
       output += `${indentationString}/// ${xmlObject['summary']}\n`;
       output += `${indentationString}/// </summary>\n`;
+    }
+
+    return output;
+  }
+
+  renderAttributes(attributes, indentation = 0) {
+    if (attributes.length === 0) {
+      return '';
+    }
+
+    let output = '';
+
+    let indentationString = this.getIndentationString(indentation);
+
+    for (const attribute of attributes) {
+      output += `${indentationString}${attribute}\n`;
     }
 
     return output;
@@ -226,9 +300,22 @@ class RenderModel {
     let output = '';
 
     output += this.renderXml(property.xmlObject, 2);
-    output += `  public ${property.dotnetType} ${uppercaseFirstLetter(property.name)} { get; set; }\n`;
 
-    return output;
+    const indentationString = this.getIndentationString(2);
+
+    output += this.renderAttributes(property.attributes, 2);
+
+    const nullableString = property.nullable ? '?' : '';
+    const requiredModifierString =
+      (property.dotnetType.resolved === 'string' ||
+        property.dotnetType.itemType?.resolved === 'string') &&
+      property.required
+        ? 'required '
+        : '';
+
+    output += `${indentationString}public ${requiredModifierString}${property.dotnetType.resolved}${nullableString} ${uppercaseFirstLetter(property.name)} { get; set; }\n`;
+
+    return output.trimEnd();
   }
 
   renderClass(classModel) {
@@ -253,7 +340,8 @@ class RenderModel {
 
     let output = '';
 
-    output += `using AspNetServer.SwashbuckleFilters;\n\n`;
+    output += 'using System.ComponentModel.DataAnnotations;\n';
+    output += 'using AspNetServer.SwashbuckleFilters;\n\n';
 
     output += `namespace ${rootNamespace}.Generated.Models;\n\n`;
 

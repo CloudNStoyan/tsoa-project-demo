@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using AspNetServer.SwashbuckleFilters;
 
 namespace AspNetServer.Generated.Models;
@@ -9,21 +10,21 @@ public class AdoptionRequest {
   /// <summary>
   /// The adoption's ID.
   /// </summary>
-  public UUID Id { get; set; }
-
+  [Required]
+  public Guid Id { get; set; }
   /// <summary>
   /// The adoptee's ID.
   /// </summary>
-  public UUID PetId { get; set; }
-
+  [Required]
+  public Guid PetId { get; set; }
   /// <summary>
   /// The date of submission of the adoption request.
   /// </summary>
+  [Required]
   public DateTime DateOfSubmission { get; set; }
-
   /// <summary>
   /// The adoption request status.
   /// </summary>
+  [Required]
   public AdoptionRequestStatus Status { get; set; }
-
 }

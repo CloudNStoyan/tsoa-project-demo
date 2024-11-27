@@ -14,7 +14,6 @@ public class Pet {
   /// </summary>
   [Required]
   public Guid Id { get; set; }
-
   /// <summary>
   /// The name of the pet.
   /// </summary>
