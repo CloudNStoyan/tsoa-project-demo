@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using AspNetServer.SwashbuckleFilters;
 using AspNetServer.Generated.Models;
 
 namespace AspNetServer.Generated.Controllers;
@@ -30,6 +31,7 @@ public class PetController : ControllerBase
   /// <response code="404">Not Found</response>
   [HttpPut]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
+  [SwaggerErrorExample(StatusCodes.Status404NotFound, "Not Found", "Pet not found!")]
   [ProducesResponseType(StatusCodes.Status200OK)]
   public ActionResult<Pet> UpdatePet([FromBody][Required] Pet pet)
   {
@@ -112,6 +114,7 @@ public class PetController : ControllerBase
   /// <response code="404">Not Found</response>
   [HttpGet("{petId}")]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
+  [SwaggerErrorExample(StatusCodes.Status404NotFound, "Not Found", "Pet not found!")]
   [ProducesResponseType(StatusCodes.Status200OK)]
   public ActionResult<Pet> GetPet([FromRoute][Required] Guid petId)
   {
@@ -127,10 +130,10 @@ public class PetController : ControllerBase
   /// <response code="404">Not Found</response>
   [HttpDelete("{petId}")]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
+  [SwaggerErrorExample(StatusCodes.Status404NotFound, "Not Found", "Pet not found!")]
   [ProducesResponseType(StatusCodes.Status204NoContent)]
   public ActionResult DeletePet([FromRoute][Required] Guid petId)
   {
     throw new NotImplementedException();
   }
-
 }

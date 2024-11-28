@@ -566,6 +566,47 @@ class DotNetModel {
     return output;
   }
 
+  GenerateResponse(responseSchemes) {
+    const responses = [];
+
+    for (const statusCode in responseSchemes) {
+      const responseSchema = responseSchemes[statusCode];
+
+      const response = {
+        statusCode: Number(statusCode),
+        description: responseSchema.description,
+      };
+
+      if (response.statusCode === 204) {
+        responses.push(response);
+        continue;
+      }
+
+      const content = responseSchema.content['application/json'];
+
+      response.dotnetType = this.ResolveDotnetType(content.schema);
+
+      response.examples = [];
+
+      if (content.example) {
+        response.examples.push(content.example);
+      }
+
+      if (content.examples) {
+        response.examples = [
+          ...response.examples,
+          ...Object.values(content.examples).map((example) => example.value),
+        ];
+      }
+
+      responses.push(response);
+    }
+
+    responses.sort((a, b) => b.statusCode - a.statusCode);
+
+    return responses;
+  }
+
   GenerateOperations() {
     const paths = this.#swaggerDocument.paths;
 
@@ -582,11 +623,8 @@ class DotNetModel {
           method,
           returnType: this.GenerateReturnType(operationSchema.responses),
           parameters: this.GenerateControllerParameters(operationSchema),
+          responses: this.GenerateResponse(operationSchema.responses),
         };
-
-        const responseCodes = operationResponses
-          .map(([code]) => Number(code))
-          .reverse();
 
         const attributes = [];
 
@@ -596,10 +634,30 @@ class DotNetModel {
 
         attributes.push(this.GenerateMethodAttribute(operation));
 
-        for (const responseCode of responseCodes) {
-          attributes.push(
-            `[ProducesResponseType(StatusCodes.${STATUS_CODES_TO_ENUM_NAMES[responseCode]})]`
-          );
+        for (const response of operation.responses) {
+          const statusCodeAsEnumType = `StatusCodes.${STATUS_CODES_TO_ENUM_NAMES[response.statusCode]}`;
+
+          attributes.push(`[ProducesResponseType(${statusCodeAsEnumType})]`);
+
+          const isErrorResponse =
+            response.statusCode > 399 && response.statusCode < 600;
+
+          if (
+            isErrorResponse &&
+            response.dotnetType.resolved !== 'ProblemDetails'
+          ) {
+            throw new Error(
+              `Expected error responses to be of type 'ProblemDetails' instead got '${response.dotnetType.resolved}'.`
+            );
+          }
+
+          if (isErrorResponse && response.examples.length > 0) {
+            for (const example of response.examples) {
+              attributes.push(
+                `[SwaggerErrorExample(${statusCodeAsEnumType}, "${example.title}", "${example.detail}")]`
+              );
+            }
+          }
         }
 
         operation.attributes = attributes;
@@ -643,11 +701,53 @@ class DotNetModel {
         op.schema.tags.includes(tag.name)
       );
 
-      controllers.push({
+      const controller = {
         name: tag.name,
         xmlObject: tag.xmlObject,
         operations: tagOperations,
-      });
+        attributes: ['[ApiController]', '[Route("[controller]")]'],
+      };
+
+      const commonAttributesMap = new Map();
+      const possibleCommonAttributes = [
+        'ProducesResponseType',
+        'SwaggerErrorExample',
+      ];
+
+      const ignoredAttributes = [
+        '[ProducesResponseType(StatusCodes.Status200OK)]',
+      ];
+
+      for (const operation of controller.operations) {
+        for (const attr of operation.attributes) {
+          for (const possibleCommonAttr of possibleCommonAttributes) {
+            if (
+              attr.startsWith(`[${possibleCommonAttr}`) &&
+              !ignoredAttributes.includes(attr)
+            ) {
+              const count = commonAttributesMap.get(attr) || 0;
+
+              commonAttributesMap.set(attr, count + 1);
+            }
+          }
+        }
+      }
+
+      const commonAttributes = Array.from(commonAttributesMap)
+        .filter(([attr, count]) => count === controller.operations.length)
+        .map(([attr]) => attr);
+
+      if (commonAttributes.length > 0) {
+        controller.attributes = [...controller.attributes, ...commonAttributes];
+
+        for (const operation of controller.operations) {
+          operation.attributes = operation.attributes.filter(
+            (attr) => !commonAttributes.includes(attr)
+          );
+        }
+      }
+
+      controllers.push(controller);
     }
 
     return controllers;
@@ -1046,9 +1146,9 @@ class RenderController {
     const imports = [
       'using System.ComponentModel.DataAnnotations;',
       'using Microsoft.AspNetCore.Mvc;',
+      `using ${this.#rootNamespace}.SwashbuckleFilters;`,
       `using ${this.#rootNamespace}.Generated.Models;`,
     ];
-    const attributes = ['[ApiController]', '[Route("[controller]")]'];
 
     let output = '';
 
@@ -1057,7 +1157,7 @@ class RenderController {
 
     output += `namespace ${this.#rootNamespace}.Generated.Controllers;\n\n`;
 
-    output += attributes.join('\n');
+    output += controller.attributes.join('\n');
     output += '\n';
     output += `public class ${controller.name}Controller : ControllerBase\n`;
     output += '{\n';
@@ -1066,7 +1166,9 @@ class RenderController {
       output += this.renderOperation(operation, 2);
     }
 
-    output += '}';
+    output = output.trim();
+
+    output += '\n}';
 
     return output;
   }
