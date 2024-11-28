@@ -32,9 +32,100 @@ if (!valid) {
   throw new Error('OpenAPI Schema was not valid!');
 }
 
+function isObjectEmpty(obj) {
+  for (const prop in obj) {
+    if (Object.hasOwn(obj, prop)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function uppercaseFirstLetter(string) {
   return string[0].toUpperCase() + string.slice(1);
 }
+
+function lowercaseFirstLetter(string) {
+  return string[0].toLowerCase() + string.slice(1);
+}
+
+const STATUS_CODES_TO_ENUM_NAMES = {
+  100: 'Status100Continue',
+  101: 'Status101SwitchingProtocols',
+  102: 'Status102Processing',
+  200: 'Status200OK',
+  201: 'Status201Created',
+  202: 'Status202Accepted',
+  203: 'Status203NonAuthoritative',
+  204: 'Status204NoContent',
+  205: 'Status205ResetContent',
+  206: 'Status206PartialContent',
+  207: 'Status207MultiStatus',
+  208: 'Status208AlreadyReported',
+  226: 'Status226IMUsed',
+  300: 'Status300MultipleChoices',
+  301: 'Status301MovedPermanently',
+  302: 'Status302Found',
+  303: 'Status303SeeOther',
+  304: 'Status304NotModified',
+  305: 'Status305UseProxy',
+  306: 'Status306SwitchProxy',
+  307: 'Status307TemporaryRedirect',
+  308: 'Status308PermanentRedirect',
+  400: 'Status400BadRequest',
+  401: 'Status401Unauthorized',
+  402: 'Status402PaymentRequired',
+  403: 'Status403Forbidden',
+  404: 'Status404NotFound',
+  405: 'Status405MethodNotAllowed',
+  406: 'Status406NotAcceptable',
+  407: 'Status407ProxyAuthenticationRequired',
+  408: 'Status408RequestTimeout',
+  409: 'Status409Conflict',
+  410: 'Status410Gone',
+  411: 'Status411LengthRequired',
+  412: 'Status412PreconditionFailed',
+  413: 'Status413RequestEntityTooLarge',
+  414: 'Status414UriTooLong',
+  415: 'Status415UnsupportedMediaType',
+  416: 'Status416RequestedRangeNotSatisfiable',
+  417: 'Status417ExpectationFailed',
+  418: 'Status418ImATeapot',
+  419: 'Status419AuthenticationTimeout',
+  421: 'Status421MisdirectedRequest',
+  422: 'Status422UnprocessableEntity',
+  423: 'Status423Locked',
+  424: 'Status424FailedDependency',
+  426: 'Status426UpgradeRequired',
+  428: 'Status428PreconditionRequired',
+  429: 'Status429TooManyRequests',
+  431: 'Status431RequestHeaderFieldsTooLarge',
+  451: 'Status451UnavailableForLegalReasons',
+  500: 'Status500InternalServerError',
+  501: 'Status501NotImplemented',
+  502: 'Status502BadGateway',
+  503: 'Status503ServiceUnavailable',
+  504: 'Status504GatewayTimeout',
+  505: 'Status505HttpVersionNotsupported',
+  506: 'Status506VariantAlsoNegotiates',
+  507: 'Status507InsufficientStorage',
+  508: 'Status508LoopDetected',
+  510: 'Status510NotExtended',
+  511: 'Status511NetworkAuthenticationRequired',
+  // This is an unofficial status code originally defined by Nginx and is commonly used in logs when the client has disconnected.
+  499: 'Status499ClientClosedRequest',
+};
+
+const HTTP_METHODS_TO_ATTRIBUTE_NAMES = {
+  get: 'HttpGet',
+  post: 'HttpPost',
+  put: 'HttpPut',
+  patch: 'HttpPatch',
+  delete: 'HttpDelete',
+  head: 'HttpHead',
+  options: 'HttpOptions',
+};
 
 class DotNetModel {
   #swaggerDocument;
@@ -305,6 +396,35 @@ class DotNetModel {
     return false;
   }
 
+  GenerateBodyParamName(dotnetType) {
+    const isArray = dotnetType.type === 'array';
+
+    let unwrappedType = dotnetType;
+
+    if (isArray) {
+      while (unwrappedType.type === 'array') {
+        unwrappedType = unwrappedType.itemType;
+      }
+    }
+
+    if (
+      (unwrappedType.type !== 'object' && unwrappedType.type !== 'enum') ||
+      unwrappedType.builtin
+    ) {
+      return 'body';
+    }
+
+    let name = lowercaseFirstLetter(unwrappedType.resolved);
+
+    if (isArray) {
+      // TODO: if we want to be fancy we can use this package:
+      // https://github.com/plurals/pluralize
+      name += 's';
+    }
+
+    return name;
+  }
+
   ThrowIfResponseContentIsInvalid(content) {
     if (!content) {
       throw new Error(
@@ -342,6 +462,110 @@ class DotNetModel {
     );
   }
 
+  GenerateControllerParameters(operation) {
+    const parameters = [];
+
+    for (const parameterInfo of operation.parameters) {
+      const attributes = [];
+
+      if (parameterInfo.in === 'query') {
+        attributes.push('[FromQuery]');
+      } else if (parameterInfo.in === 'header') {
+        attributes.push('[FromHeader]');
+      } else if (parameterInfo.in === 'path') {
+        attributes.push('[FromRoute]');
+      } else if (parameterInfo.in === 'cookie') {
+        throw new Error(
+          `.NET doesn't support 'Cookie' OpenAPI parameters, 'Cookie' OpenAPI parameter found in '${operation.operationId}' operation.`
+        );
+      } else {
+        throw new Error(`Invalid parameter.in value '${parameterInfo.in}'.`);
+      }
+
+      if (parameterInfo.required) {
+        attributes.push('[Required]');
+      }
+
+      const parameter = {
+        attributes,
+        type: parameterInfo.in,
+        name: parameterInfo.name,
+        schema: parameterInfo.schema,
+        default: parameterInfo.schema.default,
+        dotnetType: this.ResolveDotnetType(parameterInfo.schema),
+        description: parameterInfo.description,
+      };
+
+      parameters.push(parameter);
+    }
+
+    if (operation.requestBody) {
+      const body = operation.requestBody;
+
+      const content = body.content['application/json'];
+
+      if (!content) {
+        throw new Error(
+          `Request body did not have 'application/json' content:\n${JSON.stringify(body, null, 2)}`
+        );
+      }
+
+      const attributes = ['[FromBody]'];
+
+      if (body.required) {
+        attributes.push('[Required]');
+      }
+
+      const dotnetType = this.ResolveDotnetType(content.schema);
+
+      const parameter = {
+        attributes,
+        type: 'body',
+        name: this.GenerateBodyParamName(dotnetType),
+        schema: content.schema,
+        default: undefined,
+        dotnetType,
+        description: body.description,
+      };
+
+      parameters.push(parameter);
+    }
+
+    return parameters;
+  }
+
+  GenerateMethodAttribute(operation) {
+    let path = operation.path;
+
+    if (path.startsWith('/')) {
+      path = path.slice(1);
+    }
+
+    const firstPart = path.split('/')[0].toLowerCase();
+
+    const tags = new Set(operation.schema.tags.map((tag) => tag.toLowerCase()));
+
+    const firstPartIsControllerName = tags.has(firstPart);
+
+    if (firstPartIsControllerName) {
+      path = path.slice(firstPart.length);
+    }
+
+    if (path.startsWith('/')) {
+      path = path.slice(1);
+    }
+
+    let output = `[${HTTP_METHODS_TO_ATTRIBUTE_NAMES[operation.method]}`;
+
+    if (path.length > 0) {
+      output += `("${path}")`;
+    }
+
+    output += ']';
+
+    return output;
+  }
+
   GenerateOperations() {
     const paths = this.#swaggerDocument.paths;
 
@@ -350,13 +574,56 @@ class DotNetModel {
     for (const path in paths) {
       for (const method in paths[path]) {
         const operationSchema = paths[path][method];
+        const operationResponses = Object.entries(operationSchema.responses);
 
         const operation = {
           schema: operationSchema,
           path,
           method,
           returnType: this.GenerateReturnType(operationSchema.responses),
+          parameters: this.GenerateControllerParameters(operationSchema),
         };
+
+        const responseCodes = operationResponses
+          .map(([code]) => Number(code))
+          .reverse();
+
+        const attributes = [];
+
+        if (operation.schema.deprecated) {
+          attributes.push('[Obsolete]');
+        }
+
+        attributes.push(this.GenerateMethodAttribute(operation));
+
+        for (const responseCode of responseCodes) {
+          attributes.push(
+            `[ProducesResponseType(StatusCodes.${STATUS_CODES_TO_ENUM_NAMES[responseCode]})]`
+          );
+        }
+
+        operation.attributes = attributes;
+
+        const xmlObject = {};
+        xmlObject.summary = operationSchema.summary;
+        xmlObject.remarks = operationSchema.description;
+        xmlObject.params = operation.parameters.map((p) => {
+          return {
+            name: p.name,
+            description: p.description,
+          };
+        });
+
+        xmlObject.responses = operationResponses.map(
+          ([responseCode, responseSchema]) => {
+            return {
+              code: responseCode,
+              description: responseSchema.description,
+            };
+          }
+        );
+
+        operation.xmlObject = xmlObject;
 
         operations.push(operation);
       }
@@ -396,22 +663,12 @@ class RenderModel {
     this.#rootNamespace = rootNamespace;
   }
 
-  isEmpty(obj) {
-    for (const prop in obj) {
-      if (Object.hasOwn(obj, prop)) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   getIndentationString(indentation) {
     return new Array(indentation).fill(' ').join('');
   }
 
   renderXml(xmlObject, indentation = 0) {
-    if (this.isEmpty(xmlObject)) {
+    if (isObjectEmpty(xmlObject)) {
       return '';
     }
 
@@ -642,6 +899,123 @@ class RenderController {
     return new Array(indentation).fill(' ').join('');
   }
 
+  renderValue(dotnetType, value) {
+    let output = '';
+
+    if (dotnetType.type === 'literal') {
+      if (dotnetType.resolved === 'string') {
+        output += `"${value}"`;
+      } else {
+        output += value;
+      }
+    } else if (dotnetType.type === 'object') {
+      output += `${dotnetType.resolved}.Parse("${value}")`;
+    } else if (dotnetType.type === 'enum') {
+      output += `${dotnetType.resolved}.${value}`;
+    } else if (dotnetType.type === 'array') {
+      if (!Array.isArray(value)) {
+        throw new Error(
+          `Expected array value, but got '${typeof value}' value.`
+        );
+      }
+
+      output += '[';
+      output += value
+        .map((valueElement) =>
+          this.renderValue(dotnetType.itemType, valueElement)
+        )
+        .join(', ');
+      output += ']';
+    } else {
+      throw new Error(`Unexpected type '${dotnetType.type}' found.`);
+    }
+
+    return output;
+  }
+
+  renderAttributes(attributes, indentation = 0) {
+    if (attributes.length === 0) {
+      return '';
+    }
+
+    let output = '';
+
+    let indentationString = this.getIndentationString(indentation);
+
+    for (const attribute of attributes) {
+      output += `${indentationString}${attribute}\n`;
+    }
+
+    return output;
+  }
+
+  renderXml(xmlObject, indentation = 0) {
+    if (isObjectEmpty(xmlObject)) {
+      return '';
+    }
+
+    let indentationString = this.getIndentationString(indentation);
+
+    let output = '';
+
+    if ('summary' in xmlObject) {
+      output += `${indentationString}/// <summary>\n`;
+      output += `${indentationString}/// ${xmlObject['summary']}\n`;
+      output += `${indentationString}/// </summary>\n`;
+    }
+
+    if ('remarks' in xmlObject) {
+      output += `${indentationString}/// <remarks>${xmlObject['remarks']}</remarks>\n`;
+    }
+
+    if ('params' in xmlObject) {
+      const params = xmlObject['params'];
+
+      for (const param of params) {
+        output += `${indentationString}/// <param name="${param.name}">${param.description}</param>\n`;
+      }
+    }
+
+    if ('responses' in xmlObject) {
+      const responses = xmlObject['responses'];
+
+      for (const response of responses) {
+        output += `${indentationString}/// <response code="${response.code}">${response.description}</response>\n`;
+      }
+    }
+
+    return output;
+  }
+
+  renderParameter(parameter) {
+    let output = '';
+
+    output += parameter.attributes.join('');
+    output += ' ';
+    output += parameter.dotnetType.resolved;
+    output += ' ';
+    output += parameter.name;
+
+    if (parameter.default !== undefined) {
+      const renderedValue = this.renderValue(
+        parameter.dotnetType,
+        parameter.default
+      );
+
+      output += ` = ${renderedValue}`;
+    }
+
+    return output;
+  }
+
+  renderParameters(parameters) {
+    if (parameters.length === 0) {
+      return '';
+    }
+
+    return parameters.map((param) => this.renderParameter(param)).join(', ');
+  }
+
   renderOperation(operation, indentation = 0) {
     const indentationString = this.getIndentationString(indentation);
 
@@ -649,6 +1023,8 @@ class RenderController {
 
     //public ActionResult<Pet> CreatePet([Required] Pet pet)
 
+    output += this.renderXml(operation.xmlObject, indentation);
+    output += this.renderAttributes(operation.attributes, indentation);
     output += indentationString;
     output += 'public ActionResult';
 
@@ -656,8 +1032,9 @@ class RenderController {
       output += `<${operation.returnType.resolved}>`;
     }
 
-    output += ` ${operation.schema.operationId}()\n`;
+    output += ` ${operation.schema.operationId}(${this.renderParameters(operation.parameters)})\n`;
     output += `${indentationString}{\n`;
+    output += `${indentationString}  throw new NotImplementedException();\n`;
     output += `${indentationString}}\n\n`;
 
     return output;
@@ -667,6 +1044,7 @@ class RenderController {
     const controller = this.#controller;
 
     const imports = [
+      'using System.ComponentModel.DataAnnotations;',
       'using Microsoft.AspNetCore.Mvc;',
       `using ${this.#rootNamespace}.Generated.Models;`,
     ];

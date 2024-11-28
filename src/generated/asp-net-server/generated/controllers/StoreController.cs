@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using AspNetServer.Generated.Models;
 
@@ -7,20 +8,67 @@ namespace AspNetServer.Generated.Controllers;
 [Route("[controller]")]
 public class StoreController : ControllerBase
 {
+  /// <summary>
+  /// Returns pet inventories by adoption status.
+  /// </summary>
+  /// <remarks>Returns a map of adoption status to quantities.</remarks>
+  /// <response code="200">Successful retrieval of inventory.</response>
+  /// <response code="401">Unauthorized</response>
+  [HttpGet("inventory")]
+  [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+  [ProducesResponseType(StatusCodes.Status200OK)]
   public ActionResult<InventoryMap> GetInventory()
   {
+    throw new NotImplementedException();
   }
 
-  public ActionResult<AdoptionRequest> AdoptPet()
+  /// <summary>
+  /// Request an adoption of a pet.
+  /// </summary>
+  /// <remarks>Place an adoption request for a pet.</remarks>
+  /// <param name="adoptionRequest">The adoption request.</param>
+  /// <response code="200">Successful creation of adoption request.</response>
+  /// <response code="401">Unauthorized</response>
+  [HttpPost("adopt")]
+  [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+  [ProducesResponseType(StatusCodes.Status200OK)]
+  public ActionResult<AdoptionRequest> AdoptPet([FromBody][Required] AdoptionRequest adoptionRequest)
   {
+    throw new NotImplementedException();
   }
 
-  public ActionResult<AdoptionRequest> GetAdoptRequestById()
+  /// <summary>
+  /// Find adoption request by ID.
+  /// </summary>
+  /// <remarks>Find adoption request by ID.</remarks>
+  /// <param name="requestId">The adoption request's ID.</param>
+  /// <response code="200">Successful retrieval of adoption request.</response>
+  /// <response code="401">Unauthorized</response>
+  /// <response code="404">Not Found</response>
+  [HttpGet("adopt/{requestId}")]
+  [ProducesResponseType(StatusCodes.Status404NotFound)]
+  [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+  [ProducesResponseType(StatusCodes.Status200OK)]
+  public ActionResult<AdoptionRequest> GetAdoptRequestById([FromRoute][Required] Guid requestId)
   {
+    throw new NotImplementedException();
   }
 
-  public ActionResult DeleteAdoptRequestById()
+  /// <summary>
+  /// Delete adoption request by ID.
+  /// </summary>
+  /// <remarks>Delete adoption request by ID.</remarks>
+  /// <param name="requestId">The adoption request's ID.</param>
+  /// <response code="204">No Content</response>
+  /// <response code="401">Unauthorized</response>
+  /// <response code="404">Not Found</response>
+  [HttpDelete("adopt/{requestId}")]
+  [ProducesResponseType(StatusCodes.Status404NotFound)]
+  [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+  [ProducesResponseType(StatusCodes.Status204NoContent)]
+  public ActionResult DeleteAdoptRequestById([FromRoute][Required] Guid requestId)
   {
+    throw new NotImplementedException();
   }
 
 }
