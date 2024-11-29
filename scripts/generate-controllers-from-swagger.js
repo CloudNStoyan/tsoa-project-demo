@@ -2,6 +2,7 @@ import { openapi } from '@apidevtools/openapi-schemas';
 import Ajv from 'ajv-draft-04';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import crypto from 'node:crypto';
 
 const SWAGGER_JSON_FILE_PATH = './src/generated/swagger.json';
 const GENERATED_FOLDER = './src/generated/asp-net-server/generated';
@@ -40,6 +41,50 @@ function isObjectEmpty(obj) {
   }
 
   return true;
+}
+
+function hashJsonObject(obj) {
+  const json = JSON.stringify(sortObjectKeysRecursively(obj));
+
+  const hash = crypto
+    .createHash('sha1')
+    .update(json, 'utf-8')
+    .digest()
+    .toString('hex');
+
+  return hash;
+}
+
+function sortObjectKeysRecursively(inputObject) {
+  if (Array.isArray(inputObject)) {
+    const newArray = [];
+
+    for (let i = 0; i < inputObject.length; i += 1) {
+      newArray[i] = sortObjectKeysRecursively(inputObject[i]);
+    }
+
+    if (typeof newArray[0] === 'string') {
+      newArray.sort((a, b) => a.localeCompare(b));
+    }
+
+    return newArray;
+  }
+
+  if (typeof inputObject !== 'object' || inputObject === null) {
+    return inputObject;
+  }
+
+  const newObject = {};
+
+  const sortedKeys = Object.keys(inputObject).sort();
+
+  for (let i = 0; i < sortedKeys.length; i += 1) {
+    newObject[sortedKeys[i]] = sortObjectKeysRecursively(
+      inputObject[sortedKeys[i]]
+    );
+  }
+
+  return newObject;
 }
 
 function uppercaseFirstLetter(string) {
@@ -136,11 +181,25 @@ class DotNetModel {
     this.#rootNamespace = rootNamespace;
 
     this.models = this.GenerateModels();
-    this.controllers = this.GenerateControllers();
+
+    const operations = this.GenerateOperations();
+
+    this.additionalExamples =
+      this.GenerateArrayExamplesAndUpdateOperations(operations);
+
+    this.controllers = this.GenerateControllers(operations);
   }
 
   SchemaIsEnum(schema) {
     return schema.type === 'string' && Array.isArray(schema.enum);
+  }
+
+  GetArrayItemType(dotnetType) {
+    if (dotnetType.type !== 'array') {
+      return dotnetType;
+    }
+
+    return this.GetArrayItemType(dotnetType.itemType);
   }
 
   ResolveDotnetType(schema) {
@@ -589,13 +648,21 @@ class DotNetModel {
       response.examples = [];
 
       if (content.example) {
-        response.examples.push(content.example);
+        response.examples.push({
+          hash: hashJsonObject(content.example),
+          value: content.example,
+        });
       }
 
       if (content.examples) {
         response.examples = [
           ...response.examples,
-          ...Object.values(content.examples).map((example) => example.value),
+          ...Object.values(content.examples).map((example) => {
+            return {
+              hash: hashJsonObject(example.value),
+              value: example.value,
+            };
+          }),
         ];
       }
 
@@ -605,6 +672,124 @@ class DotNetModel {
     responses.sort((a, b) => b.statusCode - a.statusCode);
 
     return responses;
+  }
+
+  GenerateArrayExamplesAndUpdateOperations(operations) {
+    const arrayExamplesMap = new Map();
+
+    for (const operation of operations) {
+      for (const response of operation.responses) {
+        if (
+          !(
+            response.dotnetType?.type === 'array' &&
+            response.dotnetType.itemType?.type !== 'array' &&
+            response.examples?.length > 0
+          )
+        ) {
+          continue;
+        }
+
+        const dotnetType = response.dotnetType.itemType;
+
+        if (!arrayExamplesMap.has(dotnetType.resolved)) {
+          arrayExamplesMap.set(dotnetType.resolved, new Map());
+        }
+
+        const examplesMap = arrayExamplesMap.get(dotnetType.resolved);
+
+        for (const example of response.examples) {
+          const hashedExample = examplesMap.get(example.hash);
+
+          if (!hashedExample) {
+            examplesMap.set(example.hash, {
+              count: 1,
+              example,
+              dotnetType: response.dotnetType,
+            });
+          } else {
+            examplesMap.set(example.hash, {
+              count: hashedExample.count + 1,
+              example,
+              dotnetType: response.dotnetType,
+            });
+          }
+        }
+      }
+    }
+
+    const defaultArrayExampleMap = new Map();
+    const hashesToExamples = new Map();
+
+    const additionalExamples = [];
+
+    for (const [type, availableExamples] of arrayExamplesMap) {
+      for (const [hash, exampleMeta] of availableExamples) {
+        hashesToExamples.set(hash, {
+          example: exampleMeta.example,
+          dotnetType: exampleMeta.dotnetType,
+        });
+      }
+
+      const [defaultHash, _] = Array.from(availableExamples).sort(
+        ([_a, a], [_b, b]) => b.count - a.count
+      )[0];
+
+      defaultArrayExampleMap.set(type, defaultHash);
+    }
+
+    for (const operation of operations) {
+      for (const response of operation.responses) {
+        if (
+          response.dotnetType?.type === 'array' &&
+          response.dotnetType.itemType.type !== 'array' &&
+          response.examples?.length > 0
+        ) {
+          for (const example of response.examples) {
+            const defaultArrayExampleHash = defaultArrayExampleMap.get(
+              response.dotnetType.itemType.resolved
+            );
+
+            if (defaultArrayExampleHash === example.hash) {
+              continue;
+            }
+
+            operation.hasOperationSpecificExamples = true;
+
+            const statusCodeAsEnumType = `StatusCodes.${STATUS_CODES_TO_ENUM_NAMES[response.statusCode]}`;
+
+            const operationId = operation.schema.operationId;
+
+            additionalExamples.push({
+              name: operationId,
+              resolvedDotnetType: response.dotnetType.resolved,
+              model: this.models.find(
+                (model) => model.name === response.dotnetType.itemType.resolved
+              ),
+              example: example.value,
+            });
+
+            const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(${operationId}Example))]`;
+
+            operation.attributes.push(swaggerResponseAttr);
+          }
+        }
+      }
+    }
+
+    for (const [type, exampleHash] of defaultArrayExampleMap) {
+      const exampleMetadata = hashesToExamples.get(exampleHash);
+
+      additionalExamples.push({
+        name: `Multiple${type}`,
+        resolvedDotnetType: exampleMetadata.dotnetType.resolved,
+        model: this.models.find(
+          (model) => model.name === exampleMetadata.dotnetType.itemType.resolved
+        ),
+        example: exampleMetadata.example.value,
+      });
+    }
+
+    return additionalExamples;
   }
 
   GenerateOperations() {
@@ -654,7 +839,7 @@ class DotNetModel {
           if (isErrorResponse && response.examples.length > 0) {
             for (const example of response.examples) {
               attributes.push(
-                `[SwaggerErrorExample(${statusCodeAsEnumType}, "${example.title}", "${example.detail}")]`
+                `[SwaggerErrorExample(${statusCodeAsEnumType}, "${example.value.title}", "${example.value.detail}")]`
               );
             }
           }
@@ -690,8 +875,7 @@ class DotNetModel {
     return operations;
   }
 
-  GenerateControllers() {
-    const operations = this.GenerateOperations();
+  GenerateControllers(operations) {
     const tags = this.GenerateTags(operations);
 
     const controllers = [];
@@ -701,12 +885,36 @@ class DotNetModel {
         op.schema.tags.includes(tag.name)
       );
 
+      const hasOperationSpecificExamples =
+        tagOperations.findIndex(
+          (op) => op.hasOperationSpecificExamples === true
+        ) !== -1;
+
       const controller = {
         name: tag.name,
         xmlObject: tag.xmlObject,
         operations: tagOperations,
         attributes: ['[ApiController]', '[Route("[controller]")]'],
+        imports: [
+          'using System.ComponentModel.DataAnnotations;',
+          'using Microsoft.AspNetCore.Mvc;',
+        ],
       };
+
+      if (hasOperationSpecificExamples) {
+        controller.imports.push('using Swashbuckle.AspNetCore.Filters;');
+      }
+
+      controller.imports.push(
+        `using ${this.#rootNamespace}.SwashbuckleFilters;`
+      );
+      controller.imports.push(`using ${this.#rootNamespace}.Generated.Models;`);
+
+      if (hasOperationSpecificExamples) {
+        controller.imports.push(
+          `using ${this.#rootNamespace}.Generated.Examples;`
+        );
+      }
 
       const commonAttributesMap = new Map();
       const possibleCommonAttributes = [
@@ -883,10 +1091,25 @@ class RenderModel {
 
 class RenderExample {
   #model;
+  #name;
+  #resolvedDotnetType;
+  #example;
+  #isArray;
   #rootNamespace;
 
-  constructor(model, rootNamespace) {
+  constructor(
+    model,
+    name,
+    resolvedDotnetType,
+    example,
+    isArray,
+    rootNamespace
+  ) {
     this.#model = model;
+    this.#name = name;
+    this.#resolvedDotnetType = resolvedDotnetType;
+    this.#example = example;
+    this.#isArray = isArray;
     this.#rootNamespace = rootNamespace;
   }
 
@@ -944,6 +1167,44 @@ class RenderExample {
     return output;
   }
 
+  renderArrayExample(indentation = 0) {
+    const model = this.#model;
+
+    const indentationString = this.getIndentationString(indentation);
+
+    let output = '';
+
+    output += `${indentationString}return [\n`;
+
+    const examples = [];
+
+    for (const exampleElement of this.#example) {
+      const exampleIndentationString = this.getIndentationString(
+        indentation + 2
+      );
+      let exampleOutput = '';
+      exampleOutput += `${exampleIndentationString}new()\n`;
+      exampleOutput += `${exampleIndentationString}{\n`;
+
+      for (const property of model.properties) {
+        exampleOutput += this.renderProperty(
+          property,
+          exampleElement,
+          indentation + 4
+        );
+      }
+
+      exampleOutput += `${exampleIndentationString}}`;
+
+      examples.push(exampleOutput);
+    }
+
+    output += examples.join(',\n');
+    output += `\n${indentationString}];\n`;
+
+    return output;
+  }
+
   renderExample(indentation = 0) {
     const model = this.#model;
 
@@ -955,7 +1216,7 @@ class RenderExample {
     output += `${indentationString}{\n`;
 
     for (const property of model.properties) {
-      output += this.renderProperty(property, model.example, indentation + 2);
+      output += this.renderProperty(property, this.#example, indentation + 2);
     }
 
     output += `${indentationString}};\n`;
@@ -964,7 +1225,6 @@ class RenderExample {
   }
 
   render() {
-    const model = this.#model;
     const rootNamespace = this.#rootNamespace;
 
     let output = '';
@@ -974,11 +1234,15 @@ class RenderExample {
 
     output += `namespace ${rootNamespace}.Generated.Examples;\n\n`;
 
-    output += `public class ${model.name}Example : IExamplesProvider<${model.name}>\n`;
+    output += `public class ${this.#name}Example : IExamplesProvider<${this.#resolvedDotnetType}>\n`;
     output += '{\n';
-    output += `  public ${model.name} GetExamples()\n`;
+    output += `  public ${this.#resolvedDotnetType} GetExamples()\n`;
     output += '  {\n';
-    output += this.renderExample(4);
+    if (this.#isArray) {
+      output += this.renderArrayExample(4);
+    } else {
+      output += this.renderExample(4);
+    }
     output += '  }\n';
     output += '}';
 
@@ -1143,16 +1407,9 @@ class RenderController {
   render() {
     const controller = this.#controller;
 
-    const imports = [
-      'using System.ComponentModel.DataAnnotations;',
-      'using Microsoft.AspNetCore.Mvc;',
-      `using ${this.#rootNamespace}.SwashbuckleFilters;`,
-      `using ${this.#rootNamespace}.Generated.Models;`,
-    ];
-
     let output = '';
 
-    output += imports.join('\n');
+    output += controller.imports.join('\n');
     output += '\n\n';
 
     output += `namespace ${this.#rootNamespace}.Generated.Controllers;\n\n`;
@@ -1182,11 +1439,39 @@ const dotNetModel = new DotNetModel(swaggerDocument, ROOT_NAMESPACE);
 
 await fs.mkdir(path.join(GENERATED_FOLDER, 'models'), { recursive: true });
 await fs.mkdir(path.join(GENERATED_FOLDER, 'examples'), { recursive: true });
+for (const additionalExample of dotNetModel.additionalExamples) {
+  await fs.writeFile(
+    path.join(
+      GENERATED_FOLDER,
+      'examples',
+      `${additionalExample.name}Example.cs`
+    ),
+    new RenderExample(
+      additionalExample.model,
+      additionalExample.name,
+      additionalExample.resolvedDotnetType,
+      additionalExample.example,
+      true,
+      ROOT_NAMESPACE
+    ).render(),
+    {
+      encoding: 'utf-8',
+    }
+  );
+}
+
 for (const model of dotNetModel.models) {
   if (model.type === 'class' && model.hasExamples) {
     await fs.writeFile(
       path.join(GENERATED_FOLDER, 'examples', `${model.name}Example.cs`),
-      new RenderExample(model, ROOT_NAMESPACE).render(),
+      new RenderExample(
+        model,
+        model.name,
+        model.name,
+        model.example,
+        false,
+        ROOT_NAMESPACE
+      ).render(),
       {
         encoding: 'utf-8',
       }

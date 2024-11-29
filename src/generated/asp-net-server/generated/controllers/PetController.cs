@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Filters;
 using AspNetServer.SwashbuckleFilters;
 using AspNetServer.Generated.Models;
+using AspNetServer.Generated.Examples;
 
 namespace AspNetServer.Generated.Controllers;
 
@@ -100,6 +102,7 @@ public class PetController : ControllerBase
   [Obsolete]
   [HttpGet("findByDate")]
   [ProducesResponseType(StatusCodes.Status200OK)]
+  [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetPetsByDateExample))]
   public ActionResult<Pet[]> GetPetsByDate([FromQuery][Required] DateOnly afterDate)
   {
     throw new NotImplementedException();
