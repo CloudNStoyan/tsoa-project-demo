@@ -87,6 +87,10 @@ function sortObjectKeysRecursively(inputObject) {
   return newObject;
 }
 
+function getIndentationString(indentation = 0) {
+  return new Array(indentation).fill(' ').join('');
+}
+
 function uppercaseFirstLetter(string) {
   return string[0].toUpperCase() + string.slice(1);
 }
@@ -176,7 +180,7 @@ class DotNetModel {
   #swaggerDocument;
   #rootNamespace;
 
-  constructor(swaggerDocument, rootNamespace) {
+  constructor({ swaggerDocument, rootNamespace }) {
     this.#swaggerDocument = swaggerDocument;
     this.#rootNamespace = rootNamespace;
 
@@ -287,7 +291,7 @@ class DotNetModel {
     return '';
   }
 
-  GenerateAttributes(schema, required) {
+  GeneratePropertyAttributes({ schema, required }) {
     const attributes = [];
 
     if (schema.minLength !== undefined || schema.minItems !== undefined) {
@@ -314,7 +318,7 @@ class DotNetModel {
     return attributes;
   }
 
-  GenerateProperty(schema, name, required) {
+  GenerateProperty({ schema, name, required }) {
     return {
       name,
       type: schema.type,
@@ -322,12 +326,12 @@ class DotNetModel {
       xmlObject: this.GenerateXmlObject(schema),
       dotnetType: this.ResolveDotnetType(schema),
       nullable: schema.nullable || false,
-      attributes: this.GenerateAttributes(schema, required),
+      attributes: this.GeneratePropertyAttributes({ schema, required }),
       example: schema.example,
     };
   }
 
-  GenerateModel(schema, name) {
+  GenerateModel({ schema, name }) {
     const properties = [];
 
     for (const propertyName in schema.properties) {
@@ -336,7 +340,11 @@ class DotNetModel {
       const isRequired = schema.required?.includes(propertyName) || false;
 
       properties.push(
-        this.GenerateProperty(propertySchema, propertyName, isRequired)
+        this.GenerateProperty({
+          schema: propertySchema,
+          name: propertyName,
+          required: isRequired,
+        })
       );
     }
 
@@ -383,7 +391,7 @@ class DotNetModel {
     };
   }
 
-  GenerateEnumModel(schema, name) {
+  GenerateEnumModel({ schema, name }) {
     return {
       name,
       type: 'enum',
@@ -401,11 +409,13 @@ class DotNetModel {
       const schema = schemas[schemaName];
 
       if (schema.type === 'object') {
-        generatedModels.push(this.GenerateModel(schema, schemaName));
+        generatedModels.push(this.GenerateModel({ schema, name: schemaName }));
       }
 
       if (schema.type === 'string' && Array.isArray(schema.enum)) {
-        generatedModels.push(this.GenerateEnumModel(schema, schemaName));
+        generatedModels.push(
+          this.GenerateEnumModel({ schema, name: schemaName })
+        );
       }
     }
 
@@ -966,21 +976,17 @@ class RenderModel {
   #model;
   #rootNamespace;
 
-  constructor(model, rootNamespace) {
+  constructor({ model, rootNamespace }) {
     this.#model = model;
     this.#rootNamespace = rootNamespace;
   }
 
-  getIndentationString(indentation) {
-    return new Array(indentation).fill(' ').join('');
-  }
-
-  renderXml(xmlObject, indentation = 0) {
+  renderXml({ xmlObject, indentation = 0 }) {
     if (isObjectEmpty(xmlObject)) {
       return '';
     }
 
-    let indentationString = this.getIndentationString(indentation);
+    let indentationString = getIndentationString(indentation);
 
     let output = '';
 
@@ -993,14 +999,14 @@ class RenderModel {
     return output;
   }
 
-  renderAttributes(attributes, indentation = 0) {
+  renderAttributes({ attributes, indentation = 0 }) {
     if (attributes.length === 0) {
       return '';
     }
 
     let output = '';
 
-    let indentationString = this.getIndentationString(indentation);
+    let indentationString = getIndentationString(indentation);
 
     for (const attribute of attributes) {
       output += `${indentationString}${attribute}\n`;
@@ -1012,7 +1018,7 @@ class RenderModel {
   renderEnum(enumModel) {
     let output = '';
 
-    output += this.renderXml(enumModel.xmlObject);
+    output += this.renderXml({ xmlObject: enumModel.xmlObject });
     output += `public enum ${enumModel.name} {\n`;
 
     for (const enumMember of enumModel.enumMembers) {
@@ -1027,11 +1033,14 @@ class RenderModel {
   renderProperty(property) {
     let output = '';
 
-    output += this.renderXml(property.xmlObject, 2);
+    output += this.renderXml({ xmlObject: property.xmlObject, indentation: 2 });
 
-    const indentationString = this.getIndentationString(2);
+    const indentationString = getIndentationString(2);
 
-    output += this.renderAttributes(property.attributes, 2);
+    output += this.renderAttributes({
+      attributes: property.attributes,
+      indentation: 2,
+    });
 
     const nullableString = property.nullable ? '?' : '';
     const requiredModifierString =
@@ -1049,7 +1058,7 @@ class RenderModel {
   renderClass(classModel) {
     let output = '';
 
-    output += this.renderXml(classModel.xmlObject);
+    output += this.renderXml({ xmlObject: classModel.xmlObject });
     if (classModel.hasExamples) {
       output += `[PropertiesExample(typeof(${classModel.name}Example))]\n`;
     }
@@ -1097,24 +1106,20 @@ class RenderExample {
   #isArray;
   #rootNamespace;
 
-  constructor(
+  constructor({
     model,
     name,
     resolvedDotnetType,
     example,
     isArray,
-    rootNamespace
-  ) {
+    rootNamespace,
+  }) {
     this.#model = model;
     this.#name = name;
     this.#resolvedDotnetType = resolvedDotnetType;
     this.#example = example;
     this.#isArray = isArray;
     this.#rootNamespace = rootNamespace;
-  }
-
-  getIndentationString(indentation = 0) {
-    return new Array(indentation).fill(' ').join('');
   }
 
   renderPropertyValue(dotnetType, example) {
@@ -1152,7 +1157,7 @@ class RenderExample {
   }
 
   renderProperty(property, schemaExample, indentation = 0) {
-    const indentationString = this.getIndentationString(indentation);
+    const indentationString = getIndentationString(indentation);
 
     let output = '';
 
@@ -1170,7 +1175,7 @@ class RenderExample {
   renderArrayExample(indentation = 0) {
     const model = this.#model;
 
-    const indentationString = this.getIndentationString(indentation);
+    const indentationString = getIndentationString(indentation);
 
     let output = '';
 
@@ -1179,9 +1184,7 @@ class RenderExample {
     const examples = [];
 
     for (const exampleElement of this.#example) {
-      const exampleIndentationString = this.getIndentationString(
-        indentation + 2
-      );
+      const exampleIndentationString = getIndentationString(indentation + 2);
       let exampleOutput = '';
       exampleOutput += `${exampleIndentationString}new()\n`;
       exampleOutput += `${exampleIndentationString}{\n`;
@@ -1208,7 +1211,7 @@ class RenderExample {
   renderExample(indentation = 0) {
     const model = this.#model;
 
-    const indentationString = this.getIndentationString(indentation);
+    const indentationString = getIndentationString(indentation);
 
     let output = '';
 
@@ -1254,13 +1257,9 @@ class RenderController {
   #controller;
   #rootNamespace;
 
-  constructor(controller, rootNamespace) {
+  constructor({ controller, rootNamespace }) {
     this.#controller = controller;
     this.#rootNamespace = rootNamespace;
-  }
-
-  getIndentationString(indentation) {
-    return new Array(indentation).fill(' ').join('');
   }
 
   renderValue(dotnetType, value) {
@@ -1304,7 +1303,7 @@ class RenderController {
 
     let output = '';
 
-    let indentationString = this.getIndentationString(indentation);
+    let indentationString = getIndentationString(indentation);
 
     for (const attribute of attributes) {
       output += `${indentationString}${attribute}\n`;
@@ -1318,7 +1317,7 @@ class RenderController {
       return '';
     }
 
-    let indentationString = this.getIndentationString(indentation);
+    let indentationString = getIndentationString(indentation);
 
     let output = '';
 
@@ -1381,11 +1380,9 @@ class RenderController {
   }
 
   renderOperation(operation, indentation = 0) {
-    const indentationString = this.getIndentationString(indentation);
+    const indentationString = getIndentationString(indentation);
 
     let output = '';
-
-    //public ActionResult<Pet> CreatePet([Required] Pet pet)
 
     output += this.renderXml(operation.xmlObject, indentation);
     output += this.renderAttributes(operation.attributes, indentation);
@@ -1431,11 +1428,15 @@ class RenderController {
   }
 }
 
-const ROOT_NAMESPACE = 'AspNetServer';
+const options = {
+  rootNamespace: 'AspNetServer',
+  ignoredModels: new Set(['ProblemDetails']),
+};
 
-const IGNORED_MODELS = new Set(['ProblemDetails']);
-
-const dotNetModel = new DotNetModel(swaggerDocument, ROOT_NAMESPACE);
+const dotNetModel = new DotNetModel({
+  swaggerDocument,
+  rootNamespace: options.rootNamespace,
+});
 
 await fs.mkdir(path.join(GENERATED_FOLDER, 'models'), { recursive: true });
 await fs.mkdir(path.join(GENERATED_FOLDER, 'examples'), { recursive: true });
@@ -1446,14 +1447,14 @@ for (const additionalExample of dotNetModel.additionalExamples) {
       'examples',
       `${additionalExample.name}Example.cs`
     ),
-    new RenderExample(
-      additionalExample.model,
-      additionalExample.name,
-      additionalExample.resolvedDotnetType,
-      additionalExample.example,
-      true,
-      ROOT_NAMESPACE
-    ).render(),
+    new RenderExample({
+      model: additionalExample.model,
+      name: additionalExample.name,
+      resolvedDotnetType: additionalExample.resolvedDotnetType,
+      example: additionalExample.example,
+      isArray: true,
+      rootNamespace: options.rootNamespace,
+    }).render(),
     {
       encoding: 'utf-8',
     }
@@ -1464,24 +1465,24 @@ for (const model of dotNetModel.models) {
   if (model.type === 'class' && model.hasExamples) {
     await fs.writeFile(
       path.join(GENERATED_FOLDER, 'examples', `${model.name}Example.cs`),
-      new RenderExample(
+      new RenderExample({
         model,
-        model.name,
-        model.name,
-        model.example,
-        false,
-        ROOT_NAMESPACE
-      ).render(),
+        name: model.name,
+        resolvedDotnetType: model.name,
+        example: model.example,
+        isArray: false,
+        rootNamespace: options.rootNamespace,
+      }).render(),
       {
         encoding: 'utf-8',
       }
     );
   }
 
-  if (!IGNORED_MODELS.has(model.name)) {
+  if (!options.ignoredModels.has(model.name)) {
     await fs.writeFile(
       path.join(GENERATED_FOLDER, 'models', `${model.name}.cs`),
-      new RenderModel(model, ROOT_NAMESPACE).render(),
+      new RenderModel({ model, rootNamespace: options.rootNamespace }).render(),
       {
         encoding: 'utf-8',
       }
@@ -1496,7 +1497,10 @@ for (const controller of dotNetModel.controllers) {
       'controllers',
       `${controller.name}Controller.cs`
     ),
-    new RenderController(controller, ROOT_NAMESPACE).render(),
+    new RenderController({
+      controller,
+      rootNamespace: options.rootNamespace,
+    }).render(),
     {
       encoding: 'utf-8',
     }
