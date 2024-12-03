@@ -179,11 +179,13 @@ const HTTP_METHODS_TO_ATTRIBUTE_NAMES = {
 class DotNetModel {
   #swaggerDocument;
   #rootNamespace;
+  #securityDefinitionName;
   #modelsRegistry;
 
-  constructor({ swaggerDocument, rootNamespace }) {
+  constructor({ swaggerDocument, rootNamespace, securityDefinitionName }) {
     this.#swaggerDocument = swaggerDocument;
     this.#rootNamespace = rootNamespace;
+    this.#securityDefinitionName = securityDefinitionName;
 
     this.models = this.GenerateModels();
 
@@ -890,6 +892,16 @@ class DotNetModel {
           attributes.push('[Obsolete]');
         }
 
+        const hasSecurityDefinition =
+          operation.schema.security?.findIndex((securityDefinition) =>
+            Object.hasOwn(securityDefinition, this.#securityDefinitionName)
+          ) !== -1;
+
+        if (hasSecurityDefinition) {
+          operation.hasAuthorizeAttribute = true;
+          attributes.push('[Authorize]');
+        }
+
         attributes.push(this.GenerateMethodAttribute(operation));
 
         for (const response of operation.responses) {
@@ -963,6 +975,10 @@ class DotNetModel {
           (op) => op.hasOperationSpecificExamples === true
         ) !== -1;
 
+      const operationsThatRequireAuthorization = tagOperations.filter(
+        (op) => op.hasAuthorizeAttribute
+      );
+
       const controller = {
         name: tag.name,
         xmlObject: tag.xmlObject,
@@ -973,6 +989,22 @@ class DotNetModel {
           'using Microsoft.AspNetCore.Mvc;',
         ],
       };
+
+      const authorizeAttr = '[Authorize]';
+
+      if (operationsThatRequireAuthorization.length === tagOperations.length) {
+        controller.attributes.unshift(authorizeAttr);
+
+        for (const operation of tagOperations) {
+          operation.attributes = operation.attributes.filter(
+            (attr) => attr !== authorizeAttr
+          );
+        }
+      }
+
+      if (operationsThatRequireAuthorization.length > 0) {
+        controller.imports.push('using Microsoft.AspNetCore.Authorization;');
+      }
 
       if (hasOperationSpecificExamples) {
         controller.imports.push('using Swashbuckle.AspNetCore.Filters;');
@@ -1501,6 +1533,7 @@ const options = {
 const dotNetModel = new DotNetModel({
   swaggerDocument,
   rootNamespace: options.rootNamespace,
+  securityDefinitionName: 'api_key',
 });
 
 await fs.mkdir(path.join(GENERATED_FOLDER, 'models'), { recursive: true });

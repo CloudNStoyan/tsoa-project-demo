@@ -1,10 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AspNetServer.SwashbuckleFilters;
 using AspNetServer.Generated.Models;
 
 namespace AspNetServer.Generated.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
