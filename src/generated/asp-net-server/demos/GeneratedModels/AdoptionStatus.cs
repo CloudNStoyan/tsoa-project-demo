@@ -1,4 +1,4 @@
-namespace AspNetServer.GeneratedModels;
+namespace AspNetServer.Demos.GeneratedModels;
 
 /// <summary>
 /// The pet's adoption status.

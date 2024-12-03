@@ -1,4 +1,4 @@
-namespace AspNetServer.GeneratedModels;
+namespace AspNetServer.Demos.GeneratedModels;
 
 /// <summary>
 /// Inventory map of adoption status to quantities.

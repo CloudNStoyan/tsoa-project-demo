@@ -1,12 +1,13 @@
 using System.ComponentModel.DataAnnotations;
-using AspNetServer.GeneratedModels;
+using AspNetServer.Demos.GeneratedModels;
 using AspNetServer.SwashbuckleFilters;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AspNetServer.GeneratedControllers;
+namespace AspNetServer.Demos.GeneratedControllers;
 
 [ApiController]
 [Route("[controller]")]
+[NonController]
 public class PetController : ControllerBase {
   /// <summary>
   /// Add a new pet to the store.

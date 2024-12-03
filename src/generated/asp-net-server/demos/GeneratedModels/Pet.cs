@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using AspNetServer.OpenApiExamples;
+using AspNetServer.Demos.OpenApiExamples;
 using AspNetServer.SwashbuckleFilters;
 
-namespace AspNetServer.GeneratedModels;
+namespace AspNetServer.Demos.GeneratedModels;
 
 /// <summary>
 /// Pet characteristics.

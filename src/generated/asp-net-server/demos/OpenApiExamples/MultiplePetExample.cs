@@ -1,7 +1,7 @@
-using AspNetServer.GeneratedModels;
+using AspNetServer.Demos.GeneratedModels;
 using Swashbuckle.AspNetCore.Filters;
 
-namespace AspNetServer.OpenApiExamples;
+namespace AspNetServer.Demos.OpenApiExamples;
 
 public class MultiplePetExample : IExamplesProvider<Pet[]>
 {

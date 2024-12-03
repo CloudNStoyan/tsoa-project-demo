@@ -1,16 +1,17 @@
 using System.ComponentModel.DataAnnotations;
-using AspNetServer.GeneratedModels;
+using AspNetServer.Demos.GeneratedModels;
 using AspNetServer.SwashbuckleFilters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AspNetServer.GeneratedControllers;
+namespace AspNetServer.Demos.GeneratedControllers;
 
 [Authorize]
 [ApiController]
 [Route("[controller]")]
 [SwaggerErrorExample(StatusCodes.Status401Unauthorized, "Unauthorized", "Access denied!")]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[NonController]
 public class StoreController : ControllerBase {
 
   /// <summary>
