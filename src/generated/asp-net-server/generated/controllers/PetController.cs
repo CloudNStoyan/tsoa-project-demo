@@ -119,6 +119,7 @@ public class PetController : ControllerBase
   [ProducesResponseType(StatusCodes.Status404NotFound)]
   [SwaggerErrorExample(StatusCodes.Status404NotFound, "Not Found", "Pet not found!")]
   [ProducesResponseType(StatusCodes.Status200OK)]
+  [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetPetExample))]
   public ActionResult<Pet> GetPet([FromRoute][Required] Guid petId)
   {
     throw new NotImplementedException();

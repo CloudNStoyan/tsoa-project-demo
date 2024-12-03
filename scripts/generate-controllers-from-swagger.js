@@ -179,6 +179,7 @@ const HTTP_METHODS_TO_ATTRIBUTE_NAMES = {
 class DotNetModel {
   #swaggerDocument;
   #rootNamespace;
+  #modelsRegistry;
 
   constructor({ swaggerDocument, rootNamespace }) {
     this.#swaggerDocument = swaggerDocument;
@@ -186,10 +187,16 @@ class DotNetModel {
 
     this.models = this.GenerateModels();
 
+    this.#modelsRegistry = new Map();
+
+    for (const model of this.models) {
+      this.#modelsRegistry.set(model.name, model);
+    }
+
     const operations = this.GenerateOperations();
 
     this.additionalExamples =
-      this.GenerateArrayExamplesAndUpdateOperations(operations);
+      this.GenerateAdditionalExamplesAndUpdateOperations(operations);
 
     this.controllers = this.GenerateControllers(operations);
   }
@@ -362,11 +369,11 @@ class DotNetModel {
       }
     }
 
-    const hasExamples =
+    const hasExample =
       schema.example !== undefined ||
       properties.findIndex((prop) => prop.example === undefined) === -1;
 
-    if (hasExamples) {
+    if (hasExample) {
       const filtersImport = `using ${this.#rootNamespace}.SwashbuckleFilters;`;
 
       if (!imports.has(filtersImport)) {
@@ -380,13 +387,30 @@ class DotNetModel {
       }
     }
 
+    let jsonExample = schema.example;
+
+    if (hasExample && jsonExample === undefined) {
+      jsonExample = {};
+
+      for (const property of properties) {
+        jsonExample[property.name] = property.example;
+      }
+    }
+
+    const example = jsonExample
+      ? {
+          value: jsonExample,
+          hash: hashJsonObject(jsonExample),
+        }
+      : undefined;
+
     return {
       name,
       type: 'class',
       xmlObject: this.GenerateXmlObject(schema),
       properties,
-      hasExamples,
-      example: schema.example,
+      hasExample,
+      example,
       imports,
     };
   }
@@ -684,7 +708,7 @@ class DotNetModel {
     return responses;
   }
 
-  GenerateArrayExamplesAndUpdateOperations(operations) {
+  GenerateAdditionalExamplesAndUpdateOperations(operations) {
     const arrayExamplesMap = new Map();
 
     for (const operation of operations) {
@@ -755,8 +779,10 @@ class DotNetModel {
           response.examples?.length > 0
         ) {
           for (const example of response.examples) {
+            const dotnetType = response.dotnetType.itemType;
+
             const defaultArrayExampleHash = defaultArrayExampleMap.get(
-              response.dotnetType.itemType.resolved
+              dotnetType.resolved
             );
 
             if (defaultArrayExampleHash === example.hash) {
@@ -772,10 +798,8 @@ class DotNetModel {
             additionalExamples.push({
               name: operationId,
               resolvedDotnetType: response.dotnetType.resolved,
-              model: this.models.find(
-                (model) => model.name === response.dotnetType.itemType.resolved
-              ),
-              example: example.value,
+              model: this.#modelsRegistry.get(dotnetType.resolved),
+              example,
             });
 
             const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(${operationId}Example))]`;
@@ -792,11 +816,50 @@ class DotNetModel {
       additionalExamples.push({
         name: `Multiple${type}`,
         resolvedDotnetType: exampleMetadata.dotnetType.resolved,
-        model: this.models.find(
-          (model) => model.name === exampleMetadata.dotnetType.itemType.resolved
+        model: this.#modelsRegistry.get(
+          exampleMetadata.dotnetType.itemType.resolved
         ),
-        example: exampleMetadata.example.value,
+        example: exampleMetadata.example,
       });
+    }
+
+    for (const operation of operations) {
+      for (const response of operation.responses) {
+        if (
+          response.dotnetType === undefined ||
+          response.dotnetType.type === 'array' ||
+          !Array.isArray(response.examples) ||
+          response.examples.length === 0 ||
+          response.statusCode > 399
+        ) {
+          continue;
+        }
+
+        const model = this.#modelsRegistry.get(response.dotnetType.resolved);
+
+        const example = response.examples[0];
+
+        if (model.hasExample && model.example.hash === example.hash) {
+          continue;
+        }
+
+        operation.hasOperationSpecificExamples = true;
+
+        const statusCodeAsEnumType = `StatusCodes.${STATUS_CODES_TO_ENUM_NAMES[response.statusCode]}`;
+
+        const operationId = operation.schema.operationId;
+
+        additionalExamples.push({
+          name: operationId,
+          resolvedDotnetType: response.dotnetType.resolved,
+          model,
+          example,
+        });
+
+        const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(${operationId}Example))]`;
+
+        operation.attributes.push(swaggerResponseAttr);
+      }
     }
 
     return additionalExamples;
@@ -1059,7 +1122,7 @@ class RenderModel {
     let output = '';
 
     output += this.renderXml({ xmlObject: classModel.xmlObject });
-    if (classModel.hasExamples) {
+    if (classModel.hasExample) {
       output += `[PropertiesExample(typeof(${classModel.name}Example))]\n`;
     }
     output += `public class ${classModel.name} {\n`;
@@ -1103,7 +1166,6 @@ class RenderExample {
   #name;
   #resolvedDotnetType;
   #example;
-  #isArray;
   #rootNamespace;
 
   constructor({
@@ -1118,7 +1180,6 @@ class RenderExample {
     this.#name = name;
     this.#resolvedDotnetType = resolvedDotnetType;
     this.#example = example;
-    this.#isArray = isArray;
     this.#rootNamespace = rootNamespace;
   }
 
@@ -1163,11 +1224,8 @@ class RenderExample {
 
     const name = uppercaseFirstLetter(property.name);
 
-    const example = schemaExample
-      ? schemaExample[property.name]
-      : property.example;
-
-    output += `${indentationString}${name} = ${this.renderPropertyValue(property.dotnetType, example)},\n`;
+    output += `${indentationString}${name} = `;
+    output += `${this.renderPropertyValue(property.dotnetType, schemaExample[property.name])},\n`;
 
     return output;
   }
@@ -1230,6 +1288,8 @@ class RenderExample {
   render() {
     const rootNamespace = this.#rootNamespace;
 
+    const exampleIsArray = Array.isArray(this.#example);
+
     let output = '';
 
     output += `using ${rootNamespace}.Generated.Models;\n`;
@@ -1241,7 +1301,7 @@ class RenderExample {
     output += '{\n';
     output += `  public ${this.#resolvedDotnetType} GetExamples()\n`;
     output += '  {\n';
-    if (this.#isArray) {
+    if (exampleIsArray) {
       output += this.renderArrayExample(4);
     } else {
       output += this.renderExample(4);
@@ -1451,8 +1511,7 @@ for (const additionalExample of dotNetModel.additionalExamples) {
       model: additionalExample.model,
       name: additionalExample.name,
       resolvedDotnetType: additionalExample.resolvedDotnetType,
-      example: additionalExample.example,
-      isArray: true,
+      example: additionalExample.example.value,
       rootNamespace: options.rootNamespace,
     }).render(),
     {
@@ -1462,15 +1521,14 @@ for (const additionalExample of dotNetModel.additionalExamples) {
 }
 
 for (const model of dotNetModel.models) {
-  if (model.type === 'class' && model.hasExamples) {
+  if (model.type === 'class' && model.hasExample) {
     await fs.writeFile(
       path.join(GENERATED_FOLDER, 'examples', `${model.name}Example.cs`),
       new RenderExample({
         model,
         name: model.name,
         resolvedDotnetType: model.name,
-        example: model.example,
-        isArray: false,
+        example: model.example.value,
         rootNamespace: options.rootNamespace,
       }).render(),
       {
