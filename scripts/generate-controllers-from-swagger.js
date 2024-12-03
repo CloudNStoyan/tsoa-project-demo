@@ -1192,6 +1192,11 @@ class RenderExample {
       } else {
         output += example;
       }
+    } else if (
+      dotnetType.type === 'object' &&
+      (dotnetType.resolved === 'DateOnly' || dotnetType.resolved === 'DateTime')
+    ) {
+      output += `${dotnetType.resolved}.Parse("${example.replace('Z', '')}")`;
     } else if (dotnetType.type === 'object') {
       output += `${dotnetType.resolved}.Parse("${example}")`;
     } else if (dotnetType.type === 'enum') {

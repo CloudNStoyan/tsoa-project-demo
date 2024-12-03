@@ -16,7 +16,7 @@ public class GetPetExample : IExamplesProvider<Pet>
       Kind = AnimalKind.Cat,
       Age = 1,
       HealthProblems = false,
-      AddedDate = DateOnly.Parse("2023-08-08T00:00:00.000Z"),
+      AddedDate = DateOnly.Parse("2023-08-08T00:00:00.000"),
       Status = AdoptionStatus.Adopted,
       Tags = ["cat", "annoying", "white"],
     };
