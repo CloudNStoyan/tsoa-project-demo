@@ -789,13 +789,14 @@ class DotNetModel {
               dotnetType.resolved
             );
 
+            const statusCodeAsEnumType = `StatusCodes.${STATUS_CODES_TO_ENUM_NAMES[response.statusCode]}`;
+
             if (defaultArrayExampleHash === example.hash) {
+              const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(Multiple${dotnetType.resolved}Example))]`;
+
+              operation.attributes.push(swaggerResponseAttr);
               continue;
             }
-
-            operation.hasOperationSpecificExamples = true;
-
-            const statusCodeAsEnumType = `StatusCodes.${STATUS_CODES_TO_ENUM_NAMES[response.statusCode]}`;
 
             const operationId = operation.schema.operationId;
 
@@ -832,24 +833,35 @@ class DotNetModel {
         if (
           response.dotnetType === undefined ||
           response.dotnetType.type === 'array' ||
-          !Array.isArray(response.examples) ||
-          response.examples.length === 0 ||
           response.statusCode > 399
         ) {
           continue;
         }
 
         const model = this.#modelsRegistry.get(response.dotnetType.resolved);
+        const statusCodeAsEnumType = `StatusCodes.${STATUS_CODES_TO_ENUM_NAMES[response.statusCode]}`;
+
+        if (
+          !Array.isArray(response.examples) ||
+          response.examples.length === 0
+        ) {
+          if (model.hasExample) {
+            const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(${model.name}Example))]`;
+
+            operation.attributes.push(swaggerResponseAttr);
+          }
+
+          continue;
+        }
 
         const example = response.examples[0];
 
         if (model.hasExample && model.example.hash === example.hash) {
+          const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(${model.name}Example))]`;
+
+          operation.attributes.push(swaggerResponseAttr);
           continue;
         }
-
-        operation.hasOperationSpecificExamples = true;
-
-        const statusCodeAsEnumType = `StatusCodes.${STATUS_CODES_TO_ENUM_NAMES[response.statusCode]}`;
 
         const operationId = operation.schema.operationId;
 
@@ -973,11 +985,6 @@ class DotNetModel {
         op.schema.tags.includes(tag.name)
       );
 
-      const hasOperationSpecificExamples =
-        tagOperations.findIndex(
-          (op) => op.hasOperationSpecificExamples === true
-        ) !== -1;
-
       const operationsThatRequireAuthorization = tagOperations.filter(
         (op) => op.hasAuthorizeAttribute
       );
@@ -1011,20 +1018,14 @@ class DotNetModel {
         }
       }
 
-      if (hasOperationSpecificExamples) {
-        controller.imports.push('using Swashbuckle.AspNetCore.Filters;');
-      }
-
+      controller.imports.push('using Swashbuckle.AspNetCore.Filters;');
       controller.imports.push(
         `using ${this.#rootNamespace}.SwashbuckleFilters;`
       );
       controller.imports.push(`using ${this.#rootNamespace}.Generated.Models;`);
-
-      if (hasOperationSpecificExamples) {
-        controller.imports.push(
-          `using ${this.#rootNamespace}.Generated.Examples;`
-        );
-      }
+      controller.imports.push(
+        `using ${this.#rootNamespace}.Generated.Examples;`
+      );
 
       const commonAttributesMap = new Map();
       const possibleCommonAttributes = [

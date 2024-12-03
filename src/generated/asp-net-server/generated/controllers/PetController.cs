@@ -19,6 +19,7 @@ public class PetController : ControllerBase
   /// <response code="200">Successful creation of a pet.</response>
   [HttpPost]
   [ProducesResponseType(StatusCodes.Status200OK)]
+  [SwaggerResponseExample(StatusCodes.Status200OK, typeof(PetExample))]
   public ActionResult<Pet> CreatePet([FromBody][Required] Pet pet)
   {
     throw new NotImplementedException();
@@ -35,6 +36,7 @@ public class PetController : ControllerBase
   [ProducesResponseType(StatusCodes.Status404NotFound)]
   [SwaggerErrorExample(StatusCodes.Status404NotFound, "Not Found", "Pet not found!")]
   [ProducesResponseType(StatusCodes.Status200OK)]
+  [SwaggerResponseExample(StatusCodes.Status200OK, typeof(PetExample))]
   public ActionResult<Pet> UpdatePet([FromBody][Required] Pet pet)
   {
     throw new NotImplementedException();
@@ -49,6 +51,7 @@ public class PetController : ControllerBase
   /// <response code="200">Successful retrieval of pets.</response>
   [HttpGet("all")]
   [ProducesResponseType(StatusCodes.Status200OK)]
+  [SwaggerResponseExample(StatusCodes.Status200OK, typeof(MultiplePetExample))]
   public ActionResult<Pet[]> GetAllPets([FromQuery] int offset = 0, [FromQuery] int limit = 10)
   {
     throw new NotImplementedException();
@@ -62,6 +65,7 @@ public class PetController : ControllerBase
   /// <response code="200">Successful retrieval of pets.</response>
   [HttpGet("findByStatus")]
   [ProducesResponseType(StatusCodes.Status200OK)]
+  [SwaggerResponseExample(StatusCodes.Status200OK, typeof(MultiplePetExample))]
   public ActionResult<Pet[]> GetPetsByStatus([FromQuery][Required] AdoptionStatus status)
   {
     throw new NotImplementedException();
@@ -75,6 +79,7 @@ public class PetController : ControllerBase
   /// <response code="200">Successful retrieval of pets.</response>
   [HttpGet("findByKinds")]
   [ProducesResponseType(StatusCodes.Status200OK)]
+  [SwaggerResponseExample(StatusCodes.Status200OK, typeof(MultiplePetExample))]
   public ActionResult<Pet[]> GetPetsByKind([FromQuery][Required] AnimalKind[] kinds)
   {
     throw new NotImplementedException();
@@ -88,6 +93,7 @@ public class PetController : ControllerBase
   /// <response code="200">Successful retrieval of pets.</response>
   [HttpGet("findByTags")]
   [ProducesResponseType(StatusCodes.Status200OK)]
+  [SwaggerResponseExample(StatusCodes.Status200OK, typeof(MultiplePetExample))]
   public ActionResult<Pet[]> GetPetsByTags([FromQuery][Required] string[] tags)
   {
     throw new NotImplementedException();

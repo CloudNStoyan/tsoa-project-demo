@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Swashbuckle.AspNetCore.Filters;
 using AspNetServer.SwashbuckleFilters;
 using AspNetServer.Generated.Models;
+using AspNetServer.Generated.Examples;
 
 namespace AspNetServer.Generated.Controllers;
 
@@ -35,6 +37,7 @@ public class StoreController : ControllerBase
   /// <response code="401">Unauthorized</response>
   [HttpPost("adopt")]
   [ProducesResponseType(StatusCodes.Status200OK)]
+  [SwaggerResponseExample(StatusCodes.Status200OK, typeof(AdoptionRequestExample))]
   public ActionResult<AdoptionRequest> AdoptPet([FromBody][Required] AdoptionRequest adoptionRequest)
   {
     throw new NotImplementedException();
@@ -52,6 +55,7 @@ public class StoreController : ControllerBase
   [ProducesResponseType(StatusCodes.Status404NotFound)]
   [SwaggerErrorExample(StatusCodes.Status404NotFound, "Not Found", "Adoption request not found!")]
   [ProducesResponseType(StatusCodes.Status200OK)]
+  [SwaggerResponseExample(StatusCodes.Status200OK, typeof(AdoptionRequestExample))]
   public ActionResult<AdoptionRequest> GetAdoptRequestById([FromRoute][Required] Guid requestId)
   {
     throw new NotImplementedException();

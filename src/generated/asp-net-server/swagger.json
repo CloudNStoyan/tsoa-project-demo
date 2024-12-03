@@ -25,8 +25,7 @@
                   }
                 ],
                 "description": "Pet characteristics."
-              },
-              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-07","status":"Pending","tags":["cat","orange"]}
+              }
             }
           },
           "required": true
@@ -63,8 +62,7 @@
                   }
                 ],
                 "description": "Pet characteristics."
-              },
-              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-07","status":"Pending","tags":["cat","orange"]}
+              }
             }
           },
           "required": true
@@ -459,8 +457,7 @@
                   }
                 ],
                 "description": "Adoption request information."
-              },
-              "example": {"id":"67120cf3-1434-44be-b660-b02df64db677","petId":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","dateOfSubmission":"2024-08-25T00:00:00","status":"Pending"}
+              }
             }
           },
           "required": true
