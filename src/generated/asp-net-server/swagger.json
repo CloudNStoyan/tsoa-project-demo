@@ -26,7 +26,7 @@
                 ],
                 "description": "Pet characteristics."
               },
-              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
+              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-07","status":"Pending","tags":["cat","orange"]}
             }
           },
           "required": true
@@ -39,7 +39,7 @@
                 "schema": {
                   "$ref": "#/components/schemas/Pet"
                 },
-                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
+                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-07","status":"Pending","tags":["cat","orange"]}
               }
             }
           }
@@ -64,23 +64,12 @@
                 ],
                 "description": "Pet characteristics."
               },
-              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
+              "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-07","status":"Pending","tags":["cat","orange"]}
             }
           },
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Successful update of a pet.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Pet"
-                },
-                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
-              }
-            }
-          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -93,6 +82,17 @@
                     "value": {"title":"Not Found","status":404,"detail":"Pet not found!"}
                   }
                 }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful update of a pet.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pet"
+                },
+                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-07","status":"Pending","tags":["cat","orange"]}
               }
             }
           }
@@ -300,7 +300,7 @@
                     "$ref": "#/components/schemas/Pet"
                   }
                 },
-                "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
+                "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Unhappy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
               }
             }
           }
@@ -329,17 +329,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful retrieval of a pet.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Pet"
-                },
-                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-08","status":"Pending","tags":["cat","orange"]}
-              }
-            }
-          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -352,6 +341,17 @@
                     "value": {"title":"Not Found","status":404,"detail":"Pet not found!"}
                   }
                 }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful retrieval of a pet.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pet"
+                },
+                "example": {"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Unhappy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}
               }
             }
           }
@@ -377,9 +377,6 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
-          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -394,6 +391,9 @@
                 }
               }
             }
+          },
+          "204": {
+            "description": "No Content"
           }
         }
       }
@@ -536,17 +536,6 @@
               }
             }
           },
-          "200": {
-            "description": "Successful retrieval of adoption request.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdoptionRequest"
-                },
-                "example": {"id":"67120cf3-1434-44be-b660-b02df64db677","petId":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","dateOfSubmission":"2024-08-25T00:00:00","status":"Pending"}
-              }
-            }
-          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -559,6 +548,17 @@
                     "value": {"title":"Not Found","status":404,"detail":"Adoption request not found!"}
                   }
                 }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful retrieval of adoption request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdoptionRequest"
+                },
+                "example": {"id":"67120cf3-1434-44be-b660-b02df64db677","petId":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","dateOfSubmission":"2024-08-25T00:00:00","status":"Pending"}
               }
             }
           }
@@ -604,9 +604,6 @@
               }
             }
           },
-          "204": {
-            "description": "No Content"
-          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -621,6 +618,9 @@
                 }
               }
             }
+          },
+          "204": {
+            "description": "No Content"
           }
         },
         "security": [
@@ -701,17 +701,22 @@
         "description": "The pet's animal kind."
       },
       "InventoryMap": {
+        "required": [
+          "adopted",
+          "available",
+          "pending"
+        ],
         "type": "object",
         "properties": {
-          "Adopted": {
+          "adopted": {
             "type": "number",
             "format": "double"
           },
-          "Available": {
+          "available": {
             "type": "number",
             "format": "double"
           },
-          "Pending": {
+          "pending": {
             "type": "number",
             "format": "double"
           }
@@ -783,7 +788,7 @@
             "type": "string",
             "description": "When the pet was added to the system.",
             "format": "date",
-            "example": "2024-09-08"
+            "example": "2024-09-07"
           },
           "status": {
             "allOf": [
