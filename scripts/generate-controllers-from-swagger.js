@@ -560,38 +560,40 @@ class DotNetModel {
   GenerateControllerParameters(operation) {
     const parameters = [];
 
-    for (const parameterInfo of operation.parameters) {
-      const attributes = [];
+    if (Array.isArray(operation.parameters)) {
+      for (const parameterInfo of operation.parameters) {
+        const attributes = [];
 
-      if (parameterInfo.in === 'query') {
-        attributes.push('[FromQuery]');
-      } else if (parameterInfo.in === 'header') {
-        attributes.push('[FromHeader]');
-      } else if (parameterInfo.in === 'path') {
-        attributes.push('[FromRoute]');
-      } else if (parameterInfo.in === 'cookie') {
-        throw new Error(
-          `.NET doesn't support 'Cookie' OpenAPI parameters, 'Cookie' OpenAPI parameter found in '${operation.operationId}' operation.`
-        );
-      } else {
-        throw new Error(`Invalid parameter.in value '${parameterInfo.in}'.`);
+        if (parameterInfo.in === 'query') {
+          attributes.push('[FromQuery]');
+        } else if (parameterInfo.in === 'header') {
+          attributes.push('[FromHeader]');
+        } else if (parameterInfo.in === 'path') {
+          attributes.push('[FromRoute]');
+        } else if (parameterInfo.in === 'cookie') {
+          throw new Error(
+            `.NET doesn't support 'Cookie' OpenAPI parameters, 'Cookie' OpenAPI parameter found in '${operation.operationId}' operation.`
+          );
+        } else {
+          throw new Error(`Invalid parameter.in value '${parameterInfo.in}'.`);
+        }
+
+        if (parameterInfo.required) {
+          attributes.push('[Required]');
+        }
+
+        const parameter = {
+          attributes,
+          type: parameterInfo.in,
+          name: parameterInfo.name,
+          schema: parameterInfo.schema,
+          default: parameterInfo.schema.default,
+          dotnetType: this.ResolveDotnetType(parameterInfo.schema),
+          description: parameterInfo.description,
+        };
+
+        parameters.push(parameter);
       }
-
-      if (parameterInfo.required) {
-        attributes.push('[Required]');
-      }
-
-      const parameter = {
-        attributes,
-        type: parameterInfo.in,
-        name: parameterInfo.name,
-        schema: parameterInfo.schema,
-        default: parameterInfo.schema.default,
-        dotnetType: this.ResolveDotnetType(parameterInfo.schema),
-        description: parameterInfo.description,
-      };
-
-      parameters.push(parameter);
     }
 
     if (operation.requestBody) {
@@ -892,10 +894,11 @@ class DotNetModel {
           attributes.push('[Obsolete]');
         }
 
-        const hasSecurityDefinition =
-          operation.schema.security?.findIndex((securityDefinition) =>
-            Object.hasOwn(securityDefinition, this.#securityDefinitionName)
-          ) !== -1;
+        const hasSecurityDefinition = operation.schema.security
+          ? operation.schema.security.findIndex((securityDefinition) =>
+              Object.hasOwn(securityDefinition, this.#securityDefinitionName)
+            ) !== -1
+          : false;
 
         if (hasSecurityDefinition) {
           operation.hasAuthorizeAttribute = true;
@@ -992,18 +995,20 @@ class DotNetModel {
 
       const authorizeAttr = '[Authorize]';
 
-      if (operationsThatRequireAuthorization.length === tagOperations.length) {
-        controller.attributes.unshift(authorizeAttr);
-
-        for (const operation of tagOperations) {
-          operation.attributes = operation.attributes.filter(
-            (attr) => attr !== authorizeAttr
-          );
-        }
-      }
-
       if (operationsThatRequireAuthorization.length > 0) {
         controller.imports.push('using Microsoft.AspNetCore.Authorization;');
+
+        if (
+          operationsThatRequireAuthorization.length === tagOperations.length
+        ) {
+          controller.attributes.unshift(authorizeAttr);
+
+          for (const operation of tagOperations) {
+            operation.attributes = operation.attributes.filter(
+              (attr) => attr !== authorizeAttr
+            );
+          }
+        }
       }
 
       if (hasOperationSpecificExamples) {
