@@ -425,8 +425,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InventoryMap"
-                }
+                  "$ref": "#/components/schemas/Inventory"
+                },
+                "example": {"adopted":3,"available":1,"pending":2}
               }
             }
           }
@@ -697,7 +698,7 @@
         "type": "string",
         "description": "The pet's animal kind."
       },
-      "InventoryMap": {
+      "Inventory": {
         "required": [
           "adopted",
           "available",
@@ -706,20 +707,26 @@
         "type": "object",
         "properties": {
           "adopted": {
-            "type": "number",
-            "format": "double"
+            "type": "integer",
+            "description": "The number of pets that were adopted.",
+            "format": "int32",
+            "example": 3
           },
           "available": {
-            "type": "number",
-            "format": "double"
+            "type": "integer",
+            "description": "The number of pets that are available for adoption.",
+            "format": "int32",
+            "example": 1
           },
           "pending": {
-            "type": "number",
-            "format": "double"
+            "type": "integer",
+            "description": "The number of pets that have a pending adoption status.",
+            "format": "int32",
+            "example": 2
           }
         },
         "additionalProperties": false,
-        "description": "Inventory map of adoption status to quantities."
+        "description": "Inventory of adoption status to quantities."
       },
       "Pet": {
         "required": [
