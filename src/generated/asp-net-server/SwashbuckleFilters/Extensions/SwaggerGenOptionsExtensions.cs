@@ -14,6 +14,18 @@ public static class SwaggerGenOptionsExtensions {
     options.SchemaFilter<RemoveUndesiredMinLengthFilter>();
   }
 
+  public static void AddGeneratedSecurityDefinitions(this SwaggerGenOptions options) {
+
+  }
+
+  public static void AddGeneratedTags(this SwaggerGenOptions options) {
+
+  }
+
+  public static void AddGeneratedApiInfo(this SwaggerGenOptions options) {
+
+  }
+
   public static void AddCustomTagsMetadata(this SwaggerGenOptions options, OpenApiTag[] tags) {
     options.DocumentFilter<AddTagsMetadataFilter>(new CustomOpenApiTags(tags));
   }
