@@ -124,21 +124,27 @@ export interface Pet {
 }
 
 /**
- * Inventory map of adoption status to quantities.
+ * Inventory of adoption status to quantities.
  */
-export interface InventoryMap {
+export interface Inventory {
   /**
-   * @format double
+   * The number of pets that were adopted.
+   * @format int32
+   * @example 3
    */
   Adopted: number;
 
   /**
-   * @format double
+   * The number of pets that are available for adoption.
+   * @format int32
+   * @example 1
    */
   Available: number;
 
   /**
-   * @format double
+   * The number of pets that have a pending adoption status.
+   * @format int32
+   * @example 2
    */
   Pending: number;
 }
@@ -421,8 +427,8 @@ export class StoreClientAPI extends ClientAPIBase {
    * Returns a map of adoption status to quantities.
    * @summary Returns pet inventories by adoption status.
    */
-  getInventory(options?: Options): Promise<InventoryMap> {
-    return this.fetch<InventoryMap>(`/store/inventory`, options);
+  getInventory(options?: Options): Promise<Inventory> {
+    return this.fetch<Inventory>(`/store/inventory`, options);
   }
 
   /**
