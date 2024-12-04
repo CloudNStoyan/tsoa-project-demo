@@ -152,12 +152,12 @@ const models: TsoaRoute.Models = {
     additionalProperties: false,
   },
   // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-  InventoryMap: {
+  Inventory: {
     dataType: 'refObject',
     properties: {
-      Adopted: { dataType: 'double', required: true },
-      Available: { dataType: 'double', required: true },
-      Pending: { dataType: 'double', required: true },
+      Adopted: { dataType: 'integer', required: true },
+      Available: { dataType: 'integer', required: true },
+      Pending: { dataType: 'integer', required: true },
     },
     additionalProperties: false,
   },

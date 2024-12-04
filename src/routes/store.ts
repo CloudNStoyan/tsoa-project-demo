@@ -18,7 +18,6 @@ import { BaseController, type ProblemDetails } from '~utils.js';
 
 import {
   AdoptionRequestStatus,
-  AdoptionStatus,
   type ExpressRequestWithUser,
   type UUID,
 } from './server-types.js';
@@ -54,9 +53,30 @@ export class AdoptionRequest {
 }
 
 /**
- * Inventory map of adoption status to quantities.
+ * Inventory of adoption status to quantities.
  */
-export interface InventoryMap extends Record<AdoptionStatus, number> {}
+export class Inventory {
+  /**
+   * The number of pets that were adopted.
+   * @isInt
+   */
+  @Example<number>(3)
+  Adopted!: number;
+
+  /**
+   * The number of pets that are available for adoption.
+   * @isInt
+   */
+  @Example<number>(1)
+  Available!: number;
+
+  /**
+   * The number of pets that have a pending adoption status.
+   * @isInt
+   */
+  @Example<number>(2)
+  Pending!: number;
+}
 
 @Route('store')
 @Tags('Store')
@@ -74,18 +94,18 @@ export class StoreController extends BaseController {
    * @returns        Successful retrieval of inventory.
    */
   @Get('inventory')
-  getInventory(@Request() _request: ExpressRequestWithUser): InventoryMap {
-    const inventoryMap: InventoryMap = {
-      [AdoptionStatus.Adopted]: 0,
-      [AdoptionStatus.Available]: 0,
-      [AdoptionStatus.Pending]: 0,
+  getInventory(@Request() _request: ExpressRequestWithUser): Inventory {
+    const inventory: Inventory = {
+      Adopted: 0,
+      Available: 0,
+      Pending: 0,
     };
 
     for (const pet of state.pets) {
-      inventoryMap[pet.status] += 1;
+      inventory[pet.status] += 1;
     }
 
-    return inventoryMap;
+    return inventory;
   }
 
   /**

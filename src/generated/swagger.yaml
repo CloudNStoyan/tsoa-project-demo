@@ -121,18 +121,24 @@ components:
         - tags
       type: object
       additionalProperties: false
-    InventoryMap:
-      description: Inventory map of adoption status to quantities.
+    Inventory:
+      description: Inventory of adoption status to quantities.
       properties:
         Adopted:
-          type: number
-          format: double
+          type: integer
+          format: int32
+          description: The number of pets that were adopted.
+          example: 3
         Available:
-          type: number
-          format: double
+          type: integer
+          format: int32
+          description: The number of pets that are available for adoption.
+          example: 1
         Pending:
-          type: number
-          format: double
+          type: integer
+          format: int32
+          description: The number of pets that have a pending adoption status.
+          example: 2
       required:
         - Adopted
         - Available
@@ -605,7 +611,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InventoryMap'
+                $ref: '#/components/schemas/Inventory'
         '401':
           description: Unauthorized
           content:
