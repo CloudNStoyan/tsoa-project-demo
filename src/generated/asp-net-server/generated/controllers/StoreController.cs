@@ -23,7 +23,8 @@ public class StoreController : ControllerBase
   /// <response code="401">Unauthorized</response>
   [HttpGet("inventory")]
   [ProducesResponseType(StatusCodes.Status200OK)]
-  public ActionResult<InventoryMap> GetInventory()
+  [SwaggerResponseExample(StatusCodes.Status200OK, typeof(InventoryExample))]
+  public ActionResult<Inventory> GetInventory()
   {
     throw new NotImplementedException();
   }
