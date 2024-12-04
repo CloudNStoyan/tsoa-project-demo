@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Filters;
 using AspNetServer.SwashbuckleFilters;
 using AspNetServer.Generated.Models;
-using AspNetServer.Generated.Examples;
 
 namespace AspNetServer.Generated.Controllers;
 

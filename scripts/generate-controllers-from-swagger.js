@@ -5,7 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 
 const SWAGGER_JSON_FILE_PATH = './src/generated/swagger.json';
-const GENERATED_FOLDER = './src/generated/asp-net-server/generated';
+const GENERATED_FOLDER = './src/generated/asp-net-server/Generated';
 
 const swaggerJson = await fs.readFile(SWAGGER_JSON_FILE_PATH, {
   encoding: 'utf-8',
@@ -380,12 +380,6 @@ class DotNetModel {
 
       if (!imports.has(filtersImport)) {
         imports.add(filtersImport);
-      }
-
-      const examplesImport = `using ${this.#rootNamespace}.Generated.Examples;`;
-
-      if (!imports.has(examplesImport)) {
-        imports.add(examplesImport);
       }
     }
 
@@ -1023,9 +1017,6 @@ class DotNetModel {
         `using ${this.#rootNamespace}.SwashbuckleFilters;`
       );
       controller.imports.push(`using ${this.#rootNamespace}.Generated.Models;`);
-      controller.imports.push(
-        `using ${this.#rootNamespace}.Generated.Examples;`
-      );
 
       const commonAttributesMap = new Map();
       const possibleCommonAttributes = [
@@ -1335,10 +1326,9 @@ class RenderExample {
 
     let output = '';
 
-    output += `using ${rootNamespace}.Generated.Models;\n`;
     output += 'using Swashbuckle.AspNetCore.Filters;\n\n';
 
-    output += `namespace ${rootNamespace}.Generated.Examples;\n\n`;
+    output += `namespace ${rootNamespace}.Generated.Models;\n\n`;
 
     output += `public class ${this.#name}Example : IExamplesProvider<${this.#resolvedDotnetType}>\n`;
     output += '{\n';
@@ -1542,13 +1532,12 @@ const dotNetModel = new DotNetModel({
   securityDefinitionName: 'api_key',
 });
 
-await fs.mkdir(path.join(GENERATED_FOLDER, 'models'), { recursive: true });
-await fs.mkdir(path.join(GENERATED_FOLDER, 'examples'), { recursive: true });
+await fs.mkdir(path.join(GENERATED_FOLDER, 'Models'), { recursive: true });
 for (const additionalExample of dotNetModel.additionalExamples) {
   await fs.writeFile(
     path.join(
       GENERATED_FOLDER,
-      'examples',
+      'Models',
       `${additionalExample.name}Example.cs`
     ),
     new RenderExample({
@@ -1567,7 +1556,7 @@ for (const additionalExample of dotNetModel.additionalExamples) {
 for (const model of dotNetModel.models) {
   if (model.type === 'class' && model.hasExample) {
     await fs.writeFile(
-      path.join(GENERATED_FOLDER, 'examples', `${model.name}Example.cs`),
+      path.join(GENERATED_FOLDER, 'Models', `${model.name}Example.cs`),
       new RenderExample({
         model,
         name: model.name,
@@ -1583,7 +1572,7 @@ for (const model of dotNetModel.models) {
 
   if (!options.ignoredModels.has(model.name)) {
     await fs.writeFile(
-      path.join(GENERATED_FOLDER, 'models', `${model.name}.cs`),
+      path.join(GENERATED_FOLDER, 'Models', `${model.name}.cs`),
       new RenderModel({ model, rootNamespace: options.rootNamespace }).render(),
       {
         encoding: 'utf-8',
@@ -1591,12 +1580,12 @@ for (const model of dotNetModel.models) {
     );
   }
 }
-await fs.mkdir(path.join(GENERATED_FOLDER, 'controllers'), { recursive: true });
+await fs.mkdir(path.join(GENERATED_FOLDER, 'Controllers'), { recursive: true });
 for (const controller of dotNetModel.controllers) {
   await fs.writeFile(
     path.join(
       GENERATED_FOLDER,
-      'controllers',
+      'Controllers',
       `${controller.name}Controller.cs`
     ),
     new RenderController({

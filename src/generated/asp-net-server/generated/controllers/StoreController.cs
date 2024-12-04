@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Swashbuckle.AspNetCore.Filters;
 using AspNetServer.SwashbuckleFilters;
 using AspNetServer.Generated.Models;
-using AspNetServer.Generated.Examples;
 
 namespace AspNetServer.Generated.Controllers;
 
