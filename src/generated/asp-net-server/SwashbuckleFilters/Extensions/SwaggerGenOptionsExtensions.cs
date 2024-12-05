@@ -13,6 +13,7 @@ public static class SwaggerGenOptionsExtensions {
     options.OperationFilter<NoInlineSchemaFilter>();
     options.OperationFilter<RemoveAutomaticRequestExample>();
     options.SchemaFilter<RemoveUndesiredMinLengthFilter>();
+    options.SchemaFilter<AddPatternToUuidFilter>();
   }
 
   public static void SwaggerDocUsingGeneratedDefinitions(this SwaggerGenOptions options, string name) {

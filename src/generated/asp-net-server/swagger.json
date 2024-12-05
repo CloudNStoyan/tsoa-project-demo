@@ -321,6 +321,7 @@
             "description": "The pet's id.",
             "required": true,
             "schema": {
+              "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}",
               "type": "string",
               "format": "uuid"
             }
@@ -369,6 +370,7 @@
             "description": "Pet ID to delete.",
             "required": true,
             "schema": {
+              "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}",
               "type": "string",
               "format": "uuid"
             }
@@ -513,6 +515,7 @@
             "description": "The adoption request's ID.",
             "required": true,
             "schema": {
+              "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}",
               "type": "string",
               "format": "uuid"
             }
@@ -581,6 +584,7 @@
             "description": "The adoption request's ID.",
             "required": true,
             "schema": {
+              "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}",
               "type": "string",
               "format": "uuid"
             }
@@ -641,12 +645,14 @@
         "type": "object",
         "properties": {
           "id": {
+            "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}",
             "type": "string",
             "description": "The adoption's ID.",
             "format": "uuid",
             "example": "67120cf3-1434-44be-b660-b02df64db677"
           },
           "petId": {
+            "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}",
             "type": "string",
             "description": "The adoptee's ID.",
             "format": "uuid",
@@ -744,6 +750,7 @@
         "type": "object",
         "properties": {
           "id": {
+            "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}",
             "type": "string",
             "description": "The pet's identifier.",
             "format": "uuid",
