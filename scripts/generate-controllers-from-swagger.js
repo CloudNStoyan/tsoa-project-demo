@@ -216,18 +216,6 @@ class DotNetModel {
     this.apiInfo = this.GenerateApiInfo();
   }
 
-  SchemaIsEnum(schema) {
-    return schema.type === 'string' && Array.isArray(schema.enum);
-  }
-
-  GetArrayItemType(dotnetType) {
-    if (dotnetType.type !== 'array') {
-      return dotnetType;
-    }
-
-    return this.GetArrayItemType(dotnetType.itemType);
-  }
-
   ResolveDotnetType(schema) {
     if (Array.isArray(schema.allOf) && schema.allOf.length === 1) {
       return this.ResolveDotnetType(schema.allOf[0]);
@@ -238,7 +226,8 @@ class DotNetModel {
 
       const schemaType = resolvedRef.schema;
 
-      const isEnum = this.SchemaIsEnum(schemaType);
+      const isEnum =
+        schemaType.type === 'string' && Array.isArray(schemaType.enum);
 
       if (schemaType.type != 'object' && !isEnum) {
         return this.ResolveDotnetType(schemaType);
@@ -312,20 +301,6 @@ class DotNetModel {
     return { schema: schemaType, name: typeName };
   }
 
-  GenerateXmlObject(schema) {
-    const output = {
-      summary: schema.description,
-    };
-
-    for (const key in output) {
-      if (output[key] !== undefined) {
-        return output;
-      }
-    }
-
-    return '';
-  }
-
   GeneratePropertyAttributes({ schema, required }) {
     const attributes = [];
 
@@ -358,7 +333,9 @@ class DotNetModel {
       name,
       type: schema.type,
       required,
-      xmlObject: this.GenerateXmlObject(schema),
+      xmlObject: {
+        summary: schema.description,
+      },
       dotnetType: this.ResolveDotnetType(schema),
       nullable: schema.nullable || false,
       attributes: this.GeneratePropertyAttributes({ schema, required }),
@@ -429,7 +406,9 @@ class DotNetModel {
     return {
       name,
       type: 'class',
-      xmlObject: this.GenerateXmlObject(schema),
+      xmlObject: {
+        summary: schema.description,
+      },
       properties,
       hasExample,
       example,
@@ -442,7 +421,9 @@ class DotNetModel {
       name,
       type: 'enum',
       enumMembers: schema.enum,
-      xmlObject: this.GenerateXmlObject(schema),
+      xmlObject: {
+        summary: schema.description,
+      },
     };
   }
 
@@ -486,7 +467,9 @@ class DotNetModel {
       if (tagSchema) {
         return {
           ...tag,
-          xmlObject: this.GenerateXmlObject(tagSchema),
+          xmlObject: {
+            summary: tagSchema.description,
+          },
           schema: tagSchema,
         };
       }
@@ -568,11 +551,6 @@ class DotNetModel {
 
       this.ThrowIfResponseContentIsInvalid(content);
 
-      // TODO: How to solve this in DotNet?
-      // if (responses['204']) {
-      //   return `${this.resolveType(content.schema)} | void`;
-      // }
-
       return this.ResolveDotnetType(content.schema);
     }
 
@@ -581,53 +559,8 @@ class DotNetModel {
     );
   }
 
-  GenerateControllerParameters(operation) {
+  GenerateOperationParameters(operation) {
     const parameters = [];
-
-    if (Array.isArray(operation.parameters)) {
-      for (const parameterInfo of operation.parameters) {
-        const attributes = [];
-
-        if (parameterInfo.in === 'query') {
-          attributes.push('[FromQuery]');
-        } else if (parameterInfo.in === 'header') {
-          attributes.push('[FromHeader]');
-        } else if (parameterInfo.in === 'path') {
-          attributes.push('[FromRoute]');
-        } else if (parameterInfo.in === 'cookie') {
-          throw new Error(
-            `.NET doesn't support 'Cookie' OpenAPI parameters, 'Cookie' OpenAPI parameter found in '${operation.operationId}' operation.`
-          );
-        } else {
-          throw new Error(`Invalid parameter.in value '${parameterInfo.in}'.`);
-        }
-
-        if (parameterInfo.required) {
-          attributes.push('[Required]');
-        }
-
-        const parameterSchema = parameterInfo.schema;
-
-        const parameter = {
-          attributes,
-          type: parameterInfo.in,
-          name: parameterInfo.name,
-          schema: parameterSchema,
-          default: parameterInfo.schema.default,
-          dotnetType: this.ResolveDotnetType(parameterSchema),
-          description: parameterInfo.description,
-          example: parameterInfo.example,
-        };
-
-        if (parameterSchema.$ref) {
-          const resolvedRef = this.ResolveSchemaRef(parameterSchema.$ref);
-
-          parameter.example = resolvedRef.schema.example;
-        }
-
-        parameters.push(parameter);
-      }
-    }
 
     if (operation.requestBody) {
       const body = operation.requestBody;
@@ -661,10 +594,57 @@ class DotNetModel {
       parameters.push(parameter);
     }
 
+    if (!Array.isArray(operation.parameters)) {
+      return parameters;
+    }
+
+    for (const parameterInfo of operation.parameters) {
+      const attributes = [];
+
+      if (parameterInfo.in === 'query') {
+        attributes.push('[FromQuery]');
+      } else if (parameterInfo.in === 'header') {
+        attributes.push('[FromHeader]');
+      } else if (parameterInfo.in === 'path') {
+        attributes.push('[FromRoute]');
+      } else if (parameterInfo.in === 'cookie') {
+        throw new Error(
+          `.NET doesn't support 'Cookie' OpenAPI parameters, 'Cookie' OpenAPI parameter found in '${operation.operationId}' operation.`
+        );
+      } else {
+        throw new Error(`Invalid parameter.in value '${parameterInfo.in}'.`);
+      }
+
+      if (parameterInfo.required) {
+        attributes.push('[Required]');
+      }
+
+      const parameterSchema = parameterInfo.schema;
+
+      const parameter = {
+        attributes,
+        type: parameterInfo.in,
+        name: parameterInfo.name,
+        schema: parameterSchema,
+        default: parameterInfo.schema.default,
+        dotnetType: this.ResolveDotnetType(parameterSchema),
+        description: parameterInfo.description,
+        example: parameterInfo.example,
+      };
+
+      if (parameterSchema.$ref) {
+        const resolvedRef = this.ResolveSchemaRef(parameterSchema.$ref);
+
+        parameter.example = resolvedRef.schema.example;
+      }
+
+      parameters.push(parameter);
+    }
+
     return parameters;
   }
 
-  GenerateMethodAttribute(operation) {
+  GenerateHttpMethodAttribute(operation) {
     let path = operation.path;
 
     if (path.startsWith('/')) {
@@ -696,7 +676,7 @@ class DotNetModel {
     return output;
   }
 
-  GenerateResponse(responseSchemes) {
+  GenerateResponses(responseSchemes) {
     const responses = [];
 
     for (const statusCode in responseSchemes) {
@@ -929,8 +909,8 @@ class DotNetModel {
           path,
           method,
           returnType: this.GenerateReturnType(operationSchema.responses),
-          parameters: this.GenerateControllerParameters(operationSchema),
-          responses: this.GenerateResponse(operationSchema.responses),
+          parameters: this.GenerateOperationParameters(operationSchema),
+          responses: this.GenerateResponses(operationSchema.responses),
         };
 
         const attributes = [];
@@ -950,15 +930,14 @@ class DotNetModel {
           attributes.push('[Authorize]');
         }
 
-        attributes.push(this.GenerateMethodAttribute(operation));
+        attributes.push(this.GenerateHttpMethodAttribute(operation));
 
         for (const response of operation.responses) {
           const statusCodeAsEnumType = `StatusCodes.${STATUS_CODES_TO_ENUM_NAMES[response.statusCode]}`;
 
           attributes.push(`[ProducesResponseType(${statusCodeAsEnumType})]`);
 
-          const isErrorResponse =
-            response.statusCode > 399 && response.statusCode < 600;
+          const isErrorResponse = response.statusCode >= 400;
 
           if (
             isErrorResponse &&
@@ -1084,7 +1063,7 @@ class DotNetModel {
       }
 
       const commonAttributes = Array.from(commonAttributesMap)
-        .filter(([attr, count]) => count === controller.operations.length)
+        .filter(([_attr, count]) => count === controller.operations.length)
         .map(([attr]) => attr);
 
       if (commonAttributes.length > 0) {
@@ -1266,14 +1245,7 @@ class RenderExample {
   #example;
   #rootNamespace;
 
-  constructor({
-    model,
-    name,
-    resolvedDotnetType,
-    example,
-    isArray,
-    rootNamespace,
-  }) {
+  constructor({ model, name, resolvedDotnetType, example, rootNamespace }) {
     this.#model = model;
     this.#name = name;
     this.#resolvedDotnetType = resolvedDotnetType;
@@ -1281,7 +1253,7 @@ class RenderExample {
     this.#rootNamespace = rootNamespace;
   }
 
-  renderPropertyValue(dotnetType, example) {
+  renderPropertyValue({ dotnetType, example }) {
     let output = '';
 
     if (dotnetType.type === 'literal') {
@@ -1309,7 +1281,10 @@ class RenderExample {
       output += '[';
       output += example
         .map((exampleElement) =>
-          this.renderPropertyValue(dotnetType.itemType, exampleElement)
+          this.renderPropertyValue({
+            dotnetType: dotnetType.itemType,
+            example: exampleElement,
+          })
         )
         .join(', ');
       output += ']';
@@ -1320,7 +1295,7 @@ class RenderExample {
     return output;
   }
 
-  renderProperty(property, schemaExample, indentation = 0) {
+  renderProperty({ property, schemaExample, indentation = 0 }) {
     const indentationString = getIndentationString(indentation);
 
     let output = '';
@@ -1328,7 +1303,7 @@ class RenderExample {
     const name = uppercaseFirstLetter(property.name);
 
     output += `${indentationString}${name} = `;
-    output += `${this.renderPropertyValue(property.dotnetType, schemaExample[property.name])},\n`;
+    output += `${this.renderPropertyValue({ dotnetType: property.dotnetType, example: schemaExample[property.name] })},\n`;
 
     return output;
   }
@@ -1351,11 +1326,11 @@ class RenderExample {
       exampleOutput += `${exampleIndentationString}{\n`;
 
       for (const property of model.properties) {
-        exampleOutput += this.renderProperty(
+        exampleOutput += this.renderProperty({
           property,
-          exampleElement,
-          indentation + 4
-        );
+          schemaExample: exampleElement,
+          indentation: indentation + 4,
+        });
       }
 
       exampleOutput += `${exampleIndentationString}}`;
@@ -1380,7 +1355,11 @@ class RenderExample {
     output += `${indentationString}{\n`;
 
     for (const property of model.properties) {
-      output += this.renderProperty(property, this.#example, indentation + 2);
+      output += this.renderProperty({
+        property,
+        schemaExample: this.#example,
+        indentation: indentation + 2,
+      });
     }
 
     output += `${indentationString}};\n`;
@@ -1424,7 +1403,7 @@ class RenderController {
     this.#rootNamespace = rootNamespace;
   }
 
-  renderValue(dotnetType, value) {
+  renderValue({ dotnetType, value }) {
     let output = '';
 
     if (dotnetType.type === 'literal') {
@@ -1447,7 +1426,10 @@ class RenderController {
       output += '[';
       output += value
         .map((valueElement) =>
-          this.renderValue(dotnetType.itemType, valueElement)
+          this.renderValue({
+            dotnetType: dotnetType.itemType,
+            value: valueElement,
+          })
         )
         .join(', ');
       output += ']';
@@ -1458,7 +1440,7 @@ class RenderController {
     return output;
   }
 
-  renderAttributes(attributes, indentation = 0) {
+  renderAttributes({ attributes, indentation = 0 }) {
     if (attributes.length === 0) {
       return '';
     }
@@ -1474,7 +1456,7 @@ class RenderController {
     return output;
   }
 
-  renderXml(xmlObject, indentation = 0) {
+  renderXml({ xmlObject, indentation = 0 }) {
     if (isObjectEmpty(xmlObject)) {
       return '';
     }
@@ -1526,10 +1508,10 @@ class RenderController {
     output += parameter.name;
 
     if (parameter.default !== undefined) {
-      const renderedValue = this.renderValue(
-        parameter.dotnetType,
-        parameter.default
-      );
+      const renderedValue = this.renderValue({
+        dotnetType: parameter.dotnetType,
+        value: parameter.default,
+      });
 
       output += ` = ${renderedValue}`;
     }
@@ -1545,13 +1527,16 @@ class RenderController {
     return parameters.map((param) => this.renderParameter(param)).join(', ');
   }
 
-  renderOperation(operation, indentation = 0) {
+  renderOperation({ operation, indentation = 0 }) {
     const indentationString = getIndentationString(indentation);
 
     let output = '';
 
-    output += this.renderXml(operation.xmlObject, indentation);
-    output += this.renderAttributes(operation.attributes, indentation);
+    output += this.renderXml({ xmlObject: operation.xmlObject, indentation });
+    output += this.renderAttributes({
+      attributes: operation.attributes,
+      indentation,
+    });
     output += indentationString;
     output += 'public ActionResult';
 
@@ -1583,7 +1568,7 @@ class RenderController {
     output += '{\n';
 
     for (const operation of controller.operations) {
-      output += this.renderOperation(operation, 2);
+      output += this.renderOperation({ operation, indentation: 2 });
     }
 
     output = output.trim();
@@ -1836,10 +1821,7 @@ await fs.writeFile(
     securityDefinitions: dotNetModel.securityDefinitions,
     tags: dotNetModel.tags,
     apiInfo: dotNetModel.apiInfo,
-  }).render(),
-  {
-    encoding: 'utf-8',
-  }
+  }).render()
 );
 
 await fs.mkdir(path.join(GENERATED_FOLDER, 'Models'), { recursive: true });
@@ -1856,10 +1838,7 @@ for (const additionalExample of dotNetModel.additionalExamples) {
       resolvedDotnetType: additionalExample.resolvedDotnetType,
       example: additionalExample.example.value,
       rootNamespace: options.rootNamespace,
-    }).render(),
-    {
-      encoding: 'utf-8',
-    }
+    }).render()
   );
 }
 
@@ -1873,20 +1852,14 @@ for (const model of dotNetModel.models) {
         resolvedDotnetType: model.name,
         example: model.example.value,
         rootNamespace: options.rootNamespace,
-      }).render(),
-      {
-        encoding: 'utf-8',
-      }
+      }).render()
     );
   }
 
   if (!options.ignoredModels.has(model.name)) {
     await fs.writeFile(
       path.join(GENERATED_FOLDER, 'Models', `${model.name}.cs`),
-      new RenderModel({ model, rootNamespace: options.rootNamespace }).render(),
-      {
-        encoding: 'utf-8',
-      }
+      new RenderModel({ model, rootNamespace: options.rootNamespace }).render()
     );
   }
 }
@@ -1901,9 +1874,6 @@ for (const controller of dotNetModel.controllers) {
     new RenderController({
       controller,
       rootNamespace: options.rootNamespace,
-    }).render(),
-    {
-      encoding: 'utf-8',
-    }
+    }).render()
   );
 }
