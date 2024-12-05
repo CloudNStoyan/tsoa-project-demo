@@ -10,7 +10,6 @@ public static class SwaggerGenOptionsExtensions {
     options.SchemaFilter<PropertyExampleFilter>();
     options.OperationFilter<RemoveUndesiredContentTypesFilter>();
     options.OperationFilter<ErrorExampleFilter>();
-    options.OperationFilter<NoInlineSchemaFilter>();
     options.OperationFilter<RemoveAutomaticRequestExampleFilter>();
     options.SchemaFilter<RemoveUndesiredMinLengthFilter>();
     options.SchemaFilter<AddPatternToUuidFilter>();

@@ -3,6 +3,9 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AspNetServer.SwashbuckleFilters;
 
+/// <summary>
+/// Adds OpenAPI Tags to the schema.
+/// </summary>
 public class AddTagsMetadataFilter : IDocumentFilter
 {
   private OpenApiTag[] Tags {get; set;}

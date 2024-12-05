@@ -3,6 +3,9 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AspNetServer.SwashbuckleFilters;
 
+/// <summary>
+/// Adds a default pattern for Guid types.
+/// </summary>
 public class AddPatternToUuidFilter : ISchemaFilter
 {
   public void Apply(OpenApiSchema schema, SchemaFilterContext context)

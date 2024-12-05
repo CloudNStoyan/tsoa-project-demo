@@ -1,12 +1,14 @@
 using System.Reflection;
-using AspNetServer.SwashbuckleFilters.Extensions;
-using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AspNetServer.SwashbuckleFilters;
 
+/// <summary>
+/// Removes the automatic content examples of the request body of
+/// operations that don't have an explicit SwaggerRequestExample.
+/// </summary>
 public class RemoveAutomaticRequestExampleFilter : IOperationFilter
 {
   public void Apply(OpenApiOperation operation, OperationFilterContext context)
@@ -14,7 +16,6 @@ public class RemoveAutomaticRequestExampleFilter : IOperationFilter
     var actionAttributes = context.MethodInfo.GetCustomAttributes<SwaggerRequestExampleAttribute>();
 
     if (actionAttributes.Any()) {
-      System.Console.WriteLine(operation.OperationId);
       return;
     }
 

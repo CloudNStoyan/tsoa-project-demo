@@ -1,12 +1,14 @@
-using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AspNetServer.SwashbuckleFilters;
 
+/// <summary>
+/// Removes 'text/json' and 'application/*+json' content types from responses and request body.
+/// </summary>
 public class RemoveUndesiredContentTypesFilter : IOperationFilter
 {
-  private static string[] UndesiredContentTypes = ["text/json", "application/*+json"];
+  private static readonly string[] UndesiredContentTypes = ["text/json", "application/*+json"];
   public void Apply(OpenApiOperation operation, OperationFilterContext context)
   {
     foreach(var responseEntry in operation.Responses) {

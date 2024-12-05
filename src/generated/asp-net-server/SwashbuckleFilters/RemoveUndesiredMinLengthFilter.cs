@@ -6,6 +6,9 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AspNetServer.SwashbuckleFilters;
 
+/// <summary>
+/// Removes 'minLength: 1' strings that do not have an explicit MinLength attribute.
+/// </summary>
 public class RemoveUndesiredMinLengthFilter : ISchemaFilter
 {
   public void Apply(OpenApiSchema schema, SchemaFilterContext context)

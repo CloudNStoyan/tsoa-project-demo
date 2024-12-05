@@ -7,6 +7,9 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AspNetServer.SwashbuckleFilters;
 
+/// <summary>
+/// Adds error examples for operation responses using the SwaggerErrorExample attributes.
+/// </summary>
 public class ErrorExampleFilter : IOperationFilter
 {
   private readonly JsonSerializerOptions customJsonSerializerOptions;

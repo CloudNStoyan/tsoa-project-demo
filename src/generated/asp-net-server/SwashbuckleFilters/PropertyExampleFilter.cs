@@ -9,6 +9,10 @@ using System.Text.Json.Serialization;
 
 namespace AspNetServer.SwashbuckleFilters;
 
+/// <summary>
+/// Destruct an example to its schema properties to act as a default
+/// example using the PropertiesExample attribute.
+/// </summary>
 public class PropertyExampleFilter : ISchemaFilter {
   private readonly IServiceProvider serviceProvider;
   private readonly JsonSerializerOptions customJsonSerializerOptions;
