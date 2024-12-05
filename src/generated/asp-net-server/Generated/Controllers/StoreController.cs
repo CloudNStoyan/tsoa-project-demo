@@ -47,7 +47,7 @@ public class StoreController : ControllerBase
   /// Find adoption request by ID.
   /// </summary>
   /// <remarks>Find adoption request by ID.</remarks>
-  /// <param name="requestId">The adoption request's ID.</param>
+  /// <param name="requestId" example="7312cc99-f99f-445e-a939-eb66c0c6724c">The adoption request's ID.</param>
   /// <response code="200">Successful retrieval of adoption request.</response>
   /// <response code="401">Unauthorized</response>
   /// <response code="404">Not Found</response>
@@ -65,7 +65,7 @@ public class StoreController : ControllerBase
   /// Delete adoption request by ID.
   /// </summary>
   /// <remarks>Delete adoption request by ID.</remarks>
-  /// <param name="requestId">The adoption request's ID.</param>
+  /// <param name="requestId" example="7312cc99-f99f-445e-a939-eb66c0c6724c">The adoption request's ID.</param>
   /// <response code="204">No Content</response>
   /// <response code="401">Unauthorized</response>
   /// <response code="404">Not Found</response>

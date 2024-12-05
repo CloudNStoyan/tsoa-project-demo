@@ -117,7 +117,7 @@ public class PetController : ControllerBase
   /// Find pet by ID.
   /// </summary>
   /// <remarks>Returns a single pet.</remarks>
-  /// <param name="petId">The pet's id.</param>
+  /// <param name="petId" example="7312cc99-f99f-445e-a939-eb66c0c6724c">The pet's id.</param>
   /// <response code="200">Successful retrieval of a pet.</response>
   /// <response code="404">Not Found</response>
   [HttpGet("{petId}")]
@@ -134,7 +134,7 @@ public class PetController : ControllerBase
   /// Deletes a pet.
   /// </summary>
   /// <remarks>Deletes a pet by ID.</remarks>
-  /// <param name="petId">Pet ID to delete.</param>
+  /// <param name="petId" example="7312cc99-f99f-445e-a939-eb66c0c6724c">Pet ID to delete.</param>
   /// <response code="204">No Content</response>
   /// <response code="404">Not Found</response>
   [HttpDelete("{petId}")]

@@ -234,15 +234,9 @@ class DotNetModel {
     }
 
     if (schema.$ref) {
-      if (!schema.$ref.startsWith('#/components/schemas/')) {
-        throw new Error(
-          "Found a ref that doesn't point to #/components/schema"
-        );
-      }
+      const resolvedRef = this.ResolveSchemaRef(schema.$ref);
 
-      const typeName = schema.$ref.split('#/components/schemas/')[1];
-
-      const schemaType = this.#swaggerDocument.components.schemas[typeName];
+      const schemaType = resolvedRef.schema;
 
       const isEnum = this.SchemaIsEnum(schemaType);
 
@@ -250,7 +244,10 @@ class DotNetModel {
         return this.ResolveDotnetType(schemaType);
       }
 
-      return { resolved: typeName, type: isEnum ? 'enum' : 'object' };
+      return {
+        resolved: resolvedRef.name,
+        type: isEnum ? 'enum' : 'object',
+      };
     }
 
     switch (schema.type) {
@@ -297,6 +294,22 @@ class DotNetModel {
         throw new Error(`Unexpected schema type '${schema.type}'.`);
       }
     }
+  }
+
+  ResolveSchemaRef(ref) {
+    if (typeof ref !== 'string') {
+      throw new Error(`Found a ref that is not a string '${ref}'.`);
+    }
+
+    if (!ref.startsWith('#/components/schemas/')) {
+      throw new Error("Found a ref that doesn't point to #/components/schema");
+    }
+
+    const typeName = ref.split('#/components/schemas/')[1];
+
+    const schemaType = this.#swaggerDocument.components.schemas[typeName];
+
+    return { schema: schemaType, name: typeName };
   }
 
   GenerateXmlObject(schema) {
@@ -593,15 +606,24 @@ class DotNetModel {
           attributes.push('[Required]');
         }
 
+        const parameterSchema = parameterInfo.schema;
+
         const parameter = {
           attributes,
           type: parameterInfo.in,
           name: parameterInfo.name,
-          schema: parameterInfo.schema,
+          schema: parameterSchema,
           default: parameterInfo.schema.default,
-          dotnetType: this.ResolveDotnetType(parameterInfo.schema),
+          dotnetType: this.ResolveDotnetType(parameterSchema),
           description: parameterInfo.description,
+          example: parameterInfo.example,
         };
+
+        if (parameterSchema.$ref) {
+          const resolvedRef = this.ResolveSchemaRef(parameterSchema.$ref);
+
+          parameter.example = resolvedRef.schema.example;
+        }
 
         parameters.push(parameter);
       }
@@ -965,6 +987,7 @@ class DotNetModel {
           return {
             name: p.name,
             description: p.description,
+            example: p.example || p.resolvedSchema?.example,
           };
         });
 
@@ -1474,7 +1497,11 @@ class RenderController {
       const params = xmlObject['params'];
 
       for (const param of params) {
-        output += `${indentationString}/// <param name="${param.name}">${param.description}</param>\n`;
+        if (param.example === undefined) {
+          output += `${indentationString}/// <param name="${param.name}">${param.description}</param>\n`;
+        } else {
+          output += `${indentationString}/// <param name="${param.name}" example="${param.example}">${param.description}</param>\n`;
+        }
       }
     }
 
