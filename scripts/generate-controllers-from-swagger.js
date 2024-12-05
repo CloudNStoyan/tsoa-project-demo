@@ -166,6 +166,13 @@ const STATUS_CODES_TO_ENUM_NAMES = {
   499: 'Status499ClientClosedRequest',
 };
 
+const SECURITY_SCHEME_TYPE_TO_ENUM_NAMES = {
+  http: 'Http',
+  apiKey: 'ApiKey',
+  oauth2: 'OAuth2',
+  openIdConnect: 'OpenIdConnect',
+};
+
 const HTTP_METHODS_TO_ATTRIBUTE_NAMES = {
   get: 'HttpGet',
   post: 'HttpPost',
@@ -197,10 +204,16 @@ class DotNetModel {
 
     const operations = this.GenerateOperations();
 
+    this.tags = this.GenerateTags(operations);
+
     this.additionalExamples =
       this.GenerateAdditionalExamplesAndUpdateOperations(operations);
 
     this.controllers = this.GenerateControllers(operations);
+
+    this.securityDefinitions = this.GenerateSecurityDefinitions();
+
+    this.apiInfo = this.GenerateApiInfo();
   }
 
   SchemaIsEnum(schema) {
@@ -458,7 +471,11 @@ class DotNetModel {
     const tags = Array.from(tagsMap.values()).map((tag) => {
       const tagSchema = tagSchemas.find((t) => t.name === tag.name);
       if (tagSchema) {
-        return { ...tag, xmlObject: this.GenerateXmlObject(tagSchema) };
+        return {
+          ...tag,
+          xmlObject: this.GenerateXmlObject(tagSchema),
+          schema: tagSchema,
+        };
       }
 
       return tag;
@@ -970,7 +987,7 @@ class DotNetModel {
   }
 
   GenerateControllers(operations) {
-    const tags = this.GenerateTags(operations);
+    const tags = this.tags;
 
     const controllers = [];
 
@@ -1061,6 +1078,35 @@ class DotNetModel {
     }
 
     return controllers;
+  }
+
+  GenerateSecurityDefinitions() {
+    const securitySchemes = this.#swaggerDocument.components.securitySchemes;
+
+    const securityDefinitions = [];
+
+    for (const securitySchemeName in securitySchemes) {
+      const securityScheme = securitySchemes[securitySchemeName];
+
+      securityDefinitions.push({ ...securityScheme, name: securitySchemeName });
+    }
+
+    return securityDefinitions;
+  }
+
+  GenerateApiInfo() {
+    const info = this.#swaggerDocument.info;
+    const generatedInfo = {};
+
+    for (const propertyName in info) {
+      if (isObjectEmpty(info[propertyName])) {
+        continue;
+      }
+
+      generatedInfo[propertyName] = info[propertyName];
+    }
+
+    return generatedInfo;
   }
 }
 
@@ -1521,6 +1567,229 @@ class RenderController {
   }
 }
 
+class RenderDefinitions {
+  #rootNamespace;
+  #securityDefinitions;
+  #tags;
+  #apiInfo;
+
+  constructor({ rootNamespace, securityDefinitions, tags, apiInfo }) {
+    this.#rootNamespace = rootNamespace;
+    this.#securityDefinitions = securityDefinitions;
+    this.#tags = tags;
+    this.#apiInfo = apiInfo;
+  }
+
+  renderSecurityDefinition({ securityDefinition, indentation = 0 }) {
+    const indentationString = getIndentationString(indentation);
+    const propertiesIndentationString = getIndentationString(indentation + 2);
+
+    const securitySchemeType =
+      SECURITY_SCHEME_TYPE_TO_ENUM_NAMES[securityDefinition.type];
+
+    let output = '';
+
+    output += `${indentationString}new()\n`;
+    output += `${indentationString}{\n`;
+    output += `${propertiesIndentationString}Name = ${JSON.stringify(securityDefinition.name)},\n`;
+    output += `${propertiesIndentationString}Description = ${JSON.stringify(securityDefinition.description)},\n`;
+    output += `${propertiesIndentationString}Type = SecuritySchemeType.${securitySchemeType},\n`;
+    output += `${propertiesIndentationString}Scheme = ${JSON.stringify(securityDefinition.scheme)}\n`;
+    output += `${indentationString}}\n`;
+
+    return output;
+  }
+
+  renderSecurityDefinitions(indentation = 0) {
+    const securityDefinitions = this.#securityDefinitions;
+
+    const indentationString = getIndentationString(indentation);
+
+    let output = '';
+
+    output += `${indentationString}return [\n`;
+
+    output += securityDefinitions
+      .map((securityDefinition) =>
+        this.renderSecurityDefinition({
+          securityDefinition,
+          indentation: indentation + 2,
+        })
+      )
+      .join(',\n');
+
+    output += `${indentationString}];\n`;
+
+    return output;
+  }
+
+  renderLicense({ license, indentation = 0 }) {
+    const indentationString = getIndentationString(indentation);
+    const propertiesIndentationString = getIndentationString(indentation + 2);
+
+    let output = '';
+
+    output += `${indentationString}License = new ()\n`;
+    output += `${indentationString}{\n`;
+    output += `${propertiesIndentationString}Name = ${JSON.stringify(license.name)},\n`;
+
+    if (license.url) {
+      output += `${propertiesIndentationString}Url = new (${JSON.stringify(license.url)}),\n`;
+    }
+
+    output += `${indentationString}},\n`;
+
+    return output;
+  }
+
+  renderContact({ contact, indentation = 0 }) {
+    const indentationString = getIndentationString(indentation);
+    const propertiesIndentationString = getIndentationString(indentation + 2);
+
+    let output = '';
+
+    output += `${indentationString}Contact = new ()\n`;
+    output += `${indentationString}{\n`;
+    output += `${propertiesIndentationString}Name = ${JSON.stringify(contact.name)},\n`;
+
+    if (contact.url) {
+      output += `${propertiesIndentationString}Url = new (${JSON.stringify(contact.url)}),\n`;
+    }
+
+    if (contact.email) {
+      output += `${propertiesIndentationString}Email = ${JSON.stringify(contact.email)},\n`;
+    }
+
+    output += `${indentationString}},\n`;
+
+    return output;
+  }
+
+  renderApiInfo(indentation = 0) {
+    const apiInfo = this.#apiInfo;
+
+    const indentationString = getIndentationString(indentation);
+    const propertiesIndentationString = getIndentationString(indentation + 2);
+
+    let output = '';
+
+    output += `${indentationString}return new()\n`;
+    output += `${indentationString}{\n`;
+    output += `${propertiesIndentationString}Version = ${JSON.stringify(apiInfo.version)},\n`;
+    output += `${propertiesIndentationString}Title = ${JSON.stringify(apiInfo.title)},\n`;
+    output += `${propertiesIndentationString}Description = ${JSON.stringify(apiInfo.description)},\n`;
+
+    if (apiInfo.termsOfService) {
+      output += `${propertiesIndentationString}TermsOfService = new (${JSON.stringify(apiInfo.termsOfService)}),\n`;
+    }
+
+    if (apiInfo.contact) {
+      output += this.renderContact({
+        contact: apiInfo.contact,
+        indentation: indentation + 2,
+      });
+    }
+
+    if (apiInfo.license) {
+      output += this.renderLicense({
+        license: apiInfo.license,
+        indentation: indentation + 2,
+      });
+    }
+
+    output += `${indentationString}};\n`;
+
+    return output;
+  }
+
+  renderExternalDocs({ externalDocs, indentation = 0 }) {
+    const indentationString = getIndentationString(indentation);
+    const propertiesIndentationString = getIndentationString(indentation + 2);
+
+    let output = '';
+
+    output += `${indentationString}ExternalDocs = new()\n`;
+    output += `${indentationString}{\n`;
+    output += `${propertiesIndentationString}Description = ${JSON.stringify(externalDocs.description)},\n`;
+    output += `${propertiesIndentationString}Url = new (${JSON.stringify(externalDocs.url)}),\n`;
+    output += `${indentationString}},\n`;
+
+    return output;
+  }
+
+  renderTag({ tag, indentation = 0 }) {
+    const indentationString = getIndentationString(indentation);
+    const propertiesIndentationString = getIndentationString(indentation + 2);
+
+    let output = '';
+
+    output += `${indentationString}new()\n`;
+    output += `${indentationString}{\n`;
+    output += `${propertiesIndentationString}Name = ${JSON.stringify(tag.name)},\n`;
+    output += `${propertiesIndentationString}Description = ${JSON.stringify(tag.description)},\n`;
+
+    if (tag.externalDocs) {
+      output += this.renderExternalDocs({
+        externalDocs: tag.externalDocs,
+        indentation: indentation + 2,
+      });
+    }
+
+    output += `${indentationString}}`;
+
+    return output;
+  }
+
+  renderTags(indentation = 0) {
+    const tags = this.#tags.map((tag) => tag.schema);
+
+    const indentationString = getIndentationString(indentation);
+
+    let output = '';
+
+    output += `${indentationString}return [\n`;
+
+    for (const tag of tags) {
+      output += this.renderTag({ tag, indentation: indentation + 2 }) + ',\n';
+    }
+
+    output = output.trimEnd();
+    output += '\n';
+
+    output += `${indentationString}];\n`;
+
+    return output;
+  }
+
+  render() {
+    let output = '';
+
+    output += `using ${this.#rootNamespace}.SwashbuckleFilters;\n`;
+    output += 'using Microsoft.OpenApi.Models;\n\n';
+
+    output += `namespace ${this.#rootNamespace}.Generated;\n\n`;
+
+    output += 'public class GeneratedDefinitions : ICustomGenerated\n';
+    output += '{\n';
+    output += '  public OpenApiInfo GetGeneratedApiInfo()\n';
+    output += '  {\n';
+    output += this.renderApiInfo(4);
+    output += '  }\n\n';
+    output +=
+      '  public IEnumerable<OpenApiSecurityScheme> GetGeneratedSecuritySchemes()\n';
+    output += '  {\n';
+    output += this.renderSecurityDefinitions(4);
+    output += '  }\n\n';
+    output += '  public IEnumerable<OpenApiTag> GetGeneratedTags()\n';
+    output += '  {\n';
+    output += this.renderTags(4);
+    output += '  }\n';
+    output += '}';
+
+    return output;
+  }
+}
+
 const options = {
   rootNamespace: 'AspNetServer',
   ignoredModels: new Set(['ProblemDetails']),
@@ -1531,6 +1800,20 @@ const dotNetModel = new DotNetModel({
   rootNamespace: options.rootNamespace,
   securityDefinitionName: 'api_key',
 });
+
+await fs.mkdir(GENERATED_FOLDER, { recursive: true });
+await fs.writeFile(
+  path.join(GENERATED_FOLDER, 'GeneratedDefinitions.cs'),
+  new RenderDefinitions({
+    rootNamespace: options.rootNamespace,
+    securityDefinitions: dotNetModel.securityDefinitions,
+    tags: dotNetModel.tags,
+    apiInfo: dotNetModel.apiInfo,
+  }).render(),
+  {
+    encoding: 'utf-8',
+  }
+);
 
 await fs.mkdir(path.join(GENERATED_FOLDER, 'Models'), { recursive: true });
 for (const additionalExample of dotNetModel.additionalExamples) {

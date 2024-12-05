@@ -1,4 +1,5 @@
-using Microsoft.OpenApi.Models;
+using AspNetServer.Generated;
+using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AspNetServer.SwashbuckleFilters.Extensions;
@@ -14,19 +15,21 @@ public static class SwaggerGenOptionsExtensions {
     options.SchemaFilter<RemoveUndesiredMinLengthFilter>();
   }
 
-  public static void AddGeneratedSecurityDefinitions(this SwaggerGenOptions options) {
+  public static void SwaggerDocUsingGeneratedDefinitions(this SwaggerGenOptions options, string name) {
+    var generatedDefinitions = new GeneratedDefinitions();
 
-  }
+    options.SwaggerDoc(name, generatedDefinitions.GetGeneratedApiInfo());
 
-  public static void AddGeneratedTags(this SwaggerGenOptions options) {
+    var tags = generatedDefinitions.GetGeneratedTags().ToArray();
 
-  }
+    options.DocumentFilter<AddTagsMetadataFilter>([tags]);
 
-  public static void AddGeneratedApiInfo(this SwaggerGenOptions options) {
+    var securitySchemes = generatedDefinitions.GetGeneratedSecuritySchemes().ToArray();
 
-  }
+    foreach (var securityScheme in securitySchemes) {
+      options.AddSecurityDefinition(securityScheme.Name, securityScheme);
+    }
 
-  public static void AddCustomTagsMetadata(this SwaggerGenOptions options, OpenApiTag[] tags) {
-    options.DocumentFilter<AddTagsMetadataFilter>(new CustomOpenApiTags(tags));
+    options.OperationFilter<SecurityRequirementsOperationFilter>(false, securitySchemes[0].Name);
   }
 }

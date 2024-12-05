@@ -2,14 +2,8 @@ using Microsoft.OpenApi.Models;
 
 namespace AspNetServer.SwashbuckleFilters;
 
-public interface ICustomGeneratedTags {
-  public IEnumerable<OpenApiTag> GetGenerated();
-}
-
-public interface ICustomGeneratedSecurityDefinitions {
-  public IEnumerable<OpenApiSecurityScheme> GetGenerated();
-}
-
-public interface ICustomGeneratedOpenApiInfo {
-  public OpenApiInfo GetGenerated();
+public interface ICustomGenerated {
+  public IEnumerable<OpenApiTag> GetGeneratedTags();
+  public IEnumerable<OpenApiSecurityScheme> GetGeneratedSecuritySchemes();
+  public OpenApiInfo GetGeneratedApiInfo();
 }
