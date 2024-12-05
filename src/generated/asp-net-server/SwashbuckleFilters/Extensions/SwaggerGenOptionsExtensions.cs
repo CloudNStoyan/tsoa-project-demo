@@ -11,7 +11,7 @@ public static class SwaggerGenOptionsExtensions {
     options.OperationFilter<RemoveUndesiredContentTypesFilter>();
     options.OperationFilter<ErrorExampleFilter>();
     options.OperationFilter<NoInlineSchemaFilter>();
-    options.OperationFilter<RemoveAutomaticRequestExample>();
+    options.OperationFilter<RemoveAutomaticRequestExampleFilter>();
     options.SchemaFilter<RemoveUndesiredMinLengthFilter>();
     options.SchemaFilter<AddPatternToUuidFilter>();
   }
