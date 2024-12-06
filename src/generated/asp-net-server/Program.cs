@@ -4,8 +4,16 @@ using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using System.Text.Json;
 using AspNetServer.SwashbuckleFilters.Extensions;
+using AspNetServer.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddAuthentication("CustomAuth").AddCustomAuthentication("CustomAuth");
+builder.Services.AddAuthorization();
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<SessionService>();
 
 builder.Services
   .AddControllers(options => {
@@ -40,6 +48,12 @@ builder.Services.AddSwaggerGen(options => {
 });
 
 var app = builder.Build();
+
+
+app.UseAuthMiddleware();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
