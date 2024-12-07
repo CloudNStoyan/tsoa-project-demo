@@ -277,7 +277,6 @@ export class PetController extends BaseController {
    * @param petId Pet ID to delete.
    * @summary     Deletes a pet.
    */
-  // eslint-disable-next-line @arabasta/tsoa/valid-alternative-response
   @SuccessResponse(204, 'No Content')
   @Delete('{petId}')
   @Response<ProblemDetails>(404, 'Not Found', {
