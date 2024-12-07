@@ -1,0 +1,885 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "TSOA Demo Pet Store - OpenAPI 3.0",
+    "description": "Pet Store Server OpenAPI 3.0 specification.\n\nSome useful links:\n- [The TSOA Demo Pet Store repository](https://github.com/CloudNStoyan/tsoa-project-demo)\n- [The source API definition for the Pet Store](https://github.com/CloudNStoyan/tsoa-project-demo/blob/main/src/generated/swagger.yaml)",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/Pet": {
+      "post": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Add a new pet to the store.",
+        "description": "Add a new pet to the store.",
+        "operationId": "CreatePet",
+        "requestBody": {
+          "description": "Create a new pet in the store.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Pet"
+                  }
+                ],
+                "description": "Pet characteristics."
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful creation of a pet.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pet"
+                },
+                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-07","status":"Pending","tags":["cat","orange"]}
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Update an existing pet.",
+        "description": "Update an existing pet by ID.",
+        "operationId": "UpdatePet",
+        "requestBody": {
+          "description": "The pet's information that should be used in the update.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Pet"
+                  }
+                ],
+                "description": "Pet characteristics."
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Not Found","status":404,"detail":"Pet not found!"}
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful update of a pet.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pet"
+                },
+                "example": {"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Max","breed":"European Domestic Cat","notes":"Likes to scratch a lot.","kind":"Cat","age":2,"healthProblems":false,"addedDate":"2024-09-07","status":"Pending","tags":["cat","orange"]}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Pet/all": {
+      "get": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Returns all pets.",
+        "description": "Returns all pets with limit and offset functionality.",
+        "operationId": "GetAllPets",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offset to discard elements.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "How many records to return.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of pets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Pet"
+                  }
+                },
+                "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Pet/findByStatus": {
+      "get": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Finds Pets by status.",
+        "description": "Returns pets that have the selected adoption status.",
+        "operationId": "GetPetsByStatus",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "The adoption status.",
+            "required": true,
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/AdoptionStatus"
+                }
+              ],
+              "description": "The pet's adoption status."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of pets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Pet"
+                  }
+                },
+                "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Pet/findByKinds": {
+      "get": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Finds Pets by set of kinds.",
+        "description": "Returns pets that are of a specific set of kinds.",
+        "operationId": "GetPetsByKind",
+        "parameters": [
+          {
+            "name": "kinds",
+            "in": "query",
+            "description": "The set of kinds of pet.",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/AnimalKind"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of pets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Pet"
+                  }
+                },
+                "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Pet/findByTags": {
+      "get": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Finds Pets by tags.",
+        "description": "Returns pets that include the filter tags.",
+        "operationId": "GetPetsByTags",
+        "parameters": [
+          {
+            "name": "tags",
+            "in": "query",
+            "description": "The tags to filter by.",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of pets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Pet"
+                  }
+                },
+                "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Happy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Pet/findByDate": {
+      "get": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Finds Pets by added date.",
+        "description": "Returns pets that were added after the given date.",
+        "operationId": "GetPetsByDate",
+        "parameters": [
+          {
+            "name": "afterDate",
+            "in": "query",
+            "description": "The date to filter by.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of pets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Pet"
+                  }
+                },
+                "example": [{"id":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","name":"Kozunak","breed":"Orange Tabby","notes":"Likes to bite a lot.","kind":"Cat","age":4,"healthProblems":false,"addedDate":"2020-08-21","status":"Adopted","tags":["cat","orange"]},{"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Unhappy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}]
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/Pet/{petId}": {
+      "get": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Find pet by ID.",
+        "description": "Returns a single pet.",
+        "operationId": "GetPet",
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "description": "The pet's id.",
+            "required": true,
+            "schema": {
+              "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}",
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "7312cc99-f99f-445e-a939-eb66c0c6724c"
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Not Found","status":404,"detail":"Pet not found!"}
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful retrieval of a pet.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pet"
+                },
+                "example": {"id":"d4c8d1c2-3928-468f-8e34-b3166a56f9ce","name":"Unhappy","breed":"European Domestic Cat","notes":"Very annoying.","kind":"Cat","age":1,"healthProblems":false,"addedDate":"2023-08-08","status":"Adopted","tags":["cat","annoying","white"]}
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Deletes a pet.",
+        "description": "Deletes a pet by ID.",
+        "operationId": "DeletePet",
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "description": "Pet ID to delete.",
+            "required": true,
+            "schema": {
+              "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}",
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "7312cc99-f99f-445e-a939-eb66c0c6724c"
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Not Found","status":404,"detail":"Pet not found!"}
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/Store/inventory": {
+      "get": {
+        "tags": [
+          "Store"
+        ],
+        "summary": "Returns pet inventories by adoption status.",
+        "description": "Returns a map of adoption status to quantities.",
+        "operationId": "GetInventory",
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Unauthorized","status":401,"detail":"Access denied!"}
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful retrieval of inventory.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                },
+                "example": {"adopted":3,"available":1,"pending":2}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [ ]
+          }
+        ]
+      }
+    },
+    "/Store/adopt": {
+      "post": {
+        "tags": [
+          "Store"
+        ],
+        "summary": "Request an adoption of a pet.",
+        "description": "Place an adoption request for a pet.",
+        "operationId": "AdoptPet",
+        "requestBody": {
+          "description": "The adoption request.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AdoptionRequest"
+                  }
+                ],
+                "description": "Adoption request information."
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Unauthorized","status":401,"detail":"Access denied!"}
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful creation of adoption request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdoptionRequest"
+                },
+                "example": {"id":"67120cf3-1434-44be-b660-b02df64db677","petId":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","dateOfSubmission":"2024-08-25T00:00:00","status":"Pending"}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [ ]
+          }
+        ]
+      }
+    },
+    "/Store/adopt/{requestId}": {
+      "get": {
+        "tags": [
+          "Store"
+        ],
+        "summary": "Find adoption request by ID.",
+        "description": "Find adoption request by ID.",
+        "operationId": "GetAdoptRequestById",
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "description": "The adoption request's ID.",
+            "required": true,
+            "schema": {
+              "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}",
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "7312cc99-f99f-445e-a939-eb66c0c6724c"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Unauthorized","status":401,"detail":"Access denied!"}
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Not Found","status":404,"detail":"Adoption request not found!"}
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful retrieval of adoption request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdoptionRequest"
+                },
+                "example": {"id":"67120cf3-1434-44be-b660-b02df64db677","petId":"90dbbed9-bd3d-40ae-ad1c-86602844d4c1","dateOfSubmission":"2024-08-25T00:00:00","status":"Pending"}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Store"
+        ],
+        "summary": "Delete adoption request by ID.",
+        "description": "Delete adoption request by ID.",
+        "operationId": "DeleteAdoptRequestById",
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "description": "The adoption request's ID.",
+            "required": true,
+            "schema": {
+              "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}",
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "7312cc99-f99f-445e-a939-eb66c0c6724c"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Unauthorized","status":401,"detail":"Access denied!"}
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {"title":"Not Found","status":404,"detail":"Adoption request not found!"}
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "api_key": [ ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AdoptionRequest": {
+        "required": [
+          "dateOfSubmission",
+          "id",
+          "petId",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}",
+            "type": "string",
+            "description": "The adoption's ID.",
+            "format": "uuid",
+            "example": "67120cf3-1434-44be-b660-b02df64db677"
+          },
+          "petId": {
+            "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}",
+            "type": "string",
+            "description": "The adoptee's ID.",
+            "format": "uuid",
+            "example": "90dbbed9-bd3d-40ae-ad1c-86602844d4c1"
+          },
+          "dateOfSubmission": {
+            "type": "string",
+            "description": "The date of submission of the adoption request.",
+            "format": "date-time",
+            "example": "2024-08-25T00:00:00"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdoptionRequestStatus"
+              }
+            ],
+            "description": "The adoption request status.",
+            "example": "Pending"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Adoption request information."
+      },
+      "AdoptionRequestStatus": {
+        "enum": [
+          "Approved",
+          "Pending",
+          "Denied"
+        ],
+        "type": "string",
+        "description": "The adoption request's status."
+      },
+      "AdoptionStatus": {
+        "enum": [
+          "Adopted",
+          "Available",
+          "Pending"
+        ],
+        "type": "string",
+        "description": "The pet's adoption status."
+      },
+      "AnimalKind": {
+        "enum": [
+          "Cat",
+          "Dog",
+          "Parrot"
+        ],
+        "type": "string",
+        "description": "The pet's animal kind."
+      },
+      "Inventory": {
+        "required": [
+          "adopted",
+          "available",
+          "pending"
+        ],
+        "type": "object",
+        "properties": {
+          "adopted": {
+            "type": "integer",
+            "description": "The number of pets that were adopted.",
+            "format": "int32",
+            "example": 3
+          },
+          "available": {
+            "type": "integer",
+            "description": "The number of pets that are available for adoption.",
+            "format": "int32",
+            "example": 1
+          },
+          "pending": {
+            "type": "integer",
+            "description": "The number of pets that have a pending adoption status.",
+            "format": "int32",
+            "example": 2
+          }
+        },
+        "additionalProperties": false,
+        "description": "Inventory of adoption status to quantities."
+      },
+      "Pet": {
+        "required": [
+          "addedDate",
+          "age",
+          "breed",
+          "healthProblems",
+          "id",
+          "kind",
+          "name",
+          "notes",
+          "status",
+          "tags"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}",
+            "type": "string",
+            "description": "The pet's identifier.",
+            "format": "uuid",
+            "example": "90dbbed9-bd3d-40ae-ad1c-86602844d4c1"
+          },
+          "name": {
+            "maxLength": 20,
+            "minLength": 3,
+            "type": "string",
+            "description": "The name of the pet.",
+            "example": "Max"
+          },
+          "breed": {
+            "type": "string",
+            "description": "The kind of breed the pet is.",
+            "example": "European Domestic Cat"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Free form text associated with the pet.",
+            "example": "Likes to scratch a lot."
+          },
+          "kind": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnimalKind"
+              }
+            ],
+            "description": "What kind of pet it is.",
+            "example": "Cat"
+          },
+          "age": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "The age of the pet.",
+            "format": "int32",
+            "example": 2
+          },
+          "healthProblems": {
+            "type": "boolean",
+            "description": "Whether or not the pet has any health problems.",
+            "example": false
+          },
+          "addedDate": {
+            "type": "string",
+            "description": "When the pet was added to the system.",
+            "format": "date",
+            "example": "2024-09-07"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdoptionStatus"
+              }
+            ],
+            "description": "Pet's adoption status in the store.",
+            "example": "Pending"
+          },
+          "tags": {
+            "maxItems": 5,
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The pet's tags.",
+            "example": ["cat","orange"]
+          }
+        },
+        "additionalProperties": false,
+        "description": "Pet characteristics."
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
+      }
+    },
+    "securitySchemes": {
+      "api_key": {
+        "type": "http",
+        "description": "The TSOA Demo Pet Store API Key is:\n\n`simple-pet-token`",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Pet",
+      "description": "Everything about your Pets",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "Store",
+      "description": "Access to Petstore orders",
+      "externalDocs": {
+        "description": "Find out more about our store",
+        "url": "http://swagger.io"
+      }
+    }
+  ]
+}
