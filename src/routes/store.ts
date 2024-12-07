@@ -154,7 +154,6 @@ export class StoreController extends BaseController {
    * @param requestId The adoption request's ID.
    * @summary         Delete adoption request by ID.
    */
-  // eslint-disable-next-line @arabasta/tsoa/valid-alternative-response
   @SuccessResponse(204, 'No Content')
   @Response<ProblemDetails>(404, 'Not Found', {
     status: 404,
