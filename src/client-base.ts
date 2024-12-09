@@ -12,7 +12,7 @@ export interface BaseParameterInfo {
 
 export interface BaseUrlParam {
   name: string;
-  type: 'string' | 'number';
+  type: 'string' | 'number' | 'Date';
 }
 
 export class ClientAPIBase {
@@ -35,6 +35,14 @@ export class ClientAPIBase {
     meta: { required: false; type: 'string' } & BaseParameterInfo
   ): void;
   validateParam(
+    value: Date,
+    meta: { required: true; type: 'Date' } & BaseParameterInfo
+  ): void;
+  validateParam(
+    value: Date | undefined,
+    meta: { required: false; type: 'Date' } & BaseParameterInfo
+  ): void;
+  validateParam(
     value: number,
     meta: { required: true; type: 'number' } & BaseParameterInfo
   ): void;
@@ -43,14 +51,17 @@ export class ClientAPIBase {
     meta: { required: false; type: 'number' } & BaseParameterInfo
   ): void;
   validateParam(
-    value: string | number | undefined,
-    meta: { required: boolean; type: 'string' | 'number' } & BaseParameterInfo
-  ): void;
-  validateParam(
-    value: string | number | undefined,
+    value: string | number | Date | undefined,
     meta: {
       required: boolean;
-      type: 'string' | 'number';
+      type: 'string' | 'number' | 'Date';
+    } & BaseParameterInfo
+  ): void;
+  validateParam(
+    value: string | number | Date | undefined,
+    meta: {
+      required: boolean;
+      type: 'string' | 'number' | 'Date';
     } & BaseParameterInfo
   ): void {
     const {
@@ -144,6 +155,20 @@ export class ClientAPIBase {
         }
         break;
       }
+      case 'Date': {
+        if (required) {
+          if (!(value instanceof Date)) {
+            throw new Error(
+              `Required ${paramType} param '${name}' did not have a value of type 'Date'. Type: '${typeof value}', Value: '${value}'.`
+            );
+          }
+        } else if (typeof value !== 'undefined' && !(value instanceof Date)) {
+          throw new Error(
+            `Optional ${paramType} param '${name}' did not have a value of type 'Date' or 'undefined'. Type: '${typeof value}', Value: '${value}'.`
+          );
+        }
+        break;
+      }
       default: {
         throw new Error(
           `Unexpected value type '${type}' for ${paramType} param '${name}'.`
@@ -202,12 +227,17 @@ export class ClientAPIBase {
   ): void;
   appendUrlParam(
     urlParams: URLSearchParams,
-    value: string | number | undefined,
+    value: Date | undefined,
+    meta: BaseUrlParam & { type: 'Date' }
+  ): void;
+  appendUrlParam(
+    urlParams: URLSearchParams,
+    value: string | number | Date | undefined,
     meta: BaseUrlParam
   ): void;
   appendUrlParam(
     urlParams: URLSearchParams,
-    value: string | number | undefined,
+    value: string | number | Date | undefined,
     meta: BaseUrlParam
   ): void {
     const { name, type } = meta;
@@ -221,6 +251,12 @@ export class ClientAPIBase {
     if (type === 'string') {
       if (value && typeof value === 'string') {
         urlParams.append(name, value);
+      }
+    }
+
+    if (type === 'Date') {
+      if (value && value instanceof Date) {
+        urlParams.append(name, value.toISOString());
       }
     }
   }
