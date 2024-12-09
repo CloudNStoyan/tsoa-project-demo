@@ -238,6 +238,7 @@ export class PetClientAPI extends ClientAPIBase {
   ): Promise<Pet[]> {
     this.validateParam(offset, {
       name: 'offset',
+      required: false,
       paramType: 'query',
       type: 'number',
       numberFormat: 'integer',
@@ -245,6 +246,7 @@ export class PetClientAPI extends ClientAPIBase {
 
     this.validateParam(limit, {
       name: 'limit',
+      required: false,
       paramType: 'query',
       type: 'number',
       numberFormat: 'integer',

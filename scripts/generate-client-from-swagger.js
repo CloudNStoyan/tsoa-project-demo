@@ -135,7 +135,7 @@ class TypescriptModel {
             const param = {
               name: operationParam.name,
               jsdoc: this.resolveJsdoc(operationParam),
-              required: operationParam.required,
+              required: operationParam.required || false,
               type: operationParam.in,
               paramType: this.resolveParamType(operationParam.schema),
             };
