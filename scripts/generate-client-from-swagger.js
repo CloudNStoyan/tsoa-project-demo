@@ -38,6 +38,82 @@ function lowercaseFirstLetter(string) {
   return string[0].toLowerCase() + string.slice(1);
 }
 
+class TopologicalGraph {
+  constructor(jobs) {
+    this.nodes = [];
+    this.graph = {};
+
+    for (const job of jobs) {
+      this.#addNode(job);
+    }
+  }
+
+  static sort({ jobs, dependencies }) {
+    const graph = new TopologicalGraph(jobs);
+
+    for (const [job, dependency] of dependencies) {
+      graph.#addDependency(job, dependency);
+    }
+
+    const orderedJobs = [];
+
+    const nodesWithNoDependents = graph.nodes.filter(
+      (node) => node.numOfDependents === 0
+    );
+
+    while (nodesWithNoDependents.length > 0) {
+      const node = nodesWithNoDependents.pop();
+      orderedJobs.push(node.job);
+
+      while (node.dependencies.length > 0) {
+        const dep = node.dependencies.pop();
+        dep.numOfDependents -= 1;
+
+        if (dep.numOfDependents === 0) {
+          nodesWithNoDependents.push(dep);
+        }
+      }
+    }
+
+    const graphHasEdges =
+      graph.nodes.filter((node) => node.numOfDependents > 0).length > 0;
+
+    if (graphHasEdges) {
+      throw new Error(
+        "The graph can't be topologically sorted because there are edges!"
+      );
+    }
+
+    return orderedJobs;
+  }
+
+  #addNode(job) {
+    this.graph[job] = {
+      job,
+      dependencies: [],
+      numOfDependents: 0,
+    };
+
+    this.nodes.push(this.graph[job]);
+  }
+
+  #addDependency(job, dependency) {
+    const jobNode = this.#getNode(job);
+    const depNode = this.#getNode(dependency);
+
+    jobNode.dependencies.push(depNode);
+    depNode.numOfDependents += 1;
+  }
+
+  #getNode(job) {
+    if (!(job in this.graph)) {
+      this.#addNode(job);
+    }
+
+    return this.graph[job];
+  }
+}
+
 class TypescriptModel {
   #swaggerDocument;
 
@@ -50,8 +126,32 @@ class TypescriptModel {
     this.types = types;
     this.interfaces = interfaces;
 
+    this.interfacesMetadata = this.generateInterfacesMetadata(interfaces);
+
     this.operations = this.generateOperations(swaggerDocument);
     this.tags = this.generateOperationTags(swaggerDocument);
+  }
+
+  generateInterfacesMetadata(tsInterfaces) {
+    const interfacesMetadata = new Map();
+
+    const dependencies = [];
+
+    for (const tsInterface of tsInterfaces) {
+      for (const propertyType of tsInterface.metadata.propertyTypes) {
+        dependencies.push([propertyType, tsInterface.name]);
+      }
+    }
+
+    const topologicallySortedInterfaces = TopologicalGraph.sort({
+      jobs: tsInterfaces.map((c) => c.name),
+      dependencies,
+    });
+
+    console.log(topologicallySortedInterfaces);
+
+    for (const tsInterface of tsInterfaces) {
+    }
   }
 
   responseSchemaIsInlineObject(schema) {
@@ -297,6 +397,13 @@ class TypescriptModel {
     }
 
     if (
+      property.type === 'string' &&
+      (property.format === 'date' || property.format === 'date-time')
+    ) {
+      return { resolvedType: 'Date', type: 'literal' };
+    }
+
+    if (
       property.type === 'string' ||
       property.type === 'number' ||
       property.type === 'boolean'
@@ -436,13 +543,26 @@ class TypescriptModel {
         name: propertyName,
         required: requiredProperties?.includes(propertyName) || false,
         jsdoc: this.resolveJsdoc(propertyData),
-        resolvedType: this.resolveType(propertyData),
       };
+
+      const propertyVerboseType = this.resolveTypeVerbose(propertyData);
+
+      tsProperty.resolvedType = propertyVerboseType.resolvedType;
+      tsProperty.verboseType = propertyVerboseType;
 
       tsProperties.push(tsProperty);
     }
 
     tsInterface.properties = tsProperties;
+
+    tsInterface.metadata = {
+      dateProperties: tsProperties.filter(
+        (prop) => prop.resolvedType === 'Date'
+      ),
+      propertyTypes: tsProperties
+        .filter((prop) => prop.verboseType.type === 'object')
+        .map((prop) => prop.resolvedType),
+    };
 
     return tsInterface;
   }

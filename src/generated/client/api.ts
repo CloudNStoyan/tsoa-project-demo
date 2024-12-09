@@ -105,7 +105,7 @@ export interface Pet {
    * @format date
    * @example "2024-09-07T21:00:00.000Z"
    */
-  addedDate: string;
+  addedDate: Date;
 
   /**
    * Pet's adoption status in the store.
@@ -170,7 +170,7 @@ export interface AdoptionRequest {
    * @format date-time
    * @example "2024-08-25T00:00:00.000Z"
    */
-  dateOfSubmission: string;
+  dateOfSubmission: Date;
 
   /**
    * The adoption request status.
@@ -359,19 +359,19 @@ export class PetClientAPI extends ClientAPIBase {
    * @param afterDate The date to filter by.
    * @summary Finds Pets by added date.
    */
-  getPetsByDate(afterDate: string, options?: Options): Promise<Pet[]> {
+  getPetsByDate(afterDate: Date, options?: Options): Promise<Pet[]> {
     this.validateParam(afterDate, {
       name: 'afterDate',
       required: true,
       paramType: 'query',
-      type: 'string',
+      type: 'Date',
     });
 
     const urlParams = new URLSearchParams();
 
     this.appendUrlParam(urlParams, afterDate, {
       name: 'afterDate',
-      type: 'string',
+      type: 'Date',
     });
 
     const urlParamsString = urlParams.toString();
