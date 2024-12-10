@@ -119,6 +119,7 @@ class TypescriptModel {
 
   constructor(swaggerDocument) {
     this.#swaggerDocument = swaggerDocument;
+    this.typesRegistry = new Map();
 
     const { enums, types, interfaces } = this.generateTypings(swaggerDocument);
 
@@ -126,21 +127,8 @@ class TypescriptModel {
     this.types = types;
     this.interfaces = interfaces;
 
-    this.interfacesMetadata = this.generateInterfacesMetadata(interfaces);
-
     this.operations = this.generateOperations(swaggerDocument);
     this.tags = this.generateOperationTags(swaggerDocument);
-  }
-
-  generateInterfacesMetadata(tsInterfaces) {
-    const interfacesMap = new Map();
-
-    for (const tsInterface of tsInterfaces) {
-      interfacesMap.set(tsInterface.name, tsInterface);
-    }
-
-    for (const tsInterface of tsInterfaces) {
-    }
   }
 
   responseSchemaIsInlineObject(schema) {
@@ -177,7 +165,7 @@ class TypescriptModel {
 
   generateReturnType(responses) {
     if (responses['204'] && !responses['200']) {
-      return 'void';
+      return { resolvedType: 'void', type: 'literal' };
     }
 
     if (responses['200']) {
@@ -185,11 +173,16 @@ class TypescriptModel {
 
       this.throwIfResponseContentIsInvalid(content);
 
+      const verboseType = this.resolveTypeVerbose(content.schema);
+
       if (responses['204']) {
-        return `${this.resolveType(content.schema)} | void`;
+        return {
+          resolvedType: `${verboseType.resolvedType} | void`,
+          type: 'union',
+        };
       }
 
-      return this.resolveType(content.schema);
+      return verboseType;
     }
 
     throw new Error(
@@ -215,7 +208,23 @@ class TypescriptModel {
           tags: openapiOperationData.tags,
           jsdoc: this.resolveJsdoc(openapiOperationData),
           returnType: this.generateReturnType(openapiOperationData.responses),
+          hasDates: false,
         };
+
+        let unwrappedType = operation.returnType;
+        while (unwrappedType.type === 'array') {
+          unwrappedType = unwrappedType.itemType;
+        }
+
+        if (unwrappedType.type === 'object') {
+          const typeInfo = this.typesRegistry.get(unwrappedType.resolvedType);
+
+          operation.typeInfo = typeInfo;
+
+          if (typeInfo.metadata?.propertiesWithDates?.length > 0) {
+            operation.hasDates = true;
+          }
+        }
 
         const allParams = [];
 
@@ -529,8 +538,6 @@ class TypescriptModel {
 
     const componentNames = this.generateTopologicalOrderOfComponentNames();
 
-    const typesRegistry = new Map();
-
     const interfaces = [];
     const types = [];
     const enums = [];
@@ -539,27 +546,18 @@ class TypescriptModel {
       const componentData = schemas[componentName];
 
       if (componentData.enum) {
-        const tsEnum = this.generateEnum(
-          componentName,
-          componentData,
-          typesRegistry
-        );
+        const tsEnum = this.generateEnum(componentName, componentData);
 
         enums.push(tsEnum);
       } else if (componentData.type === 'object') {
         const tsInterface = this.generateInterface(
           componentName,
-          componentData,
-          typesRegistry
+          componentData
         );
 
         interfaces.push(tsInterface);
       } else {
-        const tsType = this.generateType(
-          componentName,
-          componentData,
-          typesRegistry
-        );
+        const tsType = this.generateType(componentName, componentData);
 
         types.push(tsType);
       }
@@ -568,7 +566,7 @@ class TypescriptModel {
     return { interfaces, types, enums };
   }
 
-  generateEnum(enumName, enumData, typesRegistry) {
+  generateEnum(enumName, enumData) {
     if (enumData.type !== 'string') {
       throw new Error(
         `Enums that are not strings are not supported, enum type found: '${enumData.type}'.`
@@ -581,12 +579,12 @@ class TypescriptModel {
       values: enumData.enum,
     };
 
-    typesRegistry.set(enumName, tsEnum);
+    this.typesRegistry.set(enumName, tsEnum);
 
     return tsEnum;
   }
 
-  generateInterface(interfaceName, interfaceData, typesRegistry) {
+  generateInterface(interfaceName, interfaceData) {
     const tsInterface = {
       name: interfaceName,
       jsdoc: this.resolveJsdoc(interfaceData),
@@ -596,6 +594,8 @@ class TypescriptModel {
     const requiredProperties = interfaceData.required;
 
     const tsProperties = [];
+
+    const propertiesWithDates = [];
 
     for (const [propertyName, propertyData] of openapiProperties) {
       const tsProperty = {
@@ -609,32 +609,50 @@ class TypescriptModel {
       tsProperty.resolvedType = propertyVerboseType.resolvedType;
       tsProperty.verboseType = propertyVerboseType;
 
+      let unwrappedType = propertyVerboseType;
+      if (unwrappedType.type === 'array') {
+        while (unwrappedType.type === 'array') {
+          unwrappedType = unwrappedType.itemType;
+        }
+      }
+
+      if (unwrappedType.type === 'object') {
+        const typeInfo = this.typesRegistry.get(unwrappedType.resolvedType);
+
+        if (
+          Array.isArray(typeInfo.metadata?.propertiesWithDates) &&
+          typeInfo.metadata.propertiesWithDates.length > 0
+        ) {
+          propertiesWithDates.push(tsProperty);
+        }
+      }
+
+      if (tsProperty.resolvedType === 'Date') {
+        propertiesWithDates.push(tsProperty);
+      }
+
       tsProperties.push(tsProperty);
     }
 
     tsInterface.properties = tsProperties;
 
-    const propertiesWithDates = tsProperties.filter(
-      (prop) => prop.resolvedType === 'Date'
-    );
-
     tsInterface.metadata = {
       propertiesWithDates,
     };
 
-    typesRegistry.set(interfaceName, tsInterface);
+    this.typesRegistry.set(interfaceName, tsInterface);
 
     return tsInterface;
   }
 
-  generateType(typeName, typeData, typesRegistry) {
+  generateType(typeName, typeData) {
     const tsType = {
       name: typeName,
       resolvedType: this.resolveType(typeData),
       jsdoc: this.resolveJsdoc(typeData),
     };
 
-    typesRegistry.set(typeName, tsType);
+    this.typesRegistry.set(typeName, tsType);
 
     return tsType;
   }
@@ -767,8 +785,28 @@ class ModelRenderer {
         op.tags.includes(tag.name)
       );
 
+      const typesThatNeedPostProcessingMap = new Map();
+
       for (const operation of tagOperations) {
+        if (
+          operation.hasDates &&
+          !typesThatNeedPostProcessingMap.has(operation.typeInfo.name)
+        ) {
+          typesThatNeedPostProcessingMap.set(
+            operation.typeInfo.name,
+            operation.typeInfo
+          );
+        }
+
         output += this.renderOperation(operation);
+      }
+
+      const typesThatNeedPostProcessing = Array.from(
+        typesThatNeedPostProcessingMap.values()
+      );
+
+      for (const typeInfo of typesThatNeedPostProcessing) {
+        output += this.renderPostProcess(typeInfo);
       }
 
       output += '}\n\n';
@@ -848,6 +886,33 @@ class ModelRenderer {
     return JSON.stringify(obj, null, 2);
   }
 
+  renderPostProcess(typeInfo) {
+    let output = '';
+
+    const variableName = lowercaseFirstLetter(typeInfo.name);
+
+    output += `#postProcess${typeInfo.name}(${variableName}: ${typeInfo.name}){}\n\n`;
+
+    return output;
+  }
+
+  renderPostProcessInvocation(operation) {
+    let output = '';
+
+    const typeInfo = operation.typeInfo;
+
+    if (operation.returnType.type === 'array') {
+      const elementName = lowercaseFirstLetter(typeInfo.name);
+      output += `for (const ${elementName} of json) {\n`;
+      output += `  this.#postProcess${typeInfo.name}(${elementName});\n`;
+      output += '}';
+    } else {
+      output += `this.#postProcess${typeInfo.name}(json);`;
+    }
+
+    return output;
+  }
+
   renderOperation(operation) {
     let output = '';
 
@@ -855,7 +920,7 @@ class ModelRenderer {
       output += this.renderJsdoc(operation.jsdoc);
     }
 
-    output += `${lowercaseFirstLetter(operation.operationId)}(${this.renderParams(operation.allParams, operation.body)}): Promise<${operation.returnType}> {\n`;
+    output += `${operation.hasDates ? 'async ' : ''}${lowercaseFirstLetter(operation.operationId)}(${this.renderParams(operation.allParams, operation.body)}): Promise<${operation.returnType.resolvedType}> {\n`;
 
     if (operation.allParams) {
       for (const param of operation.allParams) {
@@ -925,10 +990,14 @@ class ModelRenderer {
         "const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';\n\n";
     }
 
-    output += 'return this.fetch';
+    if (operation.hasDates) {
+      output += 'const json = await this.fetch';
+    } else {
+      output += 'return this.fetch';
+    }
 
-    if (operation.returnType !== 'void') {
-      output += `<${operation.returnType}>`;
+    if (operation.returnType.resolvedType !== 'void') {
+      output += `<${operation.returnType.resolvedType}>`;
     }
 
     const templatedPath = operation.rawPath
@@ -977,6 +1046,16 @@ class ModelRenderer {
       output += '});';
     } else {
       output += '`, options);';
+    }
+
+    if (operation.hasDates) {
+      output += '\n\n';
+
+      output += this.renderPostProcessInvocation(operation);
+
+      output += '\n\n';
+
+      output += `return json;\n`;
     }
 
     output += '}\n\n';

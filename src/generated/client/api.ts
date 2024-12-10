@@ -261,8 +261,8 @@ export class PetClientAPI extends ClientAPIBase {
    * @param pet Create a new pet in the store.
    * @summary Add a new pet to the store.
    */
-  createPet(pet: Pet, options?: Options): Promise<Pet> {
-    return this.fetch<Pet>(`/pet`, {
+  async createPet(pet: Pet, options?: Options): Promise<Pet> {
+    const json = await this.fetch<Pet>(`/pet`, {
       method: 'POST',
       body: JSON.stringify(pet),
       headers: {
@@ -270,6 +270,10 @@ export class PetClientAPI extends ClientAPIBase {
       },
       ...options,
     });
+
+    this.#postProcessPet(json);
+
+    return json;
   }
 
   /**
@@ -277,8 +281,8 @@ export class PetClientAPI extends ClientAPIBase {
    * @param pet The pet's information that should be used in the update.
    * @summary Update an existing pet.
    */
-  updatePet(pet: Pet, options?: Options): Promise<Pet> {
-    return this.fetch<Pet>(`/pet`, {
+  async updatePet(pet: Pet, options?: Options): Promise<Pet> {
+    const json = await this.fetch<Pet>(`/pet`, {
       method: 'PUT',
       body: JSON.stringify(pet),
       headers: {
@@ -286,6 +290,10 @@ export class PetClientAPI extends ClientAPIBase {
       },
       ...options,
     });
+
+    this.#postProcessPet(json);
+
+    return json;
   }
 
   /**
@@ -294,7 +302,7 @@ export class PetClientAPI extends ClientAPIBase {
    * @param limit How many records to return.
    * @summary Returns all pets.
    */
-  getAllPets(
+  async getAllPets(
     offset?: number,
     limit?: number,
     options?: Options
@@ -331,7 +339,13 @@ export class PetClientAPI extends ClientAPIBase {
 
     const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
 
-    return this.fetch<Pet[]>(`/pet/all${queryString}`, options);
+    const json = await this.fetch<Pet[]>(`/pet/all${queryString}`, options);
+
+    for (const pet of json) {
+      this.#postProcessPet(pet);
+    }
+
+    return json;
   }
 
   /**
@@ -339,7 +353,10 @@ export class PetClientAPI extends ClientAPIBase {
    * @param status The adoption status.
    * @summary Finds Pets by status.
    */
-  getPetsByStatus(status: AdoptionStatus, options?: Options): Promise<Pet[]> {
+  async getPetsByStatus(
+    status: AdoptionStatus,
+    options?: Options
+  ): Promise<Pet[]> {
     this.validateParam(status, {
       name: 'status',
       required: true,
@@ -359,7 +376,16 @@ export class PetClientAPI extends ClientAPIBase {
 
     const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
 
-    return this.fetch<Pet[]>(`/pet/findByStatus${queryString}`, options);
+    const json = await this.fetch<Pet[]>(
+      `/pet/findByStatus${queryString}`,
+      options
+    );
+
+    for (const pet of json) {
+      this.#postProcessPet(pet);
+    }
+
+    return json;
   }
 
   /**
@@ -367,7 +393,7 @@ export class PetClientAPI extends ClientAPIBase {
    * @param kinds The set of kinds of pet.
    * @summary Finds Pets by set of kinds.
    */
-  getPetsByKind(kinds: AnimalKind[], options?: Options): Promise<Pet[]> {
+  async getPetsByKind(kinds: AnimalKind[], options?: Options): Promise<Pet[]> {
     this.validateParamArray(kinds, {
       name: 'kinds',
       required: true,
@@ -387,7 +413,16 @@ export class PetClientAPI extends ClientAPIBase {
 
     const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
 
-    return this.fetch<Pet[]>(`/pet/findByKinds${queryString}`, options);
+    const json = await this.fetch<Pet[]>(
+      `/pet/findByKinds${queryString}`,
+      options
+    );
+
+    for (const pet of json) {
+      this.#postProcessPet(pet);
+    }
+
+    return json;
   }
 
   /**
@@ -395,7 +430,7 @@ export class PetClientAPI extends ClientAPIBase {
    * @param tags The tags to filter by.
    * @summary Finds Pets by tags.
    */
-  getPetsByTags(tags: string[], options?: Options): Promise<Pet[]> {
+  async getPetsByTags(tags: string[], options?: Options): Promise<Pet[]> {
     this.validateParamArray(tags, {
       name: 'tags',
       required: true,
@@ -414,7 +449,16 @@ export class PetClientAPI extends ClientAPIBase {
 
     const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
 
-    return this.fetch<Pet[]>(`/pet/findByTags${queryString}`, options);
+    const json = await this.fetch<Pet[]>(
+      `/pet/findByTags${queryString}`,
+      options
+    );
+
+    for (const pet of json) {
+      this.#postProcessPet(pet);
+    }
+
+    return json;
   }
 
   /**
@@ -422,7 +466,7 @@ export class PetClientAPI extends ClientAPIBase {
    * @param afterDate The date to filter by.
    * @summary Finds Pets by added date.
    */
-  getPetsByDate(afterDate: Date, options?: Options): Promise<Pet[]> {
+  async getPetsByDate(afterDate: Date, options?: Options): Promise<Pet[]> {
     this.validateParam(afterDate, {
       name: 'afterDate',
       required: true,
@@ -441,7 +485,16 @@ export class PetClientAPI extends ClientAPIBase {
 
     const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
 
-    return this.fetch<Pet[]>(`/pet/findByDate${queryString}`, options);
+    const json = await this.fetch<Pet[]>(
+      `/pet/findByDate${queryString}`,
+      options
+    );
+
+    for (const pet of json) {
+      this.#postProcessPet(pet);
+    }
+
+    return json;
   }
 
   /**
@@ -449,7 +502,7 @@ export class PetClientAPI extends ClientAPIBase {
    * @param petId The pet's id.
    * @summary Find pet by ID.
    */
-  getPet(petId: UUID, options?: Options): Promise<Pet> {
+  async getPet(petId: UUID, options?: Options): Promise<Pet> {
     this.validateParam(petId, {
       name: 'petId',
       required: true,
@@ -459,7 +512,14 @@ export class PetClientAPI extends ClientAPIBase {
         '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}',
     });
 
-    return this.fetch<Pet>(`/pet/${encodeURIComponent(petId)}`, options);
+    const json = await this.fetch<Pet>(
+      `/pet/${encodeURIComponent(petId)}`,
+      options
+    );
+
+    this.#postProcessPet(json);
+
+    return json;
   }
 
   /**
@@ -482,6 +542,8 @@ export class PetClientAPI extends ClientAPIBase {
       ...options,
     });
   }
+
+  #postProcessPet(pet: Pet) {}
 }
 
 /**
@@ -492,8 +554,12 @@ export class StoreClientAPI extends ClientAPIBase {
    * Returns a map of adoption status to array of pets.
    * @summary Returns pet inventories by adoption status.
    */
-  getInventory(options?: Options): Promise<Inventory> {
-    return this.fetch<Inventory>(`/store/inventory`, options);
+  async getInventory(options?: Options): Promise<Inventory> {
+    const json = await this.fetch<Inventory>(`/store/inventory`, options);
+
+    this.#postProcessInventory(json);
+
+    return json;
   }
 
   /**
@@ -501,11 +567,11 @@ export class StoreClientAPI extends ClientAPIBase {
    * @param adoptionRequest The adoption request.
    * @summary Request an adoption of a pet.
    */
-  adoptPet(
+  async adoptPet(
     adoptionRequest: AdoptionRequest,
     options?: Options
   ): Promise<AdoptionRequest> {
-    return this.fetch<AdoptionRequest>(`/store/adopt`, {
+    const json = await this.fetch<AdoptionRequest>(`/store/adopt`, {
       method: 'POST',
       body: JSON.stringify(adoptionRequest),
       headers: {
@@ -513,6 +579,10 @@ export class StoreClientAPI extends ClientAPIBase {
       },
       ...options,
     });
+
+    this.#postProcessAdoptionRequest(json);
+
+    return json;
   }
 
   /**
@@ -520,7 +590,7 @@ export class StoreClientAPI extends ClientAPIBase {
    * @param requestId The adoption request's ID.
    * @summary Find adoption request by ID.
    */
-  getAdoptRequestById(
+  async getAdoptRequestById(
     requestId: UUID,
     options?: Options
   ): Promise<AdoptionRequest> {
@@ -533,10 +603,14 @@ export class StoreClientAPI extends ClientAPIBase {
         '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}',
     });
 
-    return this.fetch<AdoptionRequest>(
+    const json = await this.fetch<AdoptionRequest>(
       `/store/adopt/${encodeURIComponent(requestId)}`,
       options
     );
+
+    this.#postProcessAdoptionRequest(json);
+
+    return json;
   }
 
   /**
@@ -559,4 +633,8 @@ export class StoreClientAPI extends ClientAPIBase {
       ...options,
     });
   }
+
+  #postProcessInventory(inventory: Inventory) {}
+
+  #postProcessAdoptionRequest(adoptionRequest: AdoptionRequest) {}
 }
