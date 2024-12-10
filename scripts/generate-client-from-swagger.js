@@ -133,22 +133,11 @@ class TypescriptModel {
   }
 
   generateInterfacesMetadata(tsInterfaces) {
-    const interfacesMetadata = new Map();
-
-    const dependencies = [];
+    const interfacesMap = new Map();
 
     for (const tsInterface of tsInterfaces) {
-      for (const propertyType of tsInterface.metadata.propertyTypes) {
-        dependencies.push([propertyType, tsInterface.name]);
-      }
+      interfacesMap.set(tsInterface.name, tsInterface);
     }
-
-    const topologicallySortedInterfaces = TopologicalGraph.sort({
-      jobs: tsInterfaces.map((c) => c.name),
-      dependencies,
-    });
-
-    console.log(topologicallySortedInterfaces);
 
     for (const tsInterface of tsInterfaces) {
     }
@@ -354,6 +343,26 @@ class TypescriptModel {
     return { resolvedType, valueType: schema, type: typeInfo.type };
   }
 
+  getRefSchema(ref) {
+    if (!ref.startsWith('#/components/schemas/')) {
+      throw new Error(
+        `Found a ref that doesn't point to #/components/schema, '${ref}'.`
+      );
+    }
+
+    const schemaName = ref.split('#/components/schemas/')[1];
+
+    const schema = this.#swaggerDocument.components.schemas[schemaName];
+
+    if (schema === undefined) {
+      throw new Error(
+        `Found a ref that doesn't point to valid schema, '${ref}'.`
+      );
+    }
+
+    return { schema, schemaName };
+  }
+
   resolveTypeVerbose(property) {
     if (this.isPropertyAnUnion(property)) {
       return { resolvedType: this.resolveUnion(property), type: 'union' };
@@ -370,15 +379,9 @@ class TypescriptModel {
     }
 
     if (property.$ref) {
-      if (!property.$ref.startsWith('#/components/schemas/')) {
-        throw new Error(
-          "Found a ref that doesn't point to #/components/schema"
-        );
-      }
-
-      const typeName = property.$ref.split('#/components/schemas/')[1];
-
-      const schemaType = this.#swaggerDocument.components.schemas[typeName];
+      const { schema: schemaType, schemaName: typeName } = this.getRefSchema(
+        property.$ref
+      );
 
       return {
         resolvedType: typeName,
@@ -480,29 +483,83 @@ class TypescriptModel {
     return hasJsdoc ? jsdoc : undefined;
   }
 
-  generateTypings(swaggerDocument) {
-    const schemas = swaggerDocument.components.schemas;
+  generateTopologicalOrderOfComponentNames() {
+    const schemas = this.#swaggerDocument.components.schemas;
+
+    const componentNames = Object.keys(schemas);
+
+    const dependencies = [];
+
+    for (const componentName of componentNames) {
+      const schema = schemas[componentName];
+
+      if (schema.type === 'object') {
+        for (const propertyName in schema.properties) {
+          let propertySchema = schema.properties[propertyName];
+
+          if (
+            Array.isArray(propertySchema.allOf) &&
+            propertySchema.allOf.length === 1
+          ) {
+            propertySchema = propertySchema.allOf[0];
+          }
+
+          while (propertySchema.type === 'array') {
+            propertySchema = propertySchema.items;
+          }
+
+          if (propertySchema.$ref) {
+            dependencies.push([
+              this.getRefSchema(propertySchema.$ref).schemaName,
+              componentName,
+            ]);
+          }
+        }
+      }
+    }
+
+    return TopologicalGraph.sort({
+      jobs: componentNames,
+      dependencies,
+    });
+  }
+
+  generateTypings() {
+    const schemas = this.#swaggerDocument.components.schemas;
+
+    const componentNames = this.generateTopologicalOrderOfComponentNames();
+
+    const typesRegistry = new Map();
 
     const interfaces = [];
     const types = [];
     const enums = [];
 
-    for (const componentName in schemas) {
+    for (const componentName of componentNames) {
       const componentData = schemas[componentName];
 
       if (componentData.enum) {
-        const tsEnum = this.generateEnum(componentName, componentData);
+        const tsEnum = this.generateEnum(
+          componentName,
+          componentData,
+          typesRegistry
+        );
 
         enums.push(tsEnum);
       } else if (componentData.type === 'object') {
         const tsInterface = this.generateInterface(
           componentName,
-          componentData
+          componentData,
+          typesRegistry
         );
 
         interfaces.push(tsInterface);
       } else {
-        const tsType = this.generateType(componentName, componentData);
+        const tsType = this.generateType(
+          componentName,
+          componentData,
+          typesRegistry
+        );
 
         types.push(tsType);
       }
@@ -511,7 +568,7 @@ class TypescriptModel {
     return { interfaces, types, enums };
   }
 
-  generateEnum(enumName, enumData) {
+  generateEnum(enumName, enumData, typesRegistry) {
     if (enumData.type !== 'string') {
       throw new Error(
         `Enums that are not strings are not supported, enum type found: '${enumData.type}'.`
@@ -524,10 +581,12 @@ class TypescriptModel {
       values: enumData.enum,
     };
 
+    typesRegistry.set(enumName, tsEnum);
+
     return tsEnum;
   }
 
-  generateInterface(interfaceName, interfaceData) {
+  generateInterface(interfaceName, interfaceData, typesRegistry) {
     const tsInterface = {
       name: interfaceName,
       jsdoc: this.resolveJsdoc(interfaceData),
@@ -555,24 +614,27 @@ class TypescriptModel {
 
     tsInterface.properties = tsProperties;
 
+    const propertiesWithDates = tsProperties.filter(
+      (prop) => prop.resolvedType === 'Date'
+    );
+
     tsInterface.metadata = {
-      dateProperties: tsProperties.filter(
-        (prop) => prop.resolvedType === 'Date'
-      ),
-      propertyTypes: tsProperties
-        .filter((prop) => prop.verboseType.type === 'object')
-        .map((prop) => prop.resolvedType),
+      propertiesWithDates,
     };
+
+    typesRegistry.set(interfaceName, tsInterface);
 
     return tsInterface;
   }
 
-  generateType(typeName, typeData) {
+  generateType(typeName, typeData, typesRegistry) {
     const tsType = {
       name: typeName,
       resolvedType: this.resolveType(typeData),
       jsdoc: this.resolveJsdoc(typeData),
     };
+
+    typesRegistry.set(typeName, tsType);
 
     return tsType;
   }
@@ -741,7 +803,17 @@ class ModelRenderer {
     }
 
     if (jsdoc.example !== undefined) {
-      output += `* @example ${JSON.stringify(jsdoc.example, null, 2)}\n`;
+      const example = JSON.stringify(jsdoc.example, null, 2);
+
+      if (!example.includes('\n')) {
+        output += `* @example ${example}\n`;
+      } else {
+        output += `* @example ${example.split('\n')[0]}\n${example
+          .split('\n')
+          .slice(1)
+          .map((line) => `* ${line}`)
+          .join('\n')}\n`;
+      }
     }
 
     if (jsdoc.summary) {

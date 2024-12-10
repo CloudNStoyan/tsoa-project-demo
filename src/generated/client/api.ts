@@ -3,12 +3,12 @@
 import { type Options, ClientAPIBase } from '../../client-base.js';
 
 /**
- * The pet's animal kind.
+ * The adoption request's status.
  */
-export enum AnimalKind {
-  Cat = 'Cat',
-  Dog = 'Dog',
-  Parrot = 'Parrot',
+export enum AdoptionRequestStatus {
+  Approved = 'Approved',
+  Pending = 'Pending',
+  Denied = 'Denied',
 }
 
 /**
@@ -21,12 +21,12 @@ export enum AdoptionStatus {
 }
 
 /**
- * The adoption request's status.
+ * The pet's animal kind.
  */
-export enum AdoptionRequestStatus {
-  Approved = 'Approved',
-  Pending = 'Pending',
-  Denied = 'Denied',
+export enum AnimalKind {
+  Cat = 'Cat',
+  Dog = 'Dog',
+  Parrot = 'Parrot',
 }
 
 /**
@@ -37,21 +37,6 @@ export enum AdoptionRequestStatus {
  * @example "7312cc99-f99f-445e-a939-eb66c0c6724c"
  */
 export type UUID = string;
-
-export interface ProblemDetails {
-  type?: string;
-
-  title?: string;
-
-  /**
-   * @format int32
-   */
-  status?: number;
-
-  detail?: string;
-
-  instance?: string;
-}
 
 /**
  * Pet characteristics.
@@ -114,39 +99,102 @@ export interface Pet {
   status: AdoptionStatus;
 
   /**
-* The pet's tags.
-* @example [
-  "cat",
-  "orange"
-]
-*/
+   * The pet's tags.
+   * @example [
+   *   "cat",
+   *   "orange"
+   * ]
+   */
   tags: string[];
 }
 
 /**
- * Inventory of adoption status to quantities.
+ * Inventory of adoption status to array of AdoptionRequests.
  */
 export interface Inventory {
   /**
-   * The number of pets that were adopted.
-   * @format int32
-   * @example 3
+   * All pets that were adopted.
+   * @example [
+   *   {
+   *     "id": "90dbbed9-bd3d-40ae-ad1c-86602844d4c1",
+   *     "name": "Kozunak",
+   *     "breed": "Orange Tabby",
+   *     "notes": "Likes to bite a lot.",
+   *     "kind": "Cat",
+   *     "age": 4,
+   *     "healthProblems": false,
+   *     "addedDate": "2020-08-21T00:00:00.000Z",
+   *     "status": "Adopted",
+   *     "tags": [
+   *       "cat",
+   *       "orange"
+   *     ]
+   *   },
+   *   {
+   *     "id": "d4c8d1c2-3928-468f-8e34-b3166a56f9ce",
+   *     "name": "Happy",
+   *     "breed": "European Domestic Cat",
+   *     "notes": "Very annoying.",
+   *     "kind": "Cat",
+   *     "age": 1,
+   *     "healthProblems": false,
+   *     "addedDate": "2023-08-08T00:00:00.000Z",
+   *     "status": "Adopted",
+   *     "tags": [
+   *       "cat",
+   *       "annoying",
+   *       "white"
+   *     ]
+   *   }
+   * ]
    */
-  Adopted: number;
+  Adopted: Pet[];
 
   /**
-   * The number of pets that are available for adoption.
-   * @format int32
-   * @example 1
+   * All pets that are available for adoption.
+   * @example [
+   *   {
+   *     "id": "fe6d2beb-acc3-4d8b-bf05-c8e863462238",
+   *     "name": "Beji",
+   *     "breed": "Cream Tabby",
+   *     "notes": "Likes to fight.",
+   *     "kind": "Cat",
+   *     "age": 2,
+   *     "healthProblems": true,
+   *     "addedDate": "2022-03-01T00:00:00.000Z",
+   *     "status": "Available",
+   *     "tags": [
+   *       "cat",
+   *       "beige",
+   *       "cream"
+   *     ]
+   *   }
+   * ]
    */
-  Available: number;
+  Available: Pet[];
 
   /**
-   * The number of pets that have a pending adoption status.
-   * @format int32
-   * @example 2
+   * All pets that have a pending adoption status.
+   * @example [
+   *   {
+   *     "id": "39ccecc8-9344-49ac-b953-b1b271c089fc",
+   *     "name": "Sr. Shnitz",
+   *     "breed": "Cockatiel",
+   *     "notes": "Likes biscuits!",
+   *     "kind": "Parrot",
+   *     "age": 10,
+   *     "healthProblems": false,
+   *     "addedDate": "2024-08-20T00:00:00.000Z",
+   *     "status": "Pending",
+   *     "tags": [
+   *       "parrot",
+   *       "squeak",
+   *       "mixed colors"
+   *     ]
+   *   }
+   * ]
    */
-  Pending: number;
+  Pending: Pet[];
 }
 
 /**
@@ -177,6 +225,21 @@ export interface AdoptionRequest {
    * @example "Pending"
    */
   status: AdoptionRequestStatus;
+}
+
+export interface ProblemDetails {
+  type?: string;
+
+  title?: string;
+
+  /**
+   * @format int32
+   */
+  status?: number;
+
+  detail?: string;
+
+  instance?: string;
 }
 
 export class ClientAPI {
@@ -426,7 +489,7 @@ export class PetClientAPI extends ClientAPIBase {
  */
 export class StoreClientAPI extends ClientAPIBase {
   /**
-   * Returns a map of adoption status to quantities.
+   * Returns a map of adoption status to array of pets.
    * @summary Returns pet inventories by adoption status.
    */
   getInventory(options?: Options): Promise<Inventory> {
