@@ -206,9 +206,6 @@ class DotNetModel {
 
     this.tags = this.GenerateTags(operations);
 
-    // this.additionalExamples =
-    //   this.GenerateAdditionalExamplesAndUpdateOperations(operations);
-
     this.controllers = this.GenerateControllers(operations);
 
     this.securityDefinitions = this.GenerateSecurityDefinitions();
@@ -1865,37 +1862,7 @@ await fs.writeFile(
 );
 
 await fs.mkdir(path.join(GENERATED_FOLDER, 'Models'), { recursive: true });
-// for (const additionalExample of dotNetModel.additionalExamples) {
-//   await fs.writeFile(
-//     path.join(
-//       GENERATED_FOLDER,
-//       'Models',
-//       `${additionalExample.name}Example.cs`
-//     ),
-//     new RenderExample({
-//       model: additionalExample.model,
-//       name: additionalExample.name,
-//       resolvedDotnetType: additionalExample.resolvedDotnetType,
-//       example: additionalExample.example.value,
-//       rootNamespace: options.rootNamespace,
-//     }).render()
-//   );
-// }
-
 for (const model of dotNetModel.models) {
-  // if (model.type === 'class' && model.hasExample) {
-  //   await fs.writeFile(
-  //     path.join(GENERATED_FOLDER, 'Models', `${model.name}Example.cs`),
-  //     new RenderExample({
-  //       model,
-  //       name: model.name,
-  //       resolvedDotnetType: model.name,
-  //       example: model.example.value,
-  //       rootNamespace: options.rootNamespace,
-  //     }).render()
-  //   );
-  // }
-
   if (!options.ignoredModels.has(model.name)) {
     await fs.writeFile(
       path.join(GENERATED_FOLDER, 'Models', `${model.name}.cs`),
