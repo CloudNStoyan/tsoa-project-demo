@@ -15,8 +15,8 @@ public static class SwaggerGenOptionsExtensions {
     options.SchemaFilter<AddPatternToUuidFilter>();
   }
 
-  public static void SwaggerDocUsingGeneratedDefinitions(this SwaggerGenOptions options, string name) {
-    options.SwaggerDoc(name, GeneratedDefinitions.GetGeneratedApiInfo());
+  public static void SwaggerDocUsingGeneratedDefinitions(this SwaggerGenOptions options) {
+    options.SwaggerDoc("v1", GeneratedDefinitions.GetGeneratedApiInfo());
 
     options.DocumentFilter<AddTagsMetadataFilter>([GeneratedDefinitions.GetGeneratedTags()]);
 

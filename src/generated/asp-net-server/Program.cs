@@ -36,7 +36,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => {
   options.CustomOperationIds(x => x.ActionDescriptor.RouteValues["action"]);
 
-  options.SwaggerDocUsingGeneratedDefinitions("v1");
+  options.SwaggerDocUsingGeneratedDefinitions();
 
   options.ExampleFilters();
 
