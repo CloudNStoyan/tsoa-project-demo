@@ -3,9 +3,9 @@ using Microsoft.OpenApi.Models;
 
 namespace AspNetServer.Generated;
 
-public class GeneratedDefinitions : ICustomGenerated
+public static class GeneratedDefinitions
 {
-  public OpenApiInfo GetGeneratedApiInfo()
+  public static OpenApiInfo GetGeneratedApiInfo()
   {
     return new()
     {
@@ -15,7 +15,7 @@ public class GeneratedDefinitions : ICustomGenerated
     };
   }
 
-  public IEnumerable<OpenApiSecurityScheme> GetGeneratedSecuritySchemes()
+  public static OpenApiSecurityScheme[] GetGeneratedSecuritySchemes()
   {
     return [
       new()
@@ -28,7 +28,7 @@ public class GeneratedDefinitions : ICustomGenerated
     ];
   }
 
-  public IEnumerable<OpenApiTag> GetGeneratedTags()
+  public static OpenApiTag[] GetGeneratedTags()
   {
     return [
       new()

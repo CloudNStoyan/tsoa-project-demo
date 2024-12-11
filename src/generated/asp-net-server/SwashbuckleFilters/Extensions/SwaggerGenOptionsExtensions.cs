@@ -16,15 +16,11 @@ public static class SwaggerGenOptionsExtensions {
   }
 
   public static void SwaggerDocUsingGeneratedDefinitions(this SwaggerGenOptions options, string name) {
-    var generatedDefinitions = new GeneratedDefinitions();
+    options.SwaggerDoc(name, GeneratedDefinitions.GetGeneratedApiInfo());
 
-    options.SwaggerDoc(name, generatedDefinitions.GetGeneratedApiInfo());
+    options.DocumentFilter<AddTagsMetadataFilter>([GeneratedDefinitions.GetGeneratedTags()]);
 
-    var tags = generatedDefinitions.GetGeneratedTags().ToArray();
-
-    options.DocumentFilter<AddTagsMetadataFilter>([tags]);
-
-    var securitySchemes = generatedDefinitions.GetGeneratedSecuritySchemes().ToArray();
+    var securitySchemes = GeneratedDefinitions.GetGeneratedSecuritySchemes();
 
     foreach (var securityScheme in securitySchemes) {
       options.AddSecurityDefinition(securityScheme.Name, securityScheme);

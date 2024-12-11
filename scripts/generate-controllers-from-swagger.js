@@ -1818,18 +1818,18 @@ class RenderDefinitions {
 
     output += `namespace ${this.#rootNamespace}.Generated;\n\n`;
 
-    output += 'public class GeneratedDefinitions : ICustomGenerated\n';
+    output += 'public static class GeneratedDefinitions\n';
     output += '{\n';
-    output += '  public OpenApiInfo GetGeneratedApiInfo()\n';
+    output += '  public static OpenApiInfo GetGeneratedApiInfo()\n';
     output += '  {\n';
     output += this.renderApiInfo(4);
     output += '  }\n\n';
     output +=
-      '  public IEnumerable<OpenApiSecurityScheme> GetGeneratedSecuritySchemes()\n';
+      '  public static OpenApiSecurityScheme[] GetGeneratedSecuritySchemes()\n';
     output += '  {\n';
     output += this.renderSecurityDefinitions(4);
     output += '  }\n\n';
-    output += '  public IEnumerable<OpenApiTag> GetGeneratedTags()\n';
+    output += '  public static OpenApiTag[] GetGeneratedTags()\n';
     output += '  {\n';
     output += this.renderTags(4);
     output += '  }\n';
