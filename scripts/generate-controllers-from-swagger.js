@@ -206,8 +206,8 @@ class DotNetModel {
 
     this.tags = this.GenerateTags(operations);
 
-    this.additionalExamples =
-      this.GenerateAdditionalExamplesAndUpdateOperations(operations);
+    // this.additionalExamples =
+    //   this.GenerateAdditionalExamplesAndUpdateOperations(operations);
 
     this.controllers = this.GenerateControllers(operations);
 
@@ -379,6 +379,12 @@ class DotNetModel {
       properties.findIndex((prop) => prop.example === undefined) === -1;
 
     if (hasExample) {
+      const swashbuckleFiltersImport = 'using Swashbuckle.AspNetCore.Filters;';
+
+      if (!imports.has(swashbuckleFiltersImport)) {
+        imports.add(swashbuckleFiltersImport);
+      }
+
       const filtersImport = `using ${this.#rootNamespace}.SwashbuckleFilters;`;
 
       if (!imports.has(filtersImport)) {
@@ -676,7 +682,7 @@ class DotNetModel {
     return output;
   }
 
-  GenerateResponses(responseSchemes) {
+  GenerateResponses({ responseSchemes, arrayExamplesMap }) {
     const responses = [];
 
     for (const statusCode in responseSchemes) {
@@ -717,29 +723,11 @@ class DotNetModel {
         ];
       }
 
-      responses.push(response);
-    }
-
-    responses.sort((a, b) => b.statusCode - a.statusCode);
-
-    return responses;
-  }
-
-  GenerateAdditionalExamplesAndUpdateOperations(operations) {
-    const arrayExamplesMap = new Map();
-
-    for (const operation of operations) {
-      for (const response of operation.responses) {
-        if (
-          !(
-            response.dotnetType?.type === 'array' &&
-            response.dotnetType.itemType?.type !== 'array' &&
-            response.examples?.length > 0
-          )
-        ) {
-          continue;
-        }
-
+      if (
+        response.dotnetType.type === 'array' &&
+        response.dotnetType.itemType.type !== 'array' &&
+        response.examples.length > 0
+      ) {
         const dotnetType = response.dotnetType.itemType;
 
         if (!arrayExamplesMap.has(dotnetType.resolved)) {
@@ -766,136 +754,19 @@ class DotNetModel {
           }
         }
       }
+
+      responses.push(response);
     }
 
-    const defaultArrayExampleMap = new Map();
-    const hashesToExamples = new Map();
+    responses.sort((a, b) => b.statusCode - a.statusCode);
 
-    const additionalExamples = [];
-
-    for (const [type, availableExamples] of arrayExamplesMap) {
-      for (const [hash, exampleMeta] of availableExamples) {
-        hashesToExamples.set(hash, {
-          example: exampleMeta.example,
-          dotnetType: exampleMeta.dotnetType,
-        });
-      }
-
-      const [defaultHash, _] = Array.from(availableExamples).sort(
-        ([_a, a], [_b, b]) => b.count - a.count
-      )[0];
-
-      defaultArrayExampleMap.set(type, defaultHash);
-    }
-
-    for (const operation of operations) {
-      for (const response of operation.responses) {
-        if (
-          response.dotnetType?.type === 'array' &&
-          response.dotnetType.itemType.type !== 'array' &&
-          response.examples?.length > 0
-        ) {
-          for (const example of response.examples) {
-            const dotnetType = response.dotnetType.itemType;
-
-            const defaultArrayExampleHash = defaultArrayExampleMap.get(
-              dotnetType.resolved
-            );
-
-            const statusCodeAsEnumType = `StatusCodes.${STATUS_CODES_TO_ENUM_NAMES[response.statusCode]}`;
-
-            if (defaultArrayExampleHash === example.hash) {
-              const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(Multiple${dotnetType.resolved}Example))]`;
-
-              operation.attributes.push(swaggerResponseAttr);
-              continue;
-            }
-
-            const operationId = operation.schema.operationId;
-
-            additionalExamples.push({
-              name: operationId,
-              resolvedDotnetType: response.dotnetType.resolved,
-              model: this.#modelsRegistry.get(dotnetType.resolved),
-              example,
-            });
-
-            const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(${operationId}Example))]`;
-
-            operation.attributes.push(swaggerResponseAttr);
-          }
-        }
-      }
-    }
-
-    for (const [type, exampleHash] of defaultArrayExampleMap) {
-      const exampleMetadata = hashesToExamples.get(exampleHash);
-
-      additionalExamples.push({
-        name: `Multiple${type}`,
-        resolvedDotnetType: exampleMetadata.dotnetType.resolved,
-        model: this.#modelsRegistry.get(
-          exampleMetadata.dotnetType.itemType.resolved
-        ),
-        example: exampleMetadata.example,
-      });
-    }
-
-    for (const operation of operations) {
-      for (const response of operation.responses) {
-        if (
-          response.dotnetType === undefined ||
-          response.dotnetType.type === 'array' ||
-          response.statusCode > 399
-        ) {
-          continue;
-        }
-
-        const model = this.#modelsRegistry.get(response.dotnetType.resolved);
-        const statusCodeAsEnumType = `StatusCodes.${STATUS_CODES_TO_ENUM_NAMES[response.statusCode]}`;
-
-        if (
-          !Array.isArray(response.examples) ||
-          response.examples.length === 0
-        ) {
-          if (model.hasExample) {
-            const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(${model.name}Example))]`;
-
-            operation.attributes.push(swaggerResponseAttr);
-          }
-
-          continue;
-        }
-
-        const example = response.examples[0];
-
-        if (model.hasExample && model.example.hash === example.hash) {
-          const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(${model.name}Example))]`;
-
-          operation.attributes.push(swaggerResponseAttr);
-          continue;
-        }
-
-        const operationId = operation.schema.operationId;
-
-        additionalExamples.push({
-          name: operationId,
-          resolvedDotnetType: response.dotnetType.resolved,
-          model,
-          example,
-        });
-
-        const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(${operationId}Example))]`;
-
-        operation.attributes.push(swaggerResponseAttr);
-      }
-    }
-
-    return additionalExamples;
+    return responses;
   }
 
   GenerateOperations() {
     const paths = this.#swaggerDocument.paths;
+
+    const arrayExamplesMap = new Map();
 
     const operations = [];
 
@@ -910,7 +781,11 @@ class DotNetModel {
           method,
           returnType: this.GenerateReturnType(operationSchema.responses),
           parameters: this.GenerateOperationParameters(operationSchema),
-          responses: this.GenerateResponses(operationSchema.responses),
+          responses: this.GenerateResponses({
+            responseSchemes: operationSchema.responses,
+            arrayExamplesMap,
+          }),
+          examples: [],
         };
 
         const attributes = [];
@@ -982,6 +857,136 @@ class DotNetModel {
         operation.xmlObject = xmlObject;
 
         operations.push(operation);
+      }
+    }
+
+    const defaultArrayExampleMap = new Map();
+    const hashesToExamples = new Map();
+
+    for (const [type, availableExamples] of arrayExamplesMap) {
+      for (const [hash, exampleMeta] of availableExamples) {
+        hashesToExamples.set(hash, {
+          example: exampleMeta.example,
+          dotnetType: exampleMeta.dotnetType,
+        });
+      }
+
+      const [defaultHash, _] = Array.from(availableExamples).sort(
+        ([_a, a], [_b, b]) => b.count - a.count
+      )[0];
+
+      defaultArrayExampleMap.set(type, defaultHash);
+    }
+
+    for (const operation of operations) {
+      for (const response of operation.responses) {
+        if (
+          response.dotnetType?.type === 'array' &&
+          response.dotnetType.itemType.type !== 'array' &&
+          response.examples?.length > 0
+        ) {
+          for (const example of response.examples) {
+            const dotnetType = response.dotnetType.itemType;
+
+            const defaultArrayExampleHash = defaultArrayExampleMap.get(
+              dotnetType.resolved
+            );
+
+            const statusCodeAsEnumType = `StatusCodes.${STATUS_CODES_TO_ENUM_NAMES[response.statusCode]}`;
+
+            if (defaultArrayExampleHash === example.hash) {
+              const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(Multiple${dotnetType.resolved}Example))]`;
+
+              operation.attributes.push(swaggerResponseAttr);
+              continue;
+            }
+
+            const operationId = operation.schema.operationId;
+
+            const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(${operationId}Example))]`;
+
+            operation.attributes.push(swaggerResponseAttr);
+
+            operation.examples.push({
+              name: operationId,
+              resolvedDotnetType: response.dotnetType.resolved,
+              model: this.#modelsRegistry.get(dotnetType.resolved),
+              example,
+            });
+          }
+        }
+
+        if (
+          response.dotnetType &&
+          response.dotnetType?.type !== 'array' &&
+          response.statusCode < 400
+        ) {
+          const model = this.#modelsRegistry.get(response.dotnetType.resolved);
+
+          const statusCodeAsEnumType = `StatusCodes.${STATUS_CODES_TO_ENUM_NAMES[response.statusCode]}`;
+
+          if (
+            !Array.isArray(response.examples) ||
+            response.examples.length === 0
+          ) {
+            if (model.hasExample) {
+              const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(${model.name}Example))]`;
+
+              operation.attributes.push(swaggerResponseAttr);
+            }
+
+            continue;
+          }
+
+          const example = response.examples[0];
+
+          if (model.hasExample && model.example.hash === example.hash) {
+            const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(${model.name}Example))]`;
+
+            operation.attributes.push(swaggerResponseAttr);
+            continue;
+          }
+
+          const operationId = operation.schema.operationId;
+
+          operation.examples.push({
+            name: operationId,
+            resolvedDotnetType: response.dotnetType.resolved,
+            model,
+            example,
+          });
+
+          const swaggerResponseAttr = `[SwaggerResponseExample(${statusCodeAsEnumType}, typeof(${operationId}Example))]`;
+
+          operation.attributes.push(swaggerResponseAttr);
+        }
+      }
+    }
+
+    for (const [type, exampleHash] of defaultArrayExampleMap) {
+      const exampleMetadata = hashesToExamples.get(exampleHash);
+
+      const model = this.#modelsRegistry.get(type);
+
+      model.multipleExample = {
+        name: `Multiple${type}`,
+        resolvedDotnetType: exampleMetadata.dotnetType.resolved,
+        model: this.#modelsRegistry.get(
+          exampleMetadata.dotnetType.itemType.resolved
+        ),
+        example: exampleMetadata.example,
+      };
+
+      const swashbuckleFiltersImport = 'using Swashbuckle.AspNetCore.Filters;';
+
+      if (!model.imports.has(swashbuckleFiltersImport)) {
+        model.imports.add(swashbuckleFiltersImport);
+      }
+
+      const filtersImport = `using ${this.#rootNamespace}.SwashbuckleFilters;`;
+
+      if (!model.imports.has(filtersImport)) {
+        model.imports.add(filtersImport);
       }
     }
 
@@ -1232,6 +1237,28 @@ class RenderModel {
 
     if (model.type === 'class') {
       output += this.renderClass(model);
+
+      if (model.hasExample) {
+        output += '\n\n';
+
+        output += new RenderExample({
+          model,
+          name: model.name,
+          resolvedDotnetType: model.name,
+          example: model.example.value,
+        }).render();
+      }
+
+      if (model.multipleExample) {
+        output += '\n\n';
+
+        output += new RenderExample({
+          model: model.multipleExample.model,
+          name: model.multipleExample.name,
+          resolvedDotnetType: model.multipleExample.resolvedDotnetType,
+          example: model.multipleExample.example.value,
+        }).render();
+      }
     }
 
     return output.trim();
@@ -1243,14 +1270,12 @@ class RenderExample {
   #name;
   #resolvedDotnetType;
   #example;
-  #rootNamespace;
 
-  constructor({ model, name, resolvedDotnetType, example, rootNamespace }) {
+  constructor({ model, name, resolvedDotnetType, example }) {
     this.#model = model;
     this.#name = name;
     this.#resolvedDotnetType = resolvedDotnetType;
     this.#example = example;
-    this.#rootNamespace = rootNamespace;
   }
 
   renderPropertyValue({ dotnetType, example }) {
@@ -1368,15 +1393,9 @@ class RenderExample {
   }
 
   render() {
-    const rootNamespace = this.#rootNamespace;
-
     const exampleIsArray = Array.isArray(this.#example);
 
     let output = '';
-
-    output += 'using Swashbuckle.AspNetCore.Filters;\n\n';
-
-    output += `namespace ${rootNamespace}.Generated.Models;\n\n`;
 
     output += `public class ${this.#name}Example : IExamplesProvider<${this.#resolvedDotnetType}>\n`;
     output += '{\n';
@@ -1567,15 +1586,36 @@ class RenderController {
     output += `public class ${controller.name}Controller : ControllerBase\n`;
     output += '{\n';
 
+    let operationExamples = [];
+
     for (const operation of controller.operations) {
       output += this.renderOperation({ operation, indentation: 2 });
+
+      if (operation.examples.length > 0) {
+        operationExamples = [...operationExamples, ...operation.examples];
+      }
     }
 
     output = output.trim();
 
     output += '\n}';
 
-    return output;
+    if (operationExamples.length > 0) {
+      output += '\n\n';
+    }
+
+    for (const operationExample of operationExamples) {
+      output += new RenderExample({
+        model: operationExample.model,
+        name: operationExample.name,
+        resolvedDotnetType: operationExample.resolvedDotnetType,
+        example: operationExample.example.value,
+      }).render();
+
+      output += '\n\n';
+    }
+
+    return output.trim();
   }
 }
 
@@ -1825,36 +1865,36 @@ await fs.writeFile(
 );
 
 await fs.mkdir(path.join(GENERATED_FOLDER, 'Models'), { recursive: true });
-for (const additionalExample of dotNetModel.additionalExamples) {
-  await fs.writeFile(
-    path.join(
-      GENERATED_FOLDER,
-      'Models',
-      `${additionalExample.name}Example.cs`
-    ),
-    new RenderExample({
-      model: additionalExample.model,
-      name: additionalExample.name,
-      resolvedDotnetType: additionalExample.resolvedDotnetType,
-      example: additionalExample.example.value,
-      rootNamespace: options.rootNamespace,
-    }).render()
-  );
-}
+// for (const additionalExample of dotNetModel.additionalExamples) {
+//   await fs.writeFile(
+//     path.join(
+//       GENERATED_FOLDER,
+//       'Models',
+//       `${additionalExample.name}Example.cs`
+//     ),
+//     new RenderExample({
+//       model: additionalExample.model,
+//       name: additionalExample.name,
+//       resolvedDotnetType: additionalExample.resolvedDotnetType,
+//       example: additionalExample.example.value,
+//       rootNamespace: options.rootNamespace,
+//     }).render()
+//   );
+// }
 
 for (const model of dotNetModel.models) {
-  if (model.type === 'class' && model.hasExample) {
-    await fs.writeFile(
-      path.join(GENERATED_FOLDER, 'Models', `${model.name}Example.cs`),
-      new RenderExample({
-        model,
-        name: model.name,
-        resolvedDotnetType: model.name,
-        example: model.example.value,
-        rootNamespace: options.rootNamespace,
-      }).render()
-    );
-  }
+  // if (model.type === 'class' && model.hasExample) {
+  //   await fs.writeFile(
+  //     path.join(GENERATED_FOLDER, 'Models', `${model.name}Example.cs`),
+  //     new RenderExample({
+  //       model,
+  //       name: model.name,
+  //       resolvedDotnetType: model.name,
+  //       example: model.example.value,
+  //       rootNamespace: options.rootNamespace,
+  //     }).render()
+  //   );
+  // }
 
   if (!options.ignoredModels.has(model.name)) {
     await fs.writeFile(

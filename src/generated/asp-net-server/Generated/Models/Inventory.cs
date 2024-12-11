@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Swashbuckle.AspNetCore.Filters;
 using AspNetServer.SwashbuckleFilters;
 
 namespace AspNetServer.Generated.Models;
@@ -23,4 +24,17 @@ public class Inventory {
   /// </summary>
   [Required]
   public int Pending { get; set; }
+}
+
+public class InventoryExample : IExamplesProvider<Inventory>
+{
+  public Inventory GetExamples()
+  {
+    return new()
+    {
+      Adopted = 3,
+      Available = 1,
+      Pending = 2,
+    };
+  }
 }
