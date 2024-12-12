@@ -38,11 +38,88 @@ function lowercaseFirstLetter(string) {
   return string[0].toLowerCase() + string.slice(1);
 }
 
+class TopologicalGraph {
+  constructor(jobs) {
+    this.nodes = [];
+    this.graph = {};
+
+    for (const job of jobs) {
+      this.#addNode(job);
+    }
+  }
+
+  static sort({ jobs, dependencies }) {
+    const graph = new TopologicalGraph(jobs);
+
+    for (const [job, dependency] of dependencies) {
+      graph.#addDependency(job, dependency);
+    }
+
+    const orderedJobs = [];
+
+    const nodesWithNoDependents = graph.nodes.filter(
+      (node) => node.numOfDependents === 0
+    );
+
+    while (nodesWithNoDependents.length > 0) {
+      const node = nodesWithNoDependents.pop();
+      orderedJobs.push(node.job);
+
+      while (node.dependencies.length > 0) {
+        const dep = node.dependencies.pop();
+        dep.numOfDependents -= 1;
+
+        if (dep.numOfDependents === 0) {
+          nodesWithNoDependents.push(dep);
+        }
+      }
+    }
+
+    const graphHasEdges =
+      graph.nodes.filter((node) => node.numOfDependents > 0).length > 0;
+
+    if (graphHasEdges) {
+      throw new Error(
+        "The graph can't be topologically sorted because there are edges!"
+      );
+    }
+
+    return orderedJobs;
+  }
+
+  #addNode(job) {
+    this.graph[job] = {
+      job,
+      dependencies: [],
+      numOfDependents: 0,
+    };
+
+    this.nodes.push(this.graph[job]);
+  }
+
+  #addDependency(job, dependency) {
+    const jobNode = this.#getNode(job);
+    const depNode = this.#getNode(dependency);
+
+    jobNode.dependencies.push(depNode);
+    depNode.numOfDependents += 1;
+  }
+
+  #getNode(job) {
+    if (!(job in this.graph)) {
+      this.#addNode(job);
+    }
+
+    return this.graph[job];
+  }
+}
+
 class TypescriptModel {
   #swaggerDocument;
 
   constructor(swaggerDocument) {
     this.#swaggerDocument = swaggerDocument;
+    this.typesRegistry = new Map();
 
     const { enums, types, interfaces } = this.generateTypings(swaggerDocument);
 
@@ -52,6 +129,11 @@ class TypescriptModel {
 
     this.operations = this.generateOperations(swaggerDocument);
     this.tags = this.generateOperationTags(swaggerDocument);
+
+    this.apis = this.generateApis({
+      operations: this.operations,
+      tags: this.tags,
+    });
   }
 
   responseSchemaIsInlineObject(schema) {
@@ -86,9 +168,19 @@ class TypescriptModel {
     }
   }
 
+  unwrapVerboseType(verboseType) {
+    let unwrappedType = verboseType;
+
+    while (unwrappedType.type === 'array') {
+      unwrappedType = unwrappedType.itemType;
+    }
+
+    return unwrappedType;
+  }
+
   generateReturnType(responses) {
     if (responses['204'] && !responses['200']) {
-      return 'void';
+      return { resolvedType: 'void', type: 'literal' };
     }
 
     if (responses['200']) {
@@ -96,16 +188,72 @@ class TypescriptModel {
 
       this.throwIfResponseContentIsInvalid(content);
 
+      const verboseType = this.resolveTypeVerbose(content.schema);
+
       if (responses['204']) {
-        return `${this.resolveType(content.schema)} | void`;
+        return {
+          resolvedType: `${verboseType.resolvedType} | void`,
+          type: 'union',
+        };
       }
 
-      return this.resolveType(content.schema);
+      return verboseType;
     }
 
     throw new Error(
       `Unexpected response object:\n${JSON.stringify(responses, null, 2)}`
     );
+  }
+
+  generatePostprocessMetadata(operations) {
+    const traverseTypeInfo = ({ typeInfo, postProcessingMap }) => {
+      if (postProcessingMap.has(typeInfo.name)) {
+        return;
+      }
+
+      postProcessingMap.set(typeInfo.name, typeInfo);
+
+      for (const property of typeInfo.metadata.propertiesThatContainDates) {
+        if (!postProcessingMap.has(property.typeInfo.name)) {
+          postProcessingMap.set(property.typeInfo.name, property.typeInfo);
+        }
+      }
+    };
+
+    const typesThatNeedPostProcessingMap = new Map();
+
+    for (const operation of operations) {
+      if (!operation.hasDates) {
+        continue;
+      }
+
+      traverseTypeInfo({
+        typeInfo: operation.typeInfo,
+        postProcessingMap: typesThatNeedPostProcessingMap,
+      });
+    }
+
+    return typesThatNeedPostProcessingMap.values();
+  }
+
+  generateApis({ operations, tags }) {
+    const apis = [];
+
+    for (const tag of tags) {
+      const api = {
+        name: tag.name,
+        jsdoc: tag.jsdoc,
+        operations: operations.filter((op) => op.tags.includes(tag.name)),
+      };
+
+      api.typesThatNeedPostProcessing = this.generatePostprocessMetadata(
+        api.operations
+      );
+
+      apis.push(api);
+    }
+
+    return apis;
   }
 
   generateOperations(swaggerDocument) {
@@ -126,7 +274,23 @@ class TypescriptModel {
           tags: openapiOperationData.tags,
           jsdoc: this.resolveJsdoc(openapiOperationData),
           returnType: this.generateReturnType(openapiOperationData.responses),
+          hasDates: false,
         };
+
+        const unwrappedType = this.unwrapVerboseType(operation.returnType);
+
+        if (unwrappedType.type === 'object') {
+          const typeInfo = this.typesRegistry.get(unwrappedType.resolvedType);
+
+          operation.typeInfo = typeInfo;
+
+          if (
+            typeInfo.metadata?.propertiesThatAreDates?.length > 0 ||
+            typeInfo.metadata.propertiesThatContainDates?.length > 0
+          ) {
+            operation.hasDates = true;
+          }
+        }
 
         const allParams = [];
 
@@ -254,6 +418,26 @@ class TypescriptModel {
     return { resolvedType, valueType: schema, type: typeInfo.type };
   }
 
+  getRefSchema(ref) {
+    if (!ref.startsWith('#/components/schemas/')) {
+      throw new Error(
+        `Found a ref that doesn't point to #/components/schema, '${ref}'.`
+      );
+    }
+
+    const schemaName = ref.split('#/components/schemas/')[1];
+
+    const schema = this.#swaggerDocument.components.schemas[schemaName];
+
+    if (schema === undefined) {
+      throw new Error(
+        `Found a ref that doesn't point to valid schema, '${ref}'.`
+      );
+    }
+
+    return { schema, schemaName };
+  }
+
   resolveTypeVerbose(property) {
     if (this.isPropertyAnUnion(property)) {
       return { resolvedType: this.resolveUnion(property), type: 'union' };
@@ -270,15 +454,9 @@ class TypescriptModel {
     }
 
     if (property.$ref) {
-      if (!property.$ref.startsWith('#/components/schemas/')) {
-        throw new Error(
-          "Found a ref that doesn't point to #/components/schema"
-        );
-      }
-
-      const typeName = property.$ref.split('#/components/schemas/')[1];
-
-      const schemaType = this.#swaggerDocument.components.schemas[typeName];
+      const { schema: schemaType, schemaName: typeName } = this.getRefSchema(
+        property.$ref
+      );
 
       return {
         resolvedType: typeName,
@@ -294,6 +472,13 @@ class TypescriptModel {
         type: 'array',
         itemType: itemTypeInfo,
       };
+    }
+
+    if (
+      property.type === 'string' &&
+      (property.format === 'date' || property.format === 'date-time')
+    ) {
+      return { resolvedType: 'Date', type: 'literal' };
     }
 
     if (
@@ -373,14 +558,57 @@ class TypescriptModel {
     return hasJsdoc ? jsdoc : undefined;
   }
 
-  generateTypings(swaggerDocument) {
-    const schemas = swaggerDocument.components.schemas;
+  generateTopologicalOrderOfComponentNames() {
+    const schemas = this.#swaggerDocument.components.schemas;
+
+    const componentNames = Object.keys(schemas);
+
+    const dependencies = [];
+
+    for (const componentName of componentNames) {
+      const schema = schemas[componentName];
+
+      if (schema.type === 'object') {
+        for (const propertyName in schema.properties) {
+          let propertySchema = schema.properties[propertyName];
+
+          if (
+            Array.isArray(propertySchema.allOf) &&
+            propertySchema.allOf.length === 1
+          ) {
+            propertySchema = propertySchema.allOf[0];
+          }
+
+          while (propertySchema.type === 'array') {
+            propertySchema = propertySchema.items;
+          }
+
+          if (propertySchema.$ref) {
+            dependencies.push([
+              this.getRefSchema(propertySchema.$ref).schemaName,
+              componentName,
+            ]);
+          }
+        }
+      }
+    }
+
+    return TopologicalGraph.sort({
+      jobs: componentNames,
+      dependencies,
+    });
+  }
+
+  generateTypings() {
+    const schemas = this.#swaggerDocument.components.schemas;
+
+    const componentNames = this.generateTopologicalOrderOfComponentNames();
 
     const interfaces = [];
     const types = [];
     const enums = [];
 
-    for (const componentName in schemas) {
+    for (const componentName of componentNames) {
       const componentData = schemas[componentName];
 
       if (componentData.enum) {
@@ -417,6 +645,8 @@ class TypescriptModel {
       values: enumData.enum,
     };
 
+    this.typesRegistry.set(enumName, tsEnum);
+
     return tsEnum;
   }
 
@@ -431,18 +661,52 @@ class TypescriptModel {
 
     const tsProperties = [];
 
+    const propertiesThatAreDates = [];
+    const propertiesThatContainDates = [];
+
     for (const [propertyName, propertyData] of openapiProperties) {
       const tsProperty = {
         name: propertyName,
         required: requiredProperties?.includes(propertyName) || false,
         jsdoc: this.resolveJsdoc(propertyData),
-        resolvedType: this.resolveType(propertyData),
       };
+
+      const propertyVerboseType = this.resolveTypeVerbose(propertyData);
+
+      tsProperty.resolvedType = propertyVerboseType.resolvedType;
+      tsProperty.verboseType = propertyVerboseType;
+
+      const unwrappedType = this.unwrapVerboseType(propertyVerboseType);
+
+      if (unwrappedType.type === 'object') {
+        const typeInfo = this.typesRegistry.get(unwrappedType.resolvedType);
+
+        tsProperty.typeInfo = typeInfo;
+
+        if (
+          typeInfo.metadata &&
+          (typeInfo.metadata.propertiesThatAreDates.length > 0 ||
+            typeInfo.metadata.propertiesThatContainDates.length > 0)
+        ) {
+          propertiesThatContainDates.push(tsProperty);
+        }
+      }
+
+      if (tsProperty.resolvedType === 'Date') {
+        propertiesThatAreDates.push(tsProperty);
+      }
 
       tsProperties.push(tsProperty);
     }
 
     tsInterface.properties = tsProperties;
+
+    tsInterface.metadata = {
+      propertiesThatAreDates,
+      propertiesThatContainDates,
+    };
+
+    this.typesRegistry.set(interfaceName, tsInterface);
 
     return tsInterface;
   }
@@ -453,6 +717,8 @@ class TypescriptModel {
       resolvedType: this.resolveType(typeData),
       jsdoc: this.resolveJsdoc(typeData),
     };
+
+    this.typesRegistry.set(typeName, tsType);
 
     return tsType;
   }
@@ -574,19 +840,19 @@ class ModelRenderer {
   renderApis() {
     let output = '';
 
-    for (const tag of this.model.tags) {
-      if (tag.jsdoc) {
-        output += this.renderJsdoc(tag.jsdoc);
+    for (const api of this.model.apis) {
+      if (api.jsdoc) {
+        output += this.renderJsdoc(api.jsdoc);
       }
 
-      output += `export class ${uppercaseFirstLetter(tag.name)}ClientAPI extends ClientAPIBase {\n`;
+      output += `export class ${uppercaseFirstLetter(api.name)}ClientAPI extends ClientAPIBase {\n`;
 
-      const tagOperations = this.model.operations.filter((op) =>
-        op.tags.includes(tag.name)
-      );
-
-      for (const operation of tagOperations) {
+      for (const operation of api.operations) {
         output += this.renderOperation(operation);
+      }
+
+      for (const typeInfo of api.typesThatNeedPostProcessing) {
+        output += this.renderPostProcess(typeInfo);
       }
 
       output += '}\n\n';
@@ -621,7 +887,17 @@ class ModelRenderer {
     }
 
     if (jsdoc.example !== undefined) {
-      output += `* @example ${JSON.stringify(jsdoc.example, null, 2)}\n`;
+      const example = JSON.stringify(jsdoc.example, null, 2);
+
+      if (!example.includes('\n')) {
+        output += `* @example ${example}\n`;
+      } else {
+        output += `* @example ${example.split('\n')[0]}\n${example
+          .split('\n')
+          .slice(1)
+          .map((line) => `* ${line}`)
+          .join('\n')}\n`;
+      }
     }
 
     if (jsdoc.summary) {
@@ -656,6 +932,47 @@ class ModelRenderer {
     return JSON.stringify(obj, null, 2);
   }
 
+  renderPostProcess(typeInfo) {
+    let output = '';
+
+    const variableName = lowercaseFirstLetter(typeInfo.name);
+
+    output += `#postProcess${typeInfo.name}(${variableName}: ${typeInfo.name}) {\n`;
+
+    for (const property of typeInfo.metadata.propertiesThatAreDates) {
+      output += `${variableName}.${property.name} = new Date(${variableName}.${property.name});\n`;
+    }
+
+    for (const property of typeInfo.metadata.propertiesThatContainDates) {
+      output += this.renderPostProcessInvocation({
+        typeInfo: property.typeInfo,
+        verboseType: property.verboseType,
+        variableName: `${variableName}.${property.name}`,
+      });
+
+      output += '\n\n';
+    }
+
+    output += '}\n\n';
+
+    return output;
+  }
+
+  renderPostProcessInvocation({ typeInfo, verboseType, variableName }) {
+    let output = '';
+
+    if (verboseType.type === 'array') {
+      const elementName = lowercaseFirstLetter(typeInfo.name);
+      output += `for (const ${elementName} of ${variableName}) {\n`;
+      output += `  this.#postProcess${typeInfo.name}(${elementName});\n`;
+      output += '}';
+    } else {
+      output += `this.#postProcess${typeInfo.name}(${variableName});`;
+    }
+
+    return output;
+  }
+
   renderOperation(operation) {
     let output = '';
 
@@ -663,7 +980,7 @@ class ModelRenderer {
       output += this.renderJsdoc(operation.jsdoc);
     }
 
-    output += `${lowercaseFirstLetter(operation.operationId)}(${this.renderParams(operation.allParams, operation.body)}): Promise<${operation.returnType}> {\n`;
+    output += `${operation.hasDates ? 'async ' : ''}${lowercaseFirstLetter(operation.operationId)}(${this.renderParams(operation.allParams, operation.body)}): Promise<${operation.returnType.resolvedType}> {\n`;
 
     if (operation.allParams) {
       for (const param of operation.allParams) {
@@ -733,10 +1050,14 @@ class ModelRenderer {
         "const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';\n\n";
     }
 
-    output += 'return this.fetch';
+    if (operation.hasDates) {
+      output += 'const json = await this.fetch';
+    } else {
+      output += 'return this.fetch';
+    }
 
-    if (operation.returnType !== 'void') {
-      output += `<${operation.returnType}>`;
+    if (operation.returnType.resolvedType !== 'void') {
+      output += `<${operation.returnType.resolvedType}>`;
     }
 
     const templatedPath = operation.rawPath
@@ -785,6 +1106,20 @@ class ModelRenderer {
       output += '});';
     } else {
       output += '`, options);';
+    }
+
+    if (operation.hasDates) {
+      output += '\n\n';
+
+      output += this.renderPostProcessInvocation({
+        typeInfo: operation.typeInfo,
+        verboseType: operation.returnType,
+        variableName: 'json',
+      });
+
+      output += '\n\n';
+
+      output += `return json;\n`;
     }
 
     output += '}\n\n';

@@ -155,9 +155,21 @@ const models: TsoaRoute.Models = {
   Inventory: {
     dataType: 'refObject',
     properties: {
-      Adopted: { dataType: 'integer', required: true },
-      Available: { dataType: 'integer', required: true },
-      Pending: { dataType: 'integer', required: true },
+      Adopted: {
+        dataType: 'array',
+        array: { dataType: 'refObject', ref: 'Pet' },
+        required: true,
+      },
+      Available: {
+        dataType: 'array',
+        array: { dataType: 'refObject', ref: 'Pet' },
+        required: true,
+      },
+      Pending: {
+        dataType: 'array',
+        array: { dataType: 'refObject', ref: 'Pet' },
+        required: true,
+      },
     },
     additionalProperties: false,
   },

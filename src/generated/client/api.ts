@@ -3,12 +3,12 @@
 import { type Options, ClientAPIBase } from '../../client-base.js';
 
 /**
- * The pet's animal kind.
+ * The adoption request's status.
  */
-export enum AnimalKind {
-  Cat = 'Cat',
-  Dog = 'Dog',
-  Parrot = 'Parrot',
+export enum AdoptionRequestStatus {
+  Approved = 'Approved',
+  Pending = 'Pending',
+  Denied = 'Denied',
 }
 
 /**
@@ -21,12 +21,12 @@ export enum AdoptionStatus {
 }
 
 /**
- * The adoption request's status.
+ * The pet's animal kind.
  */
-export enum AdoptionRequestStatus {
-  Approved = 'Approved',
-  Pending = 'Pending',
-  Denied = 'Denied',
+export enum AnimalKind {
+  Cat = 'Cat',
+  Dog = 'Dog',
+  Parrot = 'Parrot',
 }
 
 /**
@@ -37,21 +37,6 @@ export enum AdoptionRequestStatus {
  * @example "7312cc99-f99f-445e-a939-eb66c0c6724c"
  */
 export type UUID = string;
-
-export interface ProblemDetails {
-  type?: string;
-
-  title?: string;
-
-  /**
-   * @format int32
-   */
-  status?: number;
-
-  detail?: string;
-
-  instance?: string;
-}
 
 /**
  * Pet characteristics.
@@ -105,7 +90,7 @@ export interface Pet {
    * @format date
    * @example "2024-09-07T21:00:00.000Z"
    */
-  addedDate: string;
+  addedDate: Date;
 
   /**
    * Pet's adoption status in the store.
@@ -114,39 +99,102 @@ export interface Pet {
   status: AdoptionStatus;
 
   /**
-* The pet's tags.
-* @example [
-  "cat",
-  "orange"
-]
-*/
+   * The pet's tags.
+   * @example [
+   *   "cat",
+   *   "orange"
+   * ]
+   */
   tags: string[];
 }
 
 /**
- * Inventory of adoption status to quantities.
+ * Inventory of adoption status to array of AdoptionRequests.
  */
 export interface Inventory {
   /**
-   * The number of pets that were adopted.
-   * @format int32
-   * @example 3
+   * All pets that were adopted.
+   * @example [
+   *   {
+   *     "id": "90dbbed9-bd3d-40ae-ad1c-86602844d4c1",
+   *     "name": "Kozunak",
+   *     "breed": "Orange Tabby",
+   *     "notes": "Likes to bite a lot.",
+   *     "kind": "Cat",
+   *     "age": 4,
+   *     "healthProblems": false,
+   *     "addedDate": "2020-08-21T00:00:00.000Z",
+   *     "status": "Adopted",
+   *     "tags": [
+   *       "cat",
+   *       "orange"
+   *     ]
+   *   },
+   *   {
+   *     "id": "d4c8d1c2-3928-468f-8e34-b3166a56f9ce",
+   *     "name": "Happy",
+   *     "breed": "European Domestic Cat",
+   *     "notes": "Very annoying.",
+   *     "kind": "Cat",
+   *     "age": 1,
+   *     "healthProblems": false,
+   *     "addedDate": "2023-08-08T00:00:00.000Z",
+   *     "status": "Adopted",
+   *     "tags": [
+   *       "cat",
+   *       "annoying",
+   *       "white"
+   *     ]
+   *   }
+   * ]
    */
-  Adopted: number;
+  Adopted: Pet[];
 
   /**
-   * The number of pets that are available for adoption.
-   * @format int32
-   * @example 1
+   * All pets that are available for adoption.
+   * @example [
+   *   {
+   *     "id": "fe6d2beb-acc3-4d8b-bf05-c8e863462238",
+   *     "name": "Beji",
+   *     "breed": "Cream Tabby",
+   *     "notes": "Likes to fight.",
+   *     "kind": "Cat",
+   *     "age": 2,
+   *     "healthProblems": true,
+   *     "addedDate": "2022-03-01T00:00:00.000Z",
+   *     "status": "Available",
+   *     "tags": [
+   *       "cat",
+   *       "beige",
+   *       "cream"
+   *     ]
+   *   }
+   * ]
    */
-  Available: number;
+  Available: Pet[];
 
   /**
-   * The number of pets that have a pending adoption status.
-   * @format int32
-   * @example 2
+   * All pets that have a pending adoption status.
+   * @example [
+   *   {
+   *     "id": "39ccecc8-9344-49ac-b953-b1b271c089fc",
+   *     "name": "Sr. Shnitz",
+   *     "breed": "Cockatiel",
+   *     "notes": "Likes biscuits!",
+   *     "kind": "Parrot",
+   *     "age": 10,
+   *     "healthProblems": false,
+   *     "addedDate": "2024-08-20T00:00:00.000Z",
+   *     "status": "Pending",
+   *     "tags": [
+   *       "parrot",
+   *       "squeak",
+   *       "mixed colors"
+   *     ]
+   *   }
+   * ]
    */
-  Pending: number;
+  Pending: Pet[];
 }
 
 /**
@@ -170,13 +218,28 @@ export interface AdoptionRequest {
    * @format date-time
    * @example "2024-08-25T00:00:00.000Z"
    */
-  dateOfSubmission: string;
+  dateOfSubmission: Date;
 
   /**
    * The adoption request status.
    * @example "Pending"
    */
   status: AdoptionRequestStatus;
+}
+
+export interface ProblemDetails {
+  type?: string;
+
+  title?: string;
+
+  /**
+   * @format int32
+   */
+  status?: number;
+
+  detail?: string;
+
+  instance?: string;
 }
 
 export class ClientAPI {
@@ -198,8 +261,8 @@ export class PetClientAPI extends ClientAPIBase {
    * @param pet Create a new pet in the store.
    * @summary Add a new pet to the store.
    */
-  createPet(pet: Pet, options?: Options): Promise<Pet> {
-    return this.fetch<Pet>(`/pet`, {
+  async createPet(pet: Pet, options?: Options): Promise<Pet> {
+    const json = await this.fetch<Pet>(`/pet`, {
       method: 'POST',
       body: JSON.stringify(pet),
       headers: {
@@ -207,6 +270,10 @@ export class PetClientAPI extends ClientAPIBase {
       },
       ...options,
     });
+
+    this.#postProcessPet(json);
+
+    return json;
   }
 
   /**
@@ -214,8 +281,8 @@ export class PetClientAPI extends ClientAPIBase {
    * @param pet The pet's information that should be used in the update.
    * @summary Update an existing pet.
    */
-  updatePet(pet: Pet, options?: Options): Promise<Pet> {
-    return this.fetch<Pet>(`/pet`, {
+  async updatePet(pet: Pet, options?: Options): Promise<Pet> {
+    const json = await this.fetch<Pet>(`/pet`, {
       method: 'PUT',
       body: JSON.stringify(pet),
       headers: {
@@ -223,6 +290,10 @@ export class PetClientAPI extends ClientAPIBase {
       },
       ...options,
     });
+
+    this.#postProcessPet(json);
+
+    return json;
   }
 
   /**
@@ -231,7 +302,7 @@ export class PetClientAPI extends ClientAPIBase {
    * @param limit How many records to return.
    * @summary Returns all pets.
    */
-  getAllPets(
+  async getAllPets(
     offset?: number,
     limit?: number,
     options?: Options
@@ -268,7 +339,13 @@ export class PetClientAPI extends ClientAPIBase {
 
     const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
 
-    return this.fetch<Pet[]>(`/pet/all${queryString}`, options);
+    const json = await this.fetch<Pet[]>(`/pet/all${queryString}`, options);
+
+    for (const pet of json) {
+      this.#postProcessPet(pet);
+    }
+
+    return json;
   }
 
   /**
@@ -276,7 +353,10 @@ export class PetClientAPI extends ClientAPIBase {
    * @param status The adoption status.
    * @summary Finds Pets by status.
    */
-  getPetsByStatus(status: AdoptionStatus, options?: Options): Promise<Pet[]> {
+  async getPetsByStatus(
+    status: AdoptionStatus,
+    options?: Options
+  ): Promise<Pet[]> {
     this.validateParam(status, {
       name: 'status',
       required: true,
@@ -296,7 +376,16 @@ export class PetClientAPI extends ClientAPIBase {
 
     const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
 
-    return this.fetch<Pet[]>(`/pet/findByStatus${queryString}`, options);
+    const json = await this.fetch<Pet[]>(
+      `/pet/findByStatus${queryString}`,
+      options
+    );
+
+    for (const pet of json) {
+      this.#postProcessPet(pet);
+    }
+
+    return json;
   }
 
   /**
@@ -304,7 +393,7 @@ export class PetClientAPI extends ClientAPIBase {
    * @param kinds The set of kinds of pet.
    * @summary Finds Pets by set of kinds.
    */
-  getPetsByKind(kinds: AnimalKind[], options?: Options): Promise<Pet[]> {
+  async getPetsByKind(kinds: AnimalKind[], options?: Options): Promise<Pet[]> {
     this.validateParamArray(kinds, {
       name: 'kinds',
       required: true,
@@ -324,7 +413,16 @@ export class PetClientAPI extends ClientAPIBase {
 
     const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
 
-    return this.fetch<Pet[]>(`/pet/findByKinds${queryString}`, options);
+    const json = await this.fetch<Pet[]>(
+      `/pet/findByKinds${queryString}`,
+      options
+    );
+
+    for (const pet of json) {
+      this.#postProcessPet(pet);
+    }
+
+    return json;
   }
 
   /**
@@ -332,7 +430,7 @@ export class PetClientAPI extends ClientAPIBase {
    * @param tags The tags to filter by.
    * @summary Finds Pets by tags.
    */
-  getPetsByTags(tags: string[], options?: Options): Promise<Pet[]> {
+  async getPetsByTags(tags: string[], options?: Options): Promise<Pet[]> {
     this.validateParamArray(tags, {
       name: 'tags',
       required: true,
@@ -351,7 +449,16 @@ export class PetClientAPI extends ClientAPIBase {
 
     const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
 
-    return this.fetch<Pet[]>(`/pet/findByTags${queryString}`, options);
+    const json = await this.fetch<Pet[]>(
+      `/pet/findByTags${queryString}`,
+      options
+    );
+
+    for (const pet of json) {
+      this.#postProcessPet(pet);
+    }
+
+    return json;
   }
 
   /**
@@ -359,26 +466,35 @@ export class PetClientAPI extends ClientAPIBase {
    * @param afterDate The date to filter by.
    * @summary Finds Pets by added date.
    */
-  getPetsByDate(afterDate: string, options?: Options): Promise<Pet[]> {
+  async getPetsByDate(afterDate: Date, options?: Options): Promise<Pet[]> {
     this.validateParam(afterDate, {
       name: 'afterDate',
       required: true,
       paramType: 'query',
-      type: 'string',
+      type: 'Date',
     });
 
     const urlParams = new URLSearchParams();
 
     this.appendUrlParam(urlParams, afterDate, {
       name: 'afterDate',
-      type: 'string',
+      type: 'Date',
     });
 
     const urlParamsString = urlParams.toString();
 
     const queryString = urlParamsString.length > 0 ? `?${urlParamsString}` : '';
 
-    return this.fetch<Pet[]>(`/pet/findByDate${queryString}`, options);
+    const json = await this.fetch<Pet[]>(
+      `/pet/findByDate${queryString}`,
+      options
+    );
+
+    for (const pet of json) {
+      this.#postProcessPet(pet);
+    }
+
+    return json;
   }
 
   /**
@@ -386,7 +502,7 @@ export class PetClientAPI extends ClientAPIBase {
    * @param petId The pet's id.
    * @summary Find pet by ID.
    */
-  getPet(petId: UUID, options?: Options): Promise<Pet> {
+  async getPet(petId: UUID, options?: Options): Promise<Pet> {
     this.validateParam(petId, {
       name: 'petId',
       required: true,
@@ -396,7 +512,14 @@ export class PetClientAPI extends ClientAPIBase {
         '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}',
     });
 
-    return this.fetch<Pet>(`/pet/${encodeURIComponent(petId)}`, options);
+    const json = await this.fetch<Pet>(
+      `/pet/${encodeURIComponent(petId)}`,
+      options
+    );
+
+    this.#postProcessPet(json);
+
+    return json;
   }
 
   /**
@@ -419,6 +542,10 @@ export class PetClientAPI extends ClientAPIBase {
       ...options,
     });
   }
+
+  #postProcessPet(pet: Pet) {
+    pet.addedDate = new Date(pet.addedDate);
+  }
 }
 
 /**
@@ -426,11 +553,15 @@ export class PetClientAPI extends ClientAPIBase {
  */
 export class StoreClientAPI extends ClientAPIBase {
   /**
-   * Returns a map of adoption status to quantities.
+   * Returns a map of adoption status to array of pets.
    * @summary Returns pet inventories by adoption status.
    */
-  getInventory(options?: Options): Promise<Inventory> {
-    return this.fetch<Inventory>(`/store/inventory`, options);
+  async getInventory(options?: Options): Promise<Inventory> {
+    const json = await this.fetch<Inventory>(`/store/inventory`, options);
+
+    this.#postProcessInventory(json);
+
+    return json;
   }
 
   /**
@@ -438,11 +569,11 @@ export class StoreClientAPI extends ClientAPIBase {
    * @param adoptionRequest The adoption request.
    * @summary Request an adoption of a pet.
    */
-  adoptPet(
+  async adoptPet(
     adoptionRequest: AdoptionRequest,
     options?: Options
   ): Promise<AdoptionRequest> {
-    return this.fetch<AdoptionRequest>(`/store/adopt`, {
+    const json = await this.fetch<AdoptionRequest>(`/store/adopt`, {
       method: 'POST',
       body: JSON.stringify(adoptionRequest),
       headers: {
@@ -450,6 +581,10 @@ export class StoreClientAPI extends ClientAPIBase {
       },
       ...options,
     });
+
+    this.#postProcessAdoptionRequest(json);
+
+    return json;
   }
 
   /**
@@ -457,7 +592,7 @@ export class StoreClientAPI extends ClientAPIBase {
    * @param requestId The adoption request's ID.
    * @summary Find adoption request by ID.
    */
-  getAdoptRequestById(
+  async getAdoptRequestById(
     requestId: UUID,
     options?: Options
   ): Promise<AdoptionRequest> {
@@ -470,10 +605,14 @@ export class StoreClientAPI extends ClientAPIBase {
         '[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}',
     });
 
-    return this.fetch<AdoptionRequest>(
+    const json = await this.fetch<AdoptionRequest>(
       `/store/adopt/${encodeURIComponent(requestId)}`,
       options
     );
+
+    this.#postProcessAdoptionRequest(json);
+
+    return json;
   }
 
   /**
@@ -495,5 +634,29 @@ export class StoreClientAPI extends ClientAPIBase {
       method: 'DELETE',
       ...options,
     });
+  }
+
+  #postProcessInventory(inventory: Inventory) {
+    for (const pet of inventory.Adopted) {
+      this.#postProcessPet(pet);
+    }
+
+    for (const pet of inventory.Available) {
+      this.#postProcessPet(pet);
+    }
+
+    for (const pet of inventory.Pending) {
+      this.#postProcessPet(pet);
+    }
+  }
+
+  #postProcessPet(pet: Pet) {
+    pet.addedDate = new Date(pet.addedDate);
+  }
+
+  #postProcessAdoptionRequest(adoptionRequest: AdoptionRequest) {
+    adoptionRequest.dateOfSubmission = new Date(
+      adoptionRequest.dateOfSubmission
+    );
   }
 }

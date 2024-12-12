@@ -13,14 +13,74 @@ import {
   Tags,
 } from 'tsoa';
 
+import type { Pet } from '~routes/pet.js';
 import { state } from '~state.js';
 import { BaseController, type ProblemDetails } from '~utils.js';
 
 import {
   AdoptionRequestStatus,
+  AdoptionStatus,
+  AnimalKind,
   type ExpressRequestWithUser,
   type UUID,
 } from './server-types.js';
+
+const ADOPTED_PETS_EXAMPLE = [
+  {
+    id: '90dbbed9-bd3d-40ae-ad1c-86602844d4c1',
+    name: 'Kozunak',
+    breed: 'Orange Tabby',
+    notes: 'Likes to bite a lot.',
+    kind: AnimalKind.Cat,
+    age: 4,
+    healthProblems: false,
+    addedDate: new Date('2020-08-21'),
+    status: AdoptionStatus.Adopted,
+    tags: ['cat', 'orange'],
+  },
+  {
+    id: 'd4c8d1c2-3928-468f-8e34-b3166a56f9ce',
+    name: 'Happy',
+    breed: 'European Domestic Cat',
+    notes: 'Very annoying.',
+    kind: AnimalKind.Cat,
+    age: 1,
+    healthProblems: false,
+    addedDate: new Date('2023-08-08'),
+    status: AdoptionStatus.Adopted,
+    tags: ['cat', 'annoying', 'white'],
+  },
+];
+
+const PENDING_PETS_EXAMPLE = [
+  {
+    id: '39ccecc8-9344-49ac-b953-b1b271c089fc',
+    name: 'Sr. Shnitz',
+    breed: 'Cockatiel',
+    notes: 'Likes biscuits!',
+    kind: AnimalKind.Parrot,
+    age: 10,
+    healthProblems: false,
+    addedDate: new Date('2024-08-20'),
+    status: AdoptionStatus.Pending,
+    tags: ['parrot', 'squeak', 'mixed colors'],
+  },
+];
+
+const AVAILABLE_PETS_EXAMPLE = [
+  {
+    id: 'fe6d2beb-acc3-4d8b-bf05-c8e863462238',
+    name: 'Beji',
+    breed: 'Cream Tabby',
+    notes: 'Likes to fight.',
+    kind: AnimalKind.Cat,
+    age: 2,
+    healthProblems: true,
+    addedDate: new Date('2022-03-01'),
+    status: AdoptionStatus.Available,
+    tags: ['cat', 'beige', 'cream'],
+  },
+];
 
 /**
  * Adoption request information.
@@ -53,29 +113,26 @@ export class AdoptionRequest {
 }
 
 /**
- * Inventory of adoption status to quantities.
+ * Inventory of adoption status to array of AdoptionRequests.
  */
 export class Inventory {
   /**
-   * The number of pets that were adopted.
-   * @isInt
+   * All pets that were adopted.
    */
-  @Example<number>(3)
-  Adopted!: number;
+  @Example<Pet[]>(ADOPTED_PETS_EXAMPLE)
+  Adopted!: Pet[];
 
   /**
-   * The number of pets that are available for adoption.
-   * @isInt
+   * All pets that are available for adoption.
    */
-  @Example<number>(1)
-  Available!: number;
+  @Example<Pet[]>(AVAILABLE_PETS_EXAMPLE)
+  Available!: Pet[];
 
   /**
-   * The number of pets that have a pending adoption status.
-   * @isInt
+   * All pets that have a pending adoption status.
    */
-  @Example<number>(2)
-  Pending!: number;
+  @Example<Pet[]>(PENDING_PETS_EXAMPLE)
+  Pending!: Pet[];
 }
 
 @Route('store')
@@ -88,7 +145,7 @@ export class Inventory {
 })
 export class StoreController extends BaseController {
   /**
-   * Returns a map of adoption status to quantities.
+   * Returns a map of adoption status to array of pets.
    * @param _request The express request.
    * @summary        Returns pet inventories by adoption status.
    * @returns        Successful retrieval of inventory.
@@ -96,14 +153,16 @@ export class StoreController extends BaseController {
   @Get('inventory')
   getInventory(@Request() _request: ExpressRequestWithUser): Inventory {
     const inventory: Inventory = {
-      Adopted: 0,
-      Available: 0,
-      Pending: 0,
+      Adopted: state.pets.filter(
+        (pet) => pet.status === AdoptionStatus.Adopted
+      ),
+      Available: state.pets.filter(
+        (pet) => pet.status === AdoptionStatus.Available
+      ),
+      Pending: state.pets.filter(
+        (pet) => pet.status === AdoptionStatus.Pending
+      ),
     };
-
-    for (const pet of state.pets) {
-      inventory[pet.status] += 1;
-    }
 
     return inventory;
   }
