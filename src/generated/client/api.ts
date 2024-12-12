@@ -543,7 +543,9 @@ export class PetClientAPI extends ClientAPIBase {
     });
   }
 
-  #postProcessPet(pet: Pet) {}
+  #postProcessPet(pet: Pet) {
+    pet.addedDate = new Date(pet.addedDate);
+  }
 }
 
 /**
@@ -634,7 +636,27 @@ export class StoreClientAPI extends ClientAPIBase {
     });
   }
 
-  #postProcessInventory(inventory: Inventory) {}
+  #postProcessInventory(inventory: Inventory) {
+    for (const pet of inventory.Adopted) {
+      this.#postProcessPet(pet);
+    }
 
-  #postProcessAdoptionRequest(adoptionRequest: AdoptionRequest) {}
+    for (const pet of inventory.Available) {
+      this.#postProcessPet(pet);
+    }
+
+    for (const pet of inventory.Pending) {
+      this.#postProcessPet(pet);
+    }
+  }
+
+  #postProcessPet(pet: Pet) {
+    pet.addedDate = new Date(pet.addedDate);
+  }
+
+  #postProcessAdoptionRequest(adoptionRequest: AdoptionRequest) {
+    adoptionRequest.dateOfSubmission = new Date(
+      adoptionRequest.dateOfSubmission
+    );
+  }
 }

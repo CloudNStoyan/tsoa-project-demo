@@ -129,6 +129,11 @@ class TypescriptModel {
 
     this.operations = this.generateOperations(swaggerDocument);
     this.tags = this.generateOperationTags(swaggerDocument);
+
+    this.apis = this.generateApis({
+      operations: this.operations,
+      tags: this.tags,
+    });
   }
 
   responseSchemaIsInlineObject(schema) {
@@ -163,6 +168,16 @@ class TypescriptModel {
     }
   }
 
+  unwrapVerboseType(verboseType) {
+    let unwrappedType = verboseType;
+
+    while (unwrappedType.type === 'array') {
+      unwrappedType = unwrappedType.itemType;
+    }
+
+    return unwrappedType;
+  }
+
   generateReturnType(responses) {
     if (responses['204'] && !responses['200']) {
       return { resolvedType: 'void', type: 'literal' };
@@ -190,6 +205,57 @@ class TypescriptModel {
     );
   }
 
+  generatePostprocessMetadata(operations) {
+    const traverseTypeInfo = ({ typeInfo, postProcessingMap }) => {
+      if (postProcessingMap.has(typeInfo.name)) {
+        return;
+      }
+
+      postProcessingMap.set(typeInfo.name, typeInfo);
+
+      for (const property of typeInfo.metadata.propertiesThatContainDates) {
+        if (!postProcessingMap.has(property.typeInfo.name)) {
+          postProcessingMap.set(property.typeInfo.name, property.typeInfo);
+        }
+      }
+    };
+
+    const typesThatNeedPostProcessingMap = new Map();
+
+    for (const operation of operations) {
+      if (!operation.hasDates) {
+        continue;
+      }
+
+      traverseTypeInfo({
+        typeInfo: operation.typeInfo,
+        postProcessingMap: typesThatNeedPostProcessingMap,
+      });
+    }
+
+    return typesThatNeedPostProcessingMap.values();
+  }
+
+  generateApis({ operations, tags }) {
+    const apis = [];
+
+    for (const tag of tags) {
+      const api = {
+        name: tag.name,
+        jsdoc: tag.jsdoc,
+        operations: operations.filter((op) => op.tags.includes(tag.name)),
+      };
+
+      api.typesThatNeedPostProcessing = this.generatePostprocessMetadata(
+        api.operations
+      );
+
+      apis.push(api);
+    }
+
+    return apis;
+  }
+
   generateOperations(swaggerDocument) {
     const paths = swaggerDocument.paths;
 
@@ -211,17 +277,17 @@ class TypescriptModel {
           hasDates: false,
         };
 
-        let unwrappedType = operation.returnType;
-        while (unwrappedType.type === 'array') {
-          unwrappedType = unwrappedType.itemType;
-        }
+        const unwrappedType = this.unwrapVerboseType(operation.returnType);
 
         if (unwrappedType.type === 'object') {
           const typeInfo = this.typesRegistry.get(unwrappedType.resolvedType);
 
           operation.typeInfo = typeInfo;
 
-          if (typeInfo.metadata?.propertiesWithDates?.length > 0) {
+          if (
+            typeInfo.metadata?.propertiesThatAreDates?.length > 0 ||
+            typeInfo.metadata.propertiesThatContainDates?.length > 0
+          ) {
             operation.hasDates = true;
           }
         }
@@ -595,7 +661,8 @@ class TypescriptModel {
 
     const tsProperties = [];
 
-    const propertiesWithDates = [];
+    const propertiesThatAreDates = [];
+    const propertiesThatContainDates = [];
 
     for (const [propertyName, propertyData] of openapiProperties) {
       const tsProperty = {
@@ -609,26 +676,24 @@ class TypescriptModel {
       tsProperty.resolvedType = propertyVerboseType.resolvedType;
       tsProperty.verboseType = propertyVerboseType;
 
-      let unwrappedType = propertyVerboseType;
-      if (unwrappedType.type === 'array') {
-        while (unwrappedType.type === 'array') {
-          unwrappedType = unwrappedType.itemType;
-        }
-      }
+      const unwrappedType = this.unwrapVerboseType(propertyVerboseType);
 
       if (unwrappedType.type === 'object') {
         const typeInfo = this.typesRegistry.get(unwrappedType.resolvedType);
 
+        tsProperty.typeInfo = typeInfo;
+
         if (
-          Array.isArray(typeInfo.metadata?.propertiesWithDates) &&
-          typeInfo.metadata.propertiesWithDates.length > 0
+          typeInfo.metadata &&
+          (typeInfo.metadata.propertiesThatAreDates.length > 0 ||
+            typeInfo.metadata.propertiesThatContainDates.length > 0)
         ) {
-          propertiesWithDates.push(tsProperty);
+          propertiesThatContainDates.push(tsProperty);
         }
       }
 
       if (tsProperty.resolvedType === 'Date') {
-        propertiesWithDates.push(tsProperty);
+        propertiesThatAreDates.push(tsProperty);
       }
 
       tsProperties.push(tsProperty);
@@ -637,7 +702,8 @@ class TypescriptModel {
     tsInterface.properties = tsProperties;
 
     tsInterface.metadata = {
-      propertiesWithDates,
+      propertiesThatAreDates,
+      propertiesThatContainDates,
     };
 
     this.typesRegistry.set(interfaceName, tsInterface);
@@ -774,38 +840,18 @@ class ModelRenderer {
   renderApis() {
     let output = '';
 
-    for (const tag of this.model.tags) {
-      if (tag.jsdoc) {
-        output += this.renderJsdoc(tag.jsdoc);
+    for (const api of this.model.apis) {
+      if (api.jsdoc) {
+        output += this.renderJsdoc(api.jsdoc);
       }
 
-      output += `export class ${uppercaseFirstLetter(tag.name)}ClientAPI extends ClientAPIBase {\n`;
+      output += `export class ${uppercaseFirstLetter(api.name)}ClientAPI extends ClientAPIBase {\n`;
 
-      const tagOperations = this.model.operations.filter((op) =>
-        op.tags.includes(tag.name)
-      );
-
-      const typesThatNeedPostProcessingMap = new Map();
-
-      for (const operation of tagOperations) {
-        if (
-          operation.hasDates &&
-          !typesThatNeedPostProcessingMap.has(operation.typeInfo.name)
-        ) {
-          typesThatNeedPostProcessingMap.set(
-            operation.typeInfo.name,
-            operation.typeInfo
-          );
-        }
-
+      for (const operation of api.operations) {
         output += this.renderOperation(operation);
       }
 
-      const typesThatNeedPostProcessing = Array.from(
-        typesThatNeedPostProcessingMap.values()
-      );
-
-      for (const typeInfo of typesThatNeedPostProcessing) {
+      for (const typeInfo of api.typesThatNeedPostProcessing) {
         output += this.renderPostProcess(typeInfo);
       }
 
@@ -891,23 +937,37 @@ class ModelRenderer {
 
     const variableName = lowercaseFirstLetter(typeInfo.name);
 
-    output += `#postProcess${typeInfo.name}(${variableName}: ${typeInfo.name}){}\n\n`;
+    output += `#postProcess${typeInfo.name}(${variableName}: ${typeInfo.name}) {\n`;
+
+    for (const property of typeInfo.metadata.propertiesThatAreDates) {
+      output += `${variableName}.${property.name} = new Date(${variableName}.${property.name});\n`;
+    }
+
+    for (const property of typeInfo.metadata.propertiesThatContainDates) {
+      output += this.renderPostProcessInvocation({
+        typeInfo: property.typeInfo,
+        verboseType: property.verboseType,
+        variableName: `${variableName}.${property.name}`,
+      });
+
+      output += '\n\n';
+    }
+
+    output += '}\n\n';
 
     return output;
   }
 
-  renderPostProcessInvocation(operation) {
+  renderPostProcessInvocation({ typeInfo, verboseType, variableName }) {
     let output = '';
 
-    const typeInfo = operation.typeInfo;
-
-    if (operation.returnType.type === 'array') {
+    if (verboseType.type === 'array') {
       const elementName = lowercaseFirstLetter(typeInfo.name);
-      output += `for (const ${elementName} of json) {\n`;
+      output += `for (const ${elementName} of ${variableName}) {\n`;
       output += `  this.#postProcess${typeInfo.name}(${elementName});\n`;
       output += '}';
     } else {
-      output += `this.#postProcess${typeInfo.name}(json);`;
+      output += `this.#postProcess${typeInfo.name}(${variableName});`;
     }
 
     return output;
@@ -1051,7 +1111,11 @@ class ModelRenderer {
     if (operation.hasDates) {
       output += '\n\n';
 
-      output += this.renderPostProcessInvocation(operation);
+      output += this.renderPostProcessInvocation({
+        typeInfo: operation.typeInfo,
+        verboseType: operation.returnType,
+        variableName: 'json',
+      });
 
       output += '\n\n';
 
