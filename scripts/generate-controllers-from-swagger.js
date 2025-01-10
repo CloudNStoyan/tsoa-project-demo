@@ -1006,7 +1006,7 @@ class DotNetModel {
 
       const controller = {
         name: tag.name,
-        xmlObject: tag.xmlObject,
+        xmlObject: {},
         operations: tagOperations,
         attributes: ['[ApiController]', '[Route("[controller]")]'],
         imports: [
@@ -1049,6 +1049,8 @@ class DotNetModel {
         '[ProducesResponseType(StatusCodes.Status200OK)]',
       ];
 
+      const possibleCommonResponsesMap = new Map();
+
       for (const operation of controller.operations) {
         for (const attr of operation.attributes) {
           for (const possibleCommonAttr of possibleCommonAttributes) {
@@ -1062,6 +1064,21 @@ class DotNetModel {
             }
           }
         }
+
+        for (const response of operation.xmlObject.responses) {
+          if (!possibleCommonResponsesMap.has(response.code)) {
+            possibleCommonResponsesMap.set(response.code, {
+              response,
+              count: 0,
+            });
+          }
+
+          const data = possibleCommonResponsesMap.get(response.code);
+
+          data.count += 1;
+
+          possibleCommonResponsesMap.set(response.code, data);
+        }
       }
 
       const commonAttributes = Array.from(commonAttributesMap)
@@ -1074,6 +1091,38 @@ class DotNetModel {
         for (const operation of controller.operations) {
           operation.attributes = operation.attributes.filter(
             (attr) => !commonAttributes.includes(attr)
+          );
+        }
+      }
+
+      const commonResponses = Array.from(possibleCommonResponsesMap)
+        .filter(([_code, data]) => data.count === controller.operations.length)
+        .map(([_code, data]) => data.response);
+
+      const commonResponsesMap = new Map();
+
+      for (const response of commonResponses) {
+        commonResponsesMap.set(response.code, response);
+      }
+
+      if (commonResponses.length > 0) {
+        if (!Array.isArray(controller.xmlObject.responses)) {
+          controller.xmlObject.responses = [];
+        }
+
+        controller.xmlObject.responses = [
+          ...controller.xmlObject.responses,
+          ...commonResponses,
+        ];
+
+        for (const operation of controller.operations) {
+          operation.xmlObject.responses = operation.xmlObject.responses.filter(
+            (response) =>
+              !(
+                commonResponsesMap.has(response.code) &&
+                commonResponsesMap.get(response.code).description ===
+                  response.description
+              )
           );
         }
       }
@@ -1578,8 +1627,14 @@ class RenderController {
 
     output += `namespace ${this.#rootNamespace}.Generated.Controllers;\n\n`;
 
-    output += controller.attributes.join('\n');
-    output += '\n';
+    output += this.renderXml({
+      xmlObject: controller.xmlObject,
+      indentation: 0,
+    });
+    output += this.renderAttributes({
+      attributes: controller.attributes,
+      indentation: 0,
+    });
     output += `public class ${controller.name}Controller : ControllerBase\n`;
     output += '{\n';
 

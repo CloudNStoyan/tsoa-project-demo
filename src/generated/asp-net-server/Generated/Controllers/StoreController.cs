@@ -7,6 +7,7 @@ using AspNetServer.Generated.Models;
 
 namespace AspNetServer.Generated.Controllers;
 
+/// <response code="401">Unauthorized</response>
 [Authorize]
 [ApiController]
 [Route("[controller]")]
@@ -19,7 +20,6 @@ public class StoreController : ControllerBase
   /// </summary>
   /// <remarks>Returns a map of adoption status to quantities.</remarks>
   /// <response code="200">Successful retrieval of inventory.</response>
-  /// <response code="401">Unauthorized</response>
   [HttpGet("inventory")]
   [ProducesResponseType(StatusCodes.Status200OK)]
   [SwaggerResponseExample(StatusCodes.Status200OK, typeof(InventoryExample))]
@@ -34,7 +34,6 @@ public class StoreController : ControllerBase
   /// <remarks>Place an adoption request for a pet.</remarks>
   /// <param name="adoptionRequest">The adoption request.</param>
   /// <response code="200">Successful creation of adoption request.</response>
-  /// <response code="401">Unauthorized</response>
   [HttpPost("adopt")]
   [ProducesResponseType(StatusCodes.Status200OK)]
   [SwaggerResponseExample(StatusCodes.Status200OK, typeof(AdoptionRequestExample))]
@@ -49,7 +48,6 @@ public class StoreController : ControllerBase
   /// <remarks>Find adoption request by ID.</remarks>
   /// <param name="requestId" example="7312cc99-f99f-445e-a939-eb66c0c6724c">The adoption request's ID.</param>
   /// <response code="200">Successful retrieval of adoption request.</response>
-  /// <response code="401">Unauthorized</response>
   /// <response code="404">Not Found</response>
   [HttpGet("adopt/{requestId}")]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -67,7 +65,6 @@ public class StoreController : ControllerBase
   /// <remarks>Delete adoption request by ID.</remarks>
   /// <param name="requestId" example="7312cc99-f99f-445e-a939-eb66c0c6724c">The adoption request's ID.</param>
   /// <response code="204">No Content</response>
-  /// <response code="401">Unauthorized</response>
   /// <response code="404">Not Found</response>
   [HttpDelete("adopt/{requestId}")]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
